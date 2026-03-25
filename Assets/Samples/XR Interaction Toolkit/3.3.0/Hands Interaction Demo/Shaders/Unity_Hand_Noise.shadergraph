@@ -726,8 +726,8 @@
     "m_ObjectId": "0e5697e9fd8f4c788e50c99b8512a636",
     "m_Title": "Edge Highlight Fresnel Shading",
     "m_Position": {
-        "x": -327.9999694824219,
-        "y": 99.0
+        "x": -328.0,
+        "y": 98.99995422363281
     }
 }
 
@@ -2592,8 +2592,8 @@
     "m_ObjectId": "aff23e113c9b4ed393c693fa57a3ae64",
     "m_Title": "Wrist Fade Out",
     "m_Position": {
-        "x": -309.9999694824219,
-        "y": 673.0000610351563
+        "x": -310.0000305175781,
+        "y": 673.0
     }
 }
 
@@ -3577,7 +3577,7 @@
     "m_Title": "Finger Highlights",
     "m_Position": {
         "x": -579.0,
-        "y": -427.0000305175781
+        "y": -427.00006103515627
     }
 }
 
