@@ -4,29 +4,28 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class TriggerSpawnerManager : MonoBehaviour {
-    [SerializeField] Transform _objectToSpawn;
+    [SerializeField] Transform _worldAnchor;
     [SerializeField] Transform _previewObject;
+    [SerializeField] Transform _objectToSpawn;
     [SerializeField] EnvironmentRaycastManager _raycastManager;
     [SerializeField] Transform _controllerOrigin;
-    [SerializeField] InputActionReference _spawnInput;
     [SerializeField] LineRenderer _lineRenderer;
-
+    [SerializeField] InputActionProperty _spawnInput;
     private void Update() {
         var sceneRay = new Ray(_controllerOrigin.position, _controllerOrigin.forward);
         var rayHit = _raycastManager.Raycast(sceneRay, out var hit) || hit.status == EnvironmentRaycastHitStatus.HitPointOccluded;
-        var hasNormal = hit.normalConfidence > 0f;
 
         _previewObject.gameObject.SetActive(rayHit);
         if (rayHit) {
             _previewObject.position = hit.point;
-            if(hasNormal)
-                _previewObject.rotation = Quaternion.LookRotation(hit.normal);
+            //var worldUp = _worldAnchor.rotation * Vector3.up;
+            _previewObject.rotation = Quaternion.LookRotation(hit.normal);
         }
 
         DrawRay(sceneRay, rayHit ? hit : null);
 
         if (rayHit && _spawnInput.action.WasPerformedThisFrame()) { 
-            Instantiate(_objectToSpawn, _previewObject.position, _previewObject.rotation);
+            Instantiate(_objectToSpawn, _previewObject.position, _previewObject.rotation, _worldAnchor);
         }
     }
 
