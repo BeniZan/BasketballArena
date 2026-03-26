@@ -6446,13 +6446,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 991393285}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1308387971}
-  m_Father: {fileID: 1120537362}
+  m_Father: {fileID: 1811956807}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &991853619
 GameObject:
@@ -7043,7 +7043,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 870991025}
-  - {fileID: 991393286}
   - {fileID: 1259128969}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7060,7 +7059,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TriggerSpawnerManager
   _worldAnchor: {fileID: 1811956807}
-  _previewObject: {fileID: 3109268365859041735, guid: acf0fc9f50d3275419d8ac43b5024624, type: 3}
+  _previewObject: {fileID: 991393286}
   _objectToSpawn: {fileID: 3109268365859041735, guid: 31ae2753185c70b4c98f502f6158202c, type: 3}
   _raycastManager: {fileID: 163853356}
   _controllerOrigin: {fileID: 2073830517}
@@ -10889,7 +10888,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 991393286}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1815736918
@@ -12753,11 +12753,11 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 633011727}
   - {fileID: 2026839383}
-  - {fileID: 1811956807}
-  - {fileID: 1120537362}
   - {fileID: 738150047}
   - {fileID: 1197978612}
   - {fileID: 163853358}
   - {fileID: 2012032923}
   - {fileID: 420823487}
   - {fileID: 577599363}
+  - {fileID: 1120537362}
+  - {fileID: 1811956807}

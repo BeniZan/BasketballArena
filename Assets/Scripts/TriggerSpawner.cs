@@ -11,9 +11,14 @@ public class TriggerSpawnerManager : MonoBehaviour {
     [SerializeField] Transform _controllerOrigin;
     [SerializeField] LineRenderer _lineRenderer;
     [SerializeField] InputActionProperty _spawnInput;
+
+    private void Awake() {
+        _spawnInput.action.Enable();
+    }
+
     private void Update() {
         var sceneRay = new Ray(_controllerOrigin.position, _controllerOrigin.forward);
-        var rayHit = _raycastManager.Raycast(sceneRay, out var hit) || hit.status == EnvironmentRaycastHitStatus.HitPointOccluded;
+        var rayHit = _raycastManager.Raycast(sceneRay, out var hit);
 
         _previewObject.gameObject.SetActive(rayHit);
         if (rayHit) {
@@ -22,9 +27,8 @@ public class TriggerSpawnerManager : MonoBehaviour {
             _previewObject.rotation = Quaternion.LookRotation(hit.normal);
         }
 
-        DrawRay(sceneRay, rayHit ? hit : null);
-
-        if (rayHit && _spawnInput.action.WasPerformedThisFrame()) { 
+        DrawRay(sceneRay, rayHit ? hit : null); 
+        if (rayHit && _spawnInput.action.WasPressedThisFrame()) { 
             Instantiate(_objectToSpawn, _previewObject.position, _previewObject.rotation, _worldAnchor);
         }
     }
@@ -40,6 +44,10 @@ public class TriggerSpawnerManager : MonoBehaviour {
         var dest = hit.HasValue ? hit.Value.point : ray.origin + ray.direction * 100f;
         _lineRenderer.SetPosition(1, dest);
         _lineRenderer.startColor = hit.HasValue ? Color.red : Color.green;
+    }
+
+    private void OnDestroy() {
+        _spawnInput.action.Dispose();
     }
 
 }
