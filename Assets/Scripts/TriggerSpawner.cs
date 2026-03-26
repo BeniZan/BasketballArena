@@ -1,9 +1,10 @@
 using Meta.XR;
 using Meta.XR.MRUtilityKit.BuildingBlocks;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class TriggerSpawnerManager : MonoBehaviour {
+public class TriggerSpawner : MonoBehaviour {
     [SerializeField] Transform _worldAnchor;
     [SerializeField] Transform _previewObject;
     [SerializeField] Transform _objectToSpawn;
@@ -11,6 +12,10 @@ public class TriggerSpawnerManager : MonoBehaviour {
     [SerializeField] Transform _controllerOrigin;
     [SerializeField] LineRenderer _lineRenderer;
     [SerializeField] InputActionProperty _spawnInput;
+    [field: SerializeField] public string SpawnerUILabel { get; private set; }
+    public Transform Spawned { get; internal set; }
+
+    public event Action OnSpawned;
 
     private void Awake() {
         _spawnInput.action.Enable();
@@ -23,13 +28,13 @@ public class TriggerSpawnerManager : MonoBehaviour {
         _previewObject.gameObject.SetActive(rayHit);
         if (rayHit) {
             _previewObject.position = hit.point;
-            //var worldUp = _worldAnchor.rotation * Vector3.up;
-            _previewObject.rotation = Quaternion.LookRotation(hit.normal);
+            _previewObject.localRotation = Quaternion.identity;
         }
 
         DrawRay(sceneRay, rayHit ? hit : null); 
-        if (rayHit && _spawnInput.action.WasPressedThisFrame()) { 
-            Instantiate(_objectToSpawn, _previewObject.position, _previewObject.rotation, _worldAnchor);
+        if (rayHit && _spawnInput.action.WasPressedThisFrame()) {
+            Spawned = Instantiate(_objectToSpawn, _previewObject.position, _previewObject.rotation, _worldAnchor);
+            OnSpawned?.Invoke();
         }
     }
 

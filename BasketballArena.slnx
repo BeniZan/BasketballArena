@@ -50,10 +50,12 @@
   <Project Path="Unity.AI.Navigation.Editor.ConversionSystem.csproj" />
   <Project Path="Unity.Burst.CodeGen.csproj" />
   <Project Path="Meta.XR.BuildingBlocks.AIBlocks.csproj" />
+  <Project Path="UtilsAssembly.csproj" />
   <Project Path="Unity.VisualScripting.Flow.csproj" />
   <Project Path="Unity.XR.ARFoundation.csproj" />
   <Project Path="Unity.PerformanceTesting.csproj" />
   <Project Path="Unity.TextMeshPro.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Unity.XR.CompositionLayers.UIInteraction.csproj" />
   <Project Path="Unity.TextMeshPro.Editor.csproj" />
   <Project Path="Unity.XR.CompositionLayers.csproj" />
@@ -83,6 +85,7 @@
   <Project Path="Unity.XR.OpenXR.Editor.csproj" />
   <Project Path="Oculus.Interaction.UnityXR.csproj" />
   <Project Path="Unity.Multiplayer.Center.Common.csproj" />
+  <Project Path="Unity.InternalAPIEngineBridge.003.csproj" />
   <Project Path="Unity.XR.Management.Editor.csproj" />
   <Project Path="Meta.XR.Editor.Notifications.csproj" />
   <Project Path="Unity.XR.OpenXR.Features.MetaQuestSupport.Editor.csproj" />
@@ -100,7 +103,6 @@
   <Project Path="Meta.XR.MultiplayerBlocks.NGO.Editor.csproj" />
   <Project Path="UnityEditor.UI.Analytics.csproj" />
   <Project Path="Meta.XR.EnvironmentDepth.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Meta.XR.Editor.Settings.csproj" />
   <Project Path="Unity.XR.MetaOpenXR.Editor.csproj" />
   <Project Path="Meta.XR.Editor.Id.csproj" />
@@ -122,6 +124,7 @@
   <Project Path="Unity.CollabProxy.Editor.csproj" />
   <Project Path="Oculus.Interaction.Samples.Editor.csproj" />
   <Project Path="Unity.RenderPipeline.Universal.ShaderLibrary.csproj" />
+  <Project Path="UnityUtils.Rendering.csproj" />
   <Project Path="Meta.XR.Editor.Callbacks.csproj" />
   <Project Path="Unity.XR.OpenXR.Features.RuntimeDebugger.csproj" />
   <Project Path="UnityEngine.SpatialTracking.csproj" />
@@ -132,6 +135,7 @@
   <Project Path="Meta.XR.Editor.StatusMenu.csproj" />
   <Project Path="Meta.XR.Editor.ToolingSupport.RuntimeOptimizer.csproj" />
   <Project Path="Unity.InputSystem.DocCodeSamples.csproj" />
+  <Project Path="Sirenix.OdinInspector.Modules.UnityMathematics.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Shaders.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.Shared.csproj" />
   <Project Path="Unity.InternalAPIEngineBridge.004.csproj" />
