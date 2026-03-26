@@ -7,15 +7,11 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
-    guid: 55daccc09a3b69647bbab145b54a3ab3
+    guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
-    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: bfa1182bd221b4ca89619141f66f1260, type: 2}
-    Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: dc5a169419fa04987b057f65238cf3ba, type: 2}
-    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 2e05861145f7f8e4e88f13a9eefcc40a, type: 2}
-    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 6c4f4ab68eb32044aafdc72d793daaad, type: 2}
-    com.unity.input.settings: {fileID: 11400000, guid: f8a442de0c8906f4d9c00184993fc289, type: 2}
-    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 56a98106ce58f09459a9990007b50acb, type: 2}
-    com.unity.xr.magicleap.magic_leap_settings: {fileID: 11400000, guid: 43e231e21fbbf574a9be9d5f1a44b151, type: 2}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 2462f957eee75f940a3393fd6f039795, type: 2}
-    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 136958f90a130274b8b70a31eed352fb, type: 2}
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 3c3864a6990486c4086984e414e69d35, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 0f7eecfa0d973ea4981d58f9993b8187, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 94c7508c7b0e0ef45b36dd58b2231b69, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: e7877b0d07ed8094faf1ce173ce70063, type: 2}
   m_UseUCBPForAssetBundles: 0
