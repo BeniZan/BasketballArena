@@ -12,10 +12,11 @@ public class TriggerSpawner : MonoBehaviour {
     [SerializeField] Transform _controllerOrigin;
     [SerializeField] LineRenderer _lineRenderer;
     [SerializeField] InputActionProperty _spawnInput;
+    [SerializeField] bool _replaceSpawnedObject;
     [field: SerializeField] public string SpawnerUILabel { get; private set; }
     public Transform Spawned { get; internal set; }
 
-    public event Action OnSpawned;
+    public event Action OnSpawned, OnPlaced;
 
     private void Awake() {
         _spawnInput.action.Enable();
@@ -31,12 +32,23 @@ public class TriggerSpawner : MonoBehaviour {
             _previewObject.localRotation = Quaternion.identity;
         }
 
-        DrawRay(sceneRay, rayHit ? hit : null); 
-        if (rayHit && _spawnInput.action.WasPressedThisFrame()) {
-            Spawned = Instantiate(_objectToSpawn, _previewObject.position, _previewObject.rotation, _worldAnchor);
+        DrawRay(sceneRay, rayHit ? hit : null);
+        if (rayHit && _spawnInput.action.WasPressedThisFrame())
+            Spawn();
+    }
+
+    void Spawn() {
+        _previewObject.GetPositionAndRotation(out var pos, out var rot);
+        if ( _replaceSpawnedObject && Spawned) {
+            // use spawned object  
+            Spawned.SetPositionAndRotation(pos, rot);
+        } else {  // always instanties
+            Spawned = Instantiate(_objectToSpawn, pos, rot, _worldAnchor);
             OnSpawned?.Invoke();
         }
+        OnPlaced?.Invoke();
     }
+
 
     void DrawRay(Ray ray, EnvironmentRaycastHit? hit) {  
         var hasHit = hit.HasValue;
