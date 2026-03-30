@@ -7843,6 +7843,7 @@ MonoBehaviour:
         m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 3001919216989983466, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _replaceSpawnedObject: 0
   <SpawnerUILabel>k__BackingField: 
 --- !u!1 &1159304392
 GameObject:
@@ -10044,6 +10045,7 @@ MonoBehaviour:
         m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 3001919216989983466, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _replaceSpawnedObject: 0
   <SpawnerUILabel>k__BackingField: 
 --- !u!1 &1491512149
 GameObject:
@@ -11720,6 +11722,7 @@ MonoBehaviour:
         m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 3001919216989983466, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _replaceSpawnedObject: 1
   <SpawnerUILabel>k__BackingField: 
 --- !u!1 &1801341417
 GameObject:
