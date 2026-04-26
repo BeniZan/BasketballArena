@@ -2,7 +2,8 @@ using Meta.XR;
 using Meta.XR.MRUtilityKit.BuildingBlocks;
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.InputSystem; 
+
 
 public class TriggerSpawner : MonoBehaviour {
     [SerializeField] Transform _worldAnchor;
@@ -13,23 +14,25 @@ public class TriggerSpawner : MonoBehaviour {
     [SerializeField] LineRenderer _lineRenderer;
     [SerializeField] InputActionProperty _spawnInput;
     [SerializeField] bool _replaceSpawnedObject;
+    [SerializeField] bool _previewAfterSpawned;
     [field: SerializeField] public string SpawnerUILabel { get; private set; }
     public Transform Spawned { get; internal set; }
 
     public event Action OnSpawned, OnPlaced;
 
     private void Awake() {
-        _spawnInput.action.Enable();
+        _spawnInput.action.Enable(); 
     }
 
     private void Update() {
         var sceneRay = new Ray(_controllerOrigin.position, _controllerOrigin.forward);
         var rayHit = _raycastManager.Raycast(sceneRay, out var hit);
 
-        _previewObject.gameObject.SetActive(rayHit);
+        var showPreview = rayHit && (_previewAfterSpawned || !Spawned); 
+        _previewObject.gameObject.SetActive(showPreview);
         if (rayHit) {
             _previewObject.position = hit.point;
-            _previewObject.localRotation = Quaternion.identity;
+            _previewObject.rotation = Quaternion.identity;
         }
 
         DrawRay(sceneRay, rayHit ? hit : null);
