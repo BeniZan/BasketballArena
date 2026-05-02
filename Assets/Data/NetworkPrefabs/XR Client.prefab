@@ -10649,6 +10649,7 @@ GameObject:
   - component: {fileID: 4121043501438209210}
   - component: {fileID: -1720271785283989664}
   - component: {fileID: 9066625609755576442}
+  - component: {fileID: 4232914205945395362}
   m_Layer: 0
   m_Name: XR Client
   m_TagString: Untagged
@@ -10716,8 +10717,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adaa1fecf68fc6a42955d31340318d84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetVisibility
+  ShowTopMostFoldoutHeaderGroup: 1
   visibility: 1
   netObj: {fileID: -1720271785283989664}
+--- !u!114 &4232914205945395362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8558883640438443848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 957c12b414838884d8d1e328088f14d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkXRPlayer
+  ShowTopMostFoldoutHeaderGroup: 1
+  PositionOnField:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: {x: 0, y: 0}
+  NetRotation:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: {x: 0, y: 0}
 --- !u!1 &8622979525637637930
 GameObject:
   m_ObjectHideFlags: 0
