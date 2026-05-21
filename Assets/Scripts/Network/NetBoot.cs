@@ -9,7 +9,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     Notifier<PlayerType> _playerType = new Notifier<PlayerType>(PlayerType.NotSetup);
     [SerializeField, Get] NetworkManager _netMng;
     [SerializeField] NetworkObject _CoachHostPrefab, _XRClientPrefab;
-    [SerializeField] GameObject XRLocalDevicePrefab;
+    [SerializeField] GameObject LocalXRDevice;
     GameObject _spawnedXRDevice;
     public ReadOnlyNotifier<PlayerType> Type => _playerType;
     public bool IsXR => _playerType.Value == PlayerType.XRPlayer;
@@ -19,20 +19,16 @@ public class NetBoot : SingletonMono<NetBoot> {
     public bool IsConnected => _netMng.IsListening && _netMng.IsConnectedClient;  
     protected override void Awake() {
         base.Awake();
-         
-#if !UNITY_EDITOR
-    // release build
-    #if UNITY_META_QUEST
-        //quest build
-         SetupPlayerType(true);
-    #else
-         //non-quest coach build
-         SetupPlayerType(false);
-    #endif
-#endif
+
         _netMng.OnConnectionEvent += NetMng_OnConnectionEvent;
         DontDestroyOnLoad(gameObject);
-    } 
+
+#if !UNITY_EDITOR
+        var deviceModel = SystemInfo.deviceModel.ToLower();
+        var isXR = deviceModel.Contains("quest") || deviceModel.Contains("oculus");
+        SetupPlayerType(isXR);
+#endif
+    }
 
     public void SetupPlayerType(bool isXR) {
         if (PlayerTypeReady) {
@@ -42,9 +38,7 @@ public class NetBoot : SingletonMono<NetBoot> {
         var type = isXR ? PlayerType.XRPlayer : PlayerType.Coach;
         _playerType.Value = type;
         StartNetwork(isXR);
-        if (isXR)
-            _spawnedXRDevice = Instantiate(XRLocalDevicePrefab);
-        else _spawnedXRDevice.SafeDestroy();
+        LocalXRDevice.SetActive(isXR);
     } 
 
     private void NetMng_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {

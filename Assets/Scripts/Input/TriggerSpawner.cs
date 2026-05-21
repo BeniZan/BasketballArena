@@ -31,8 +31,7 @@ public class TriggerSpawner : MonoBehaviour {
         var showPreview = rayHit && (_previewAfterSpawned || !Spawned); 
         _previewObject.gameObject.SetActive(showPreview);
         if (rayHit) {
-            _previewObject.position = hit.point;
-            _previewObject.rotation = Quaternion.identity;
+            _previewObject.SetPositionAndRotation(hit.point, Quaternion.identity);
         }
 
         DrawRay(sceneRay, rayHit ? hit : null);
