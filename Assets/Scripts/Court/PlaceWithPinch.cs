@@ -38,6 +38,10 @@ public class PlaceWithPinch : MonoBehaviour {
     bool Raycast(Ray ray, out Vector3 hit) {
         if (Application.isEditor) {
             var room = MRUK.Instance.GetCurrentRoom();
+            if (!room) {
+                hit = default;
+                return false;
+            }
             var isRayHit = room.Raycast(ray, 100f, out var rhit);
             hit = rhit.point;
             return isRayHit;
