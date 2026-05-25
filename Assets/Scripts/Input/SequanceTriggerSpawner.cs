@@ -1,7 +1,5 @@
 using Sirenix.OdinInspector;
-using System;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
+using System; 
 using UnityEngine;
 
 public class SequanceTriggerSpawner : MonoBehaviour

@@ -4,24 +4,23 @@ using UnityEngine;
 
 public class NetVisibility : NetworkBehaviour
 {
-    public enum Visibility { CoachOnly, XRPlayerOnly }
+    public enum Visibility { CoachOnly, XRPlayersOnly, OwnerXRPlayerOnly, LocalXROnly }
     public Visibility visibility;
-    [SerializeField, Get] NetworkObject netObj;
-
-
-    protected override void OnNetworkPreSpawn(ref NetworkManager networkManager) {
-        base.OnNetworkPreSpawn(ref networkManager);
-        gameObject.SetActive(IsVisible(ref networkManager));
+    public override void OnNetworkSpawn() {
+        base.OnNetworkSpawn();
+        gameObject.SetActive(IsVisible());  
     }
      
-    bool IsVisible(ref NetworkManager nm) {
-        var isServer = nm.IsServer;
-        if(visibility == Visibility.CoachOnly)
-            return isServer;
-        else if(visibility == Visibility.XRPlayerOnly)
-            return !isServer;
+    bool IsVisible() {
+        var isXR = !IsServer;
+        if (visibility == Visibility.CoachOnly)
+            return !isXR;
+        else if (visibility == Visibility.XRPlayersOnly)
+            return isXR;
+        else if (visibility == Visibility.OwnerXRPlayerOnly)
+            return isXR && IsOwner; 
         Debug.LogError("Not implemented visibility for " + visibility, this);
-        return true;
+        return false;
     }
      
 }
