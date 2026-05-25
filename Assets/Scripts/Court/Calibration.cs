@@ -1,13 +1,39 @@
 using Meta.XR; 
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.UI;
+
+public class CalibrationUI : MonoBehaviour {
+    [SerializeField] Calibration _calibration;
+    [SerializeField] GameObject _throwlineTab, _basketTab; 
+    [SerializeField] Button _next, _previous;
+     
+    private void Awake() {
+        _next.onClick.AddListener(OnNext);
+        _previous.onClick.AddListener(OnPrevious);
+        _calibration.CalibrationState.Sub(OnState);
+    }
+    void OnState(Calibration.State state) {  
+        gameObject.SetActive(_calibration.IsCalibrating);
+        _throwlineTab.SetActive(state == Calibration.State.CalibratingThrowLine);
+        _basketTab.SetActive(state == Calibration.State.CalibratingBasket); 
+        _previous.gameObject.SetActive(state == Calibration.State.CalibratingBasket);
+        _next.gameObject.SetActive(_calibration.IsCalibrating);
+    }
+    void OnNext() { _calibration.OnConfirmed(); }
+    void OnPrevious() {
+        if(_calibration.CalibrationState.Value == Calibration.State.CalibratingBasket)
+            _calibration.CalibrateThrowline(); 
+    }
+}
 
 
 public class Calibration : MonoBehaviour {
-
+    public enum State { NotCalibrated, CalibratingThrowLine, CalibratingBasket, Calibrated }
+    public Notifier<State> CalibrationState = new Notifier<State>();
     [SerializeField] PlaceWithPinch _placeThrowline, _placeBasket;
-    [ShowInInspector] public bool IsCalibrated { get; private set; }
+    [ShowInInspector] bool _confirmedPlacement;
+
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
 
     [SerializeField] PlaceWithPinch[] _placePins;
@@ -18,24 +44,28 @@ public class Calibration : MonoBehaviour {
     public float PinchThreshold;
     Awaitable _calibrationAwait;
     [ShowInInspector]
-    public bool IsCalibrating => _calibrationAwait != null;
+    public bool IsCalibrating => CalibrationState.Value == State.CalibratingThrowLine || CalibrationState.Value == State.CalibratingBasket;
     CustomLogger _logger;
     private async Awaitable Awake() {
-        _logger = new CustomLogger(this, Color.green); 
-        _confirmCalibBtn.onClick.AddListener(OnCalibrationConfirmed);
+        CalibrationState.Value = State.NotCalibrated;
+        _placeThrowline.gameObject.SetActive(false);
+        _placeBasket.gameObject.SetActive(false);
+        _logger = new CustomLogger(this, Color.green);  
         await (_calibrationAwait = BeginCalibration());
     }
 
     async Awaitable BeginCalibration() {
+        if (_calibrationAwait != null && !_calibrationAwait.IsCompleted) {
+            Debug.LogError("tried calibrating while already calibrating", this);
+            return;
+        }
+        CalibrationState.Value = State.CalibratingThrowLine;
         try {
-            if (_calibrationAwait != null && !_calibrationAwait.IsCompleted) {
-                Debug.LogError("tried calibrating while already calibrating", this);
-            }
+            _placeThrowline.gameObject.SetActive(true);
+
             _logger.Log("Calibration Started");
-            _calibrationConfirmGUI.SetActive(false);
-            _pinchLine.enabled = true;
-            IsCalibrated = false;
-            while (!IsCalibrated) {
+            _calibrationConfirmGUI.SetActive(false); 
+            while (IsCalibrating) {
                 CalibrationUpdate();
                 await Awaitable.EndOfFrameAsync();
                 await Awaitable.NextFrameAsync();
@@ -43,7 +73,7 @@ public class Calibration : MonoBehaviour {
         } 
         catch(System.Exception ex) { Debug.LogException(ex); } 
         finally {
-            _pinchLine.enabled = false;
+            CalibrationState.Value = State.Calibrated;
             _calibrationAwait = null;
             _logger.Log("Calibration Done");
         }
@@ -88,9 +118,12 @@ public class Calibration : MonoBehaviour {
         return isPinching;
     }
 
-    public void OnCalibrationConfirmed() { 
-        IsCalibrated = true;
-        _logger.Log("Calibration Confirmed");
-        _calibrationConfirmGUI.SetActive(false);
+    public void CalibrateThrowline() {
+        CalibrationState.Value = State.CalibratingThrowLine;
+    }
+
+    public void OnConfirmed() {
+        _confirmedPlacement = true;
+        _logger.Log("Placement Confirmed"); 
     }
 } 
