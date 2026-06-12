@@ -10,10 +10,11 @@ public class Calibration : MonoBehaviour {
     public Notifier<State> CalibrationState = new Notifier<State>();
     [SerializeField] PlaceWithPinch _placeThrowline, _placeBasket; 
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
-    [SerializeField] PlaceWithPinch[] _placePins; 
     [SerializeField] LineRenderer _pinchLine;
     [SerializeField] EnvironmentRaycastManager _raycastManager;
+    [SerializeField] Transform _courtSurface, _courtSurfacePreview;
     public float MinPinchForLine = 0.2f, PinchThreshold = 0.85f;
+    public float ThrowlineWidth = 5f;
     Awaitable _calibrationAwait;
     CustomLogger _logger;
     [ShowInInspector]
@@ -35,8 +36,8 @@ public class Calibration : MonoBehaviour {
     }
 
     void OnCalibrationStateChange(State state) {
-        _placeThrowline.gameObject.SetActive(state == State.CalibratingThrowLine);
-        _placeBasket.gameObject.SetActive(state == State.CalibratingBasket);
+        _placeThrowline.enabled = state == State.CalibratingThrowLine;
+        _placeBasket.enabled = state == State.CalibratingBasket; 
     }
 
     async Awaitable BeginCalibration() {
@@ -47,7 +48,19 @@ public class Calibration : MonoBehaviour {
         CalibrationState.Value = State.CalibratingThrowLine;
         try { 
             _logger.Log("Calibration Started"); 
-            while (IsCalibrating) { 
+            while (IsCalibrating) {
+                var showPreviewSurface = CalibrationState == State.CalibratingBasket;
+                _courtSurface.gameObject.SetActive(_placeBasket.WasPlaced);
+
+                var canPreview = _placeThrowline.WasPlaced && _placeBasket.isActiveAndEnabled;
+                _courtSurfacePreview.gameObject.SetActive(canPreview);
+                if(canPreview)
+                    SetSurface(_courtSurfacePreview, _placeThrowline.PlacedObj.position, _placeBasket.PreviewObj.position);
+
+                var fullPlacement = _placeThrowline.WasPlaced && _placeBasket.WasPlaced;
+                _courtSurface.gameObject.SetActive(fullPlacement);
+                if (fullPlacement)  
+                    SetSurface( _courtSurface , _placeThrowline.PlacedObj.position, _placeBasket.PlacedObj.position);
                 await Awaitable.EndOfFrameAsync();
                 await Awaitable.NextFrameAsync();
             } 
@@ -58,8 +71,16 @@ public class Calibration : MonoBehaviour {
             _calibrationAwait = null;
             _logger.Log("Calibration Done");
         }
-        
     }   
+
+    void SetSurface(Transform surface, Vector3 bottomCenter, Vector3 corner) {
+        corner.y = bottomCenter.y;
+        surface.position = bottomCenter;
+        var width = ThrowlineWidth;
+        var length = Vector3.Distance(bottomCenter, corner); 
+        surface.rotation = bottomCenter.DirectionToAsRotation(corner);
+        surface.localScale = new Vector3(width, 0f, length);  
+    }
 
     public void CalibrateThrowline() {
         if(_calibrationAwait == null) {
@@ -75,8 +96,8 @@ public class Calibration : MonoBehaviour {
             CalibrationState.Value = State.CalibratingBasket;
         }
         else if(CalibrationState == State.CalibratingBasket) {
-            _logger.Log("Confirmed throwline");
+            _logger.Log("Confirmed Basket");
             CalibrationState.Value = State.Calibrated;
-        } 
+        }
     }
 } 

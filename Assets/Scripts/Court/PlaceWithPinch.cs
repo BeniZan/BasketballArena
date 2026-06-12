@@ -10,13 +10,27 @@ public class PlaceWithPinch : MonoBehaviour {
     [SerializeField] LineRenderer _lineRend;
     [SerializeField] EnvironmentRaycastManager _raycastManager;
     [SerializeField] Transform _preview;
-    [SerializeField] PlaceWithAnchor _placeObj;
+    [SerializeField] Transform _placeObj;
     public float PinchThreshold = 0.7f;
     [NonSerialized, ShowInInspector] public bool WasPlaced;
 
+    public Transform PreviewObj => _preview;
+    public Transform PlacedObj => _placeObj;
+
     private void Awake() {
-        _placeObj.Target.gameObject.SetActive(false);
+        _placeObj.gameObject.SetActive(false); 
     }
+
+    private void OnEnable() {
+        _preview.gameObject.SetActive(true);
+        _lineRend.enabled = true;
+    }
+
+    private void OnDisable() {
+        _preview.gameObject.SetActive(false);
+        _lineRend.enabled = false;
+    }
+
 
     private void Update() { 
         var pinchValue = _xrPlayer.LocalRightHand.GetFingerPinchStrength(0);  
@@ -29,8 +43,8 @@ public class PlaceWithPinch : MonoBehaviour {
         _preview.gameObject.SetActive(rayHit); 
         _preview.position = hitPoint;
         if (isPinching && rayHit) {
-            _placeObj.Target.gameObject.SetActive(true);
-            _placeObj.RequestMove(new Pose() { position = hitPoint, rotation = Quaternion.identity });
+            _placeObj.gameObject.SetActive(true); 
+            _placeObj.transform.position = hitPoint;
             WasPlaced = true;
         } 
     }

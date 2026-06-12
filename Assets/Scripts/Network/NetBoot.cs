@@ -30,6 +30,12 @@ public class NetBoot : SingletonMono<NetBoot> {
 #endif
     }
 
+    void UnsetPlayerType() {
+        _netMng.Shutdown();
+        _playerType.Value = PlayerType.NotSetup;
+        LocalXRDevice.SetActive(false);
+    }
+
     public void SetupPlayerType(bool isXR) {
         if (PlayerTypeReady) {
             Debug.LogWarning("Player type already setup, ignoring LocalSetup call");
@@ -88,8 +94,8 @@ public class NetBoot : SingletonMono<NetBoot> {
 
     void ConnectionAwaitingGUI() {
         GUILayout.Label("Connecting...");
-        if(GUILayout.Button("Cancel"))
-            _netMng.Shutdown();
+        if (GUILayout.Button("Cancel")) 
+            UnsetPlayerType();
     }
 
     void ConnectedGUI() {
