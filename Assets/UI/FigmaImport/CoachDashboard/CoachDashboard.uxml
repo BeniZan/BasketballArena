@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <Style src="CoachDashboard.uss" />
+    <ui:VisualElement class="dashboard-root">
+        <!-- LEFT SIDEBAR -->
+        <ui:VisualElement class="left-sidebar">
+            <ui:VisualElement class="logo-area">
+                <ui:Image name="logoImage" class="logo-image" />
+            </ui:VisualElement>
+            <ui:VisualElement class="separator" />
+            <ui:VisualElement class="cards-section">
+                <!-- H1 Card -->
+                <ui:VisualElement class="team-card">
+                    <ui:VisualElement class="team-card-row1">
+                        <ui:VisualElement class="label-badge">
+                            <ui:Label text="H1" class="label-badge-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="status-group">
+                            <ui:VisualElement class="status-dot" />
+                            <ui:Label text="95%" class="status-percent" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="toggle-switch">
+                            <ui:VisualElement class="toggle-knob" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="team-card-row2">
+                        <ui:Button name="h1OffenseBtn" class="off-def-btn active">
+                            <ui:Label text="OFFENSE" class="off-def-btn-text" />
+                        </ui:Button>
+                        <ui:Button name="h1DefenseBtn" class="off-def-btn">
+                            <ui:Label text="DEFENSE" class="off-def-btn-text" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- H2 Card -->
+                <ui:VisualElement class="team-card">
+                    <ui:VisualElement class="team-card-row1">
+                        <ui:VisualElement class="label-badge">
+                            <ui:Label text="H2" class="label-badge-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="status-group">
+                            <ui:VisualElement class="status-dot" />
+                            <ui:Label text="95%" class="status-percent" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="toggle-switch">
+                            <ui:VisualElement class="toggle-knob" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="team-card-row2">
+                        <ui:Button name="h2OffenseBtn" class="off-def-btn active">
+                            <ui:Label text="OFFENSE" class="off-def-btn-text" />
+                        </ui:Button>
+                        <ui:Button name="h2DefenseBtn" class="off-def-btn">
+                            <ui:Label text="DEFENSE" class="off-def-btn-text" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Coach View Card -->
+                <ui:VisualElement name="coachViewCard" class="coach-view-card">
+                    <ui:VisualElement class="coach-view-left">
+                        <ui:Image name="coachViewEyeIcon" class="coach-view-icon" />
+                        <ui:Label text="COACH VIEW" class="coach-view-text" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="coachViewToggle" class="coach-view-toggle active">
+                        <ui:VisualElement class="toggle-knob" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <ui:VisualElement class="separator" />
+            <ui:VisualElement class="bottom-info">
+                <ui:VisualElement class="bottom-info-dot" />
+                <ui:Label name="bottomActiveText" text="0 / 3 Active" class="bottom-info-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- CENTER VIEWPORT -->
+        <ui:VisualElement class="center-pane">
+            <ui:VisualElement class="center-header">
+                <ui:Label text="PLAYER STREAM" class="stream-title" />
+                <ui:VisualElement class="stream-mode-toggles">
+                    <ui:Button name="realisticBtn" class="stream-toggle-btn active">
+                        <ui:Image name="realisticIcon" class="stream-toggle-icon" />
+                        <ui:Label text="REALISTIC" class="stream-toggle-text" />
+                    </ui:Button>
+                    <ui:Button name="hologramBtn" class="stream-toggle-btn">
+                        <ui:Image name="hologramIcon" class="stream-toggle-icon" />
+                        <ui:Label text="HOLOGRAM" class="stream-toggle-text" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Display viewport -->
+            <ui:VisualElement class="stream-viewport">
+                <ui:VisualElement class="viewport-placeholder">
+                    <ui:Image name="streamEyeIcon" class="viewport-icon" />
+                    <ui:Label text="Awaiting Player Stream" class="viewport-header" />
+                    <ui:Label text="Start session to view live POV" class="viewport-subtext" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Bottom Control Bar -->
+            <ui:VisualElement class="bottom-control-bar">
+                <ui:VisualElement class="control-bar-inner">
+                    <ui:VisualElement class="status-label-group">
+                        <ui:Label name="statusText" text="READY" class="status-lbl" />
+                        <ui:Label text="·" class="status-dot-divider" />
+                        <ui:Label name="timerText" text="00:00" class="status-timer" />
+                        <ui:Label text="·" class="status-dot-divider" />
+                        <ui:Label name="repText" text="REP 0/0" class="status-rep" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="controls-group">
+                        <ui:Button name="startBtn" class="playback-btn start">
+                            <ui:Image name="startIcon" class="playback-icon" />
+                            <ui:Label text="START" class="playback-text" />
+                        </ui:Button>
+                        <ui:Button name="nextBtn" class="playback-btn next">
+                            <ui:Image name="nextIcon" class="playback-icon" />
+                            <ui:Label text="NEXT" class="playback-text" />
+                        </ui:Button>
+                        <ui:Button name="pauseBtn" class="playback-btn pause">
+                            <ui:Image name="pauseIcon" class="playback-icon" />
+                            <ui:Label text="PAUSE" class="playback-text" />
+                        </ui:Button>
+                        <ui:Button name="stopBtn" class="playback-btn stop">
+                            <ui:Image name="stopIcon" class="playback-icon" />
+                            <ui:Label text="STOP" class="playback-text" />
+                        </ui:Button>
+                        <ui:Button name="forceBtn" class="playback-btn force">
+                            <ui:Image name="forceIcon" class="playback-icon" />
+                            <ui:Label text="FORCE" class="playback-text" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- RIGHT SIDEBAR -->
+        <ui:VisualElement class="right-sidebar">
+            <!-- Exercise Library -->
+            <ui:VisualElement class="exercise-library">
+                <ui:VisualElement class="section-header">
+                    <ui:Label text="EXERCISE LIBRARY" class="section-title" />
+                    <ui:Label text="Tap to add →" class="section-subtitle" />
+                </ui:VisualElement>
+                <ui:ScrollView class="exercise-list">
+                    <!-- Pick & Roll -->
+                    <ui:Button name="pickAndRollBtn" class="exercise-item-btn">
+                        <ui:VisualElement class="exercise-left-group">
+                            <ui:Image name="pickAndRollIcon" class="exercise-icon" />
+                            <ui:Label text="PICK &amp; ROLL" class="exercise-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="exercise-badge">
+                            <ui:Label text="12" class="exercise-badge-text" />
+                        </ui:VisualElement>
+                    </ui:Button>
+                    <!-- Shooting -->
+                    <ui:Button name="shootingBtn" class="exercise-item-btn">
+                        <ui:VisualElement class="exercise-left-group">
+                            <ui:Image name="shootingIcon" class="exercise-icon" />
+                            <ui:Label text="SHOOTING" class="exercise-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="exercise-badge">
+                            <ui:Label text="12" class="exercise-badge-text" />
+                        </ui:VisualElement>
+                    </ui:Button>
+                    <!-- Post Plays -->
+                    <ui:Button name="postPlaysBtn" class="exercise-item-btn">
+                        <ui:VisualElement class="exercise-left-group">
+                            <ui:Image name="postPlaysIcon" class="exercise-icon" />
+                            <ui:Label text="POST PLAYS" class="exercise-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="exercise-badge small">
+                            <ui:Label text="8" class="exercise-badge-text" />
+                        </ui:VisualElement>
+                    </ui:Button>
+                </ui:ScrollView>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="separator" />
+
+            <!-- Training Flow -->
+            <ui:VisualElement class="training-flow">
+                <ui:VisualElement class="section-header">
+                    <ui:Label text="TRAINING FLOW" class="section-title orange" />
+                    <ui:Label name="drillsCountText" text="0 drills" class="section-subtitle" />
+                </ui:VisualElement>
+                <ui:VisualElement class="training-flow-content">
+                    <ui:VisualElement name="buildSessionPlaceholder" class="build-session-placeholder">
+                        <ui:Image name="marginIcon" class="build-session-icon" />
+                        <ui:Label text="Build Your Session" class="build-session-heading" />
+                        <ui:Label text="Tap drills above to add" class="build-session-subtext" />
+                    </ui:VisualElement>
+                    <ui:ScrollView name="drillListContainer" class="drill-list-scrollview" style="display: none;" />
+                </ui:VisualElement>
+                <ui:Button name="randomDrillBtn" class="random-drill-btn">
+                    <ui:Image name="randomDrillIcon" class="random-drill-icon" />
+                    <ui:Label text="RANDOM DRILL" class="random-drill-text" />
+                </ui:Button>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="separator" />
+
+            <!-- Analytics Footer -->
+            <ui:VisualElement class="analytics-section">
+                <ui:VisualElement class="analytics-row">
+                    <ui:VisualElement class="analytics-left">
+                        <ui:Image name="analyticsIcon" class="analytics-icon" />
+                        <ui:Label text="ANALYTICS" class="analytics-text" />
+                        <ui:VisualElement class="pro-badge">
+                            <ui:Label text="PRO" class="pro-badge-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Button class="upgrade-btn">
+                        <ui:Label text="Upgrade" class="upgrade-btn-text" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:Label text="Player insights &amp; performance tracking" class="analytics-desc" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
