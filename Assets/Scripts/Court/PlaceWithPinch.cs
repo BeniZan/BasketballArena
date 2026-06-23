@@ -11,11 +11,16 @@ public class PlaceWithPinch : MonoBehaviour {
     [SerializeField] EnvironmentRaycastManager _raycastManager;
     [SerializeField] Transform _preview;
     [SerializeField] Transform _placeObj;
+    public string Description;
     public float PinchThreshold = 0.7f;
-    [NonSerialized, ShowInInspector] public bool WasPlaced;
-
+    [NonSerialized, ShowInInspector] public bool WasPlaced; 
     public Transform PreviewObj => _preview;
     public Transform PlacedObj => _placeObj;
+
+    public bool IsPlacing {
+        get => isActiveAndEnabled;
+        set => gameObject.SetActive(value);
+    }
 
     private void Awake() {
         _placeObj.gameObject.SetActive(false); 
@@ -51,6 +56,11 @@ public class PlaceWithPinch : MonoBehaviour {
 
     bool Raycast(Ray ray, out Vector3 hit) {
         if (Application.isEditor) {
+            if (!MRUK.Instance) {
+                hit = default;
+                return false;
+            }
+
             var room = MRUK.Instance.GetCurrentRoom();
             if (!room) {
                 hit = default;
@@ -78,6 +88,5 @@ public class PlaceWithPinch : MonoBehaviour {
         _lineRend.startColor = color;
         _lineRend.endColor = color;
     }
-
 
 }

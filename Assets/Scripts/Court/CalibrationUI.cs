@@ -1,9 +1,10 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CalibrationUI : MonoBehaviour {
     [SerializeField] Calibration _calibration;
-    [SerializeField] GameObject _throwlineTab, _basketTab; 
+    [SerializeField] GameObject[] _tabs;
     [SerializeField] Button _next, _previous;
     [SerializeField] Camera _cam;
     [SerializeField] OVRHand _hand;
@@ -11,21 +12,21 @@ public class CalibrationUI : MonoBehaviour {
     private void Awake() {
         _next.onClick.AddListener(OnNext);
         _previous.onClick.AddListener(OnPrevious);
-        _calibration.CalibrationState.Sub(OnState);
+        _calibration.CalibrationStep.Sub(OnState);
     }
-    void OnState(Calibration.State state) {  
+    private void OnDestroy() => _calibration.CalibrationStep.Unsub(OnState); 
+    void OnState(Calibration.Step state) {  
         gameObject.SetActive(_calibration.IsCalibrating);
-        _throwlineTab.SetActive(state == Calibration.State.CalibratingThrowLine);
-        _basketTab.SetActive(state == Calibration.State.CalibratingBasket); 
-        _previous.gameObject.SetActive(state == Calibration.State.CalibratingBasket);
-        _next.gameObject.SetActive(_calibration.IsCalibrating);
+        for(int i=0; i< _tabs.Length; i++) {
+            _tabs[i].SetActive((int)_calibration.CalibrationStep.Value == i);
+        }
+        _previous.gameObject.SetActive(state > Calibration.Step.NotCalibrated);
+        _next.gameObject.SetActive(state < Calibration.Step.Calibrated);
     }
-    void OnNext() { _calibration.OnConfirmedCalibrationStep(); }
-    void OnPrevious() {
-        if(_calibration.CalibrationState.Value == Calibration.State.CalibratingBasket)
-            _calibration.CalibrateThrowline(); 
-    }
-
+    [Button, HorizontalGroup]
+    void OnNext() => _calibration.OnConfirmedCalibrationStep();
+    [Button, HorizontalGroup]
+    void OnPrevious() => _calibration.Backtrack();  
     private void Update() {
         var dirToCam = -transform.DirectionTo(_cam.transform);
         transform.rotation = Quaternion.LookRotation(dirToCam, _cam.transform.up);

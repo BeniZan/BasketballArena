@@ -4,12 +4,13 @@ using System;
 using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
+[DefaultExecutionOrder(-1000)]
 public class NetBoot : SingletonMono<NetBoot> {
     public enum PlayerType { NotSetup, XRPlayer, Coach }
     Notifier<PlayerType> _playerType = new Notifier<PlayerType>(PlayerType.NotSetup);
     [SerializeField, Get] NetworkManager _netMng;
     [SerializeField] NetworkObject _CoachHostPrefab, _XRClientPrefab;
-    [SerializeField] GameObject LocalXRDevice;
+    [SerializeField] GameObject LocalXRDeviceToggle;
     GameObject _spawnedXRDevice;
     public ReadOnlyNotifier<PlayerType> Type => _playerType;
     public bool IsXR => _playerType.Value == PlayerType.XRPlayer;
@@ -23,7 +24,7 @@ public class NetBoot : SingletonMono<NetBoot> {
         _netMng.OnConnectionEvent += NetMng_OnConnectionEvent;
         DontDestroyOnLoad(gameObject);
 
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR 
         var deviceModel = SystemInfo.deviceModel.ToLower();
         var isXR = deviceModel.Contains("quest") || deviceModel.Contains("oculus");
         SetupPlayerType(isXR);
@@ -33,7 +34,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     void UnsetPlayerType() {
         _netMng.Shutdown();
         _playerType.Value = PlayerType.NotSetup;
-        LocalXRDevice.SetActive(false);
+        LocalXRDeviceToggle.SetActive(false);
     }
 
     public void SetupPlayerType(bool isXR) {
@@ -44,7 +45,7 @@ public class NetBoot : SingletonMono<NetBoot> {
         var type = isXR ? PlayerType.XRPlayer : PlayerType.Coach;
         _playerType.Value = type;
         StartNetwork(isXR);
-        LocalXRDevice.SetActive(isXR);
+        LocalXRDeviceToggle.SetActive(isXR);
     } 
 
     private void NetMng_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {
