@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7f63e253653e34893818f789375768, type: 3}
+  m_Name: Scene_12_b_converted_move_5
+  m_EditorClassIdentifier: Assembly-CSharp::TeamManeuver
+  OriginPoint: {x: 0, y: 0, z: 0}
+  OriginYRotation: 0
+  CharsData:
+  - FieldStandardPosition: {x: 1.18, y: -1.01}
+    yRotation: 118.64487
+    Animation: {fileID: 7400000, guid: bdcce69c73d54004bb0aee8e6a1be8b5, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 2.618011, y: -1.5471208}
+    yRotation: 83.53435
+    Animation: {fileID: 7400000, guid: 584e917ba906c1e449ef928646bdbad7, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 3.8650584, y: -1.1142309}
+    yRotation: 201.19069
+    Animation: {fileID: 7400000, guid: 996d3f406be56c249b3bab3ee192ec23, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 2.5570436, y: -0.58896446}
+    yRotation: 106.54865
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 1.3070722, y: -0.11880301}
+    yRotation: 106.87078
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 3.4209485, y: 5.6824455}
+    yRotation: 247.89233
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -1.0305848, y: 4.097183}
+    yRotation: 273.4514
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 2.3417382, y: 8.415365}
+    yRotation: 157.83003
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
