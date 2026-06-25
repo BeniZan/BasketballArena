@@ -16,14 +16,19 @@ public class PlaceWithPinch : MonoBehaviour {
     [NonSerialized, ShowInInspector] public bool WasPlaced; 
     public Transform PreviewObj => _preview;
     public Transform PlacedObj => _placeObj;
-
+    bool _isPlacing;
+    public Vector3 PreviewOrPlacedPosition => WasPlaced ? _placeObj.position : _preview.position;
     public bool IsPlacing {
-        get => isActiveAndEnabled;
-        set => gameObject.SetActive(value);
+        get => isActiveAndEnabled && _isPlacing;
+        set {
+            enabled = _isPlacing = value;
+            if(!_isPlacing)
+                _preview.gameObject.SetActive(_isPlacing);
+        }
     }
 
     private void Awake() {
-        _placeObj.gameObject.SetActive(false); 
+        IsPlacing = _isPlacing;
     }
 
     private void OnEnable() {
@@ -32,7 +37,7 @@ public class PlaceWithPinch : MonoBehaviour {
     }
 
     private void OnDisable() {
-        _preview.gameObject.SetActive(false);
+        _preview.gameObject.SetActive(false); 
         _lineRend.enabled = false;
     }
 

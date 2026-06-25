@@ -15,7 +15,10 @@ public class CalibrationUI : MonoBehaviour {
         _calibration.CalibrationStep.Sub(OnState);
     }
     private void OnDestroy() => _calibration.CalibrationStep.Unsub(OnState); 
-    void OnState(Calibration.Step state) {  
+    void OnState(Calibration.Step state) {
+        _previous.interactable = state > Calibration.Step.NotCalibrated + 1;
+        _next.interactable = true;
+
         gameObject.SetActive(_calibration.IsCalibrating);
         for(int i=0; i< _tabs.Length; i++) {
             _tabs[i].SetActive((int)_calibration.CalibrationStep.Value == i);

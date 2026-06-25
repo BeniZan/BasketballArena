@@ -874,8 +874,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5844126655981019104}
   - {fileID: 3217159187278354248}
+  - {fileID: 5844126655981019104}
   m_Father: {fileID: 5326220525645583007}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.1, y: 0}
@@ -1685,7 +1685,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CalibrationUI
   _calibration: {fileID: 0}
-  _tabs: []
+  _tabs:
+  - {fileID: 5020535360090552684}
+  - {fileID: 6171013921714642214}
+  - {fileID: 5271660807265021384}
   _next: {fileID: 7763726514128740344}
   _previous: {fileID: 7332312701643905771}
   _cam: {fileID: 0}

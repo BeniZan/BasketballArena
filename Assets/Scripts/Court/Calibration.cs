@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class Calibration : MonoBehaviour {
     public enum Step { NotCalibrated = -1, 
-        CalibratingCenter, CalibratingCenterCorner, CalibratingBasketCorner, 
+        CalibratingCenter, CalibratingCenterCorner, CalibratingBasketCorner,
         Calibrated 
     }
     public Notifier<Step> CalibrationStep = new Notifier<Step>();
@@ -46,7 +46,7 @@ public class Calibration : MonoBehaviour {
         _logger.Log($"changing calibration step {CalibrationStep}->{step}");
         var stepInt = (int)step;
         for (int i = 0; i < _placers.Length; i++) {
-            _placers[i].gameObject.SetActive(i == stepInt);
+            _placers[i].IsPlacing = (i == stepInt);
         }
         CalibrationStep.Value = step;
     }
@@ -63,12 +63,13 @@ public class Calibration : MonoBehaviour {
                 UpdateInBetweenLine();
 
                 var lastStep = Step.Calibrated - 1;
-                var canShowPreviewSurface = CalibrationStep.Value > lastStep;
+                var canShowPreviewSurface = CalibrationStep.Value >= lastStep;
                 var lastStepPlacer = GetPlacer(lastStep);
                 var canShowSurface = canShowPreviewSurface && lastStepPlacer.WasPlaced;
                 _courtSurface.gameObject.SetActive(canShowSurface);
-                _courtSurfacePreview.gameObject.SetActive(canShowPreviewSurface);
-                if(canShowSurface)
+                _courtSurfacePreview.gameObject.SetActive(canShowPreviewSurface); 
+
+                if (canShowSurface)
                     UpdateSurface(_courtSurface, lastStepPlacer.PlacedObj.position); 
                 if(canShowPreviewSurface)
                     UpdateSurface(_courtSurfacePreview, lastStepPlacer.PreviewObj.position);
@@ -85,55 +86,88 @@ public class Calibration : MonoBehaviour {
 
     Vector3[] _tempLine = new Vector3[(int)Step.Calibrated];
     void UpdateInBetweenLine() {
-        if(_inBetweenPlacersLine.positionCount != (int)CalibrationStep.Value)
-            _inBetweenPlacersLine.positionCount = (int)CalibrationStep.Value;
-        _inBetweenPlacersLine.enabled = _inBetweenPlacersLine.positionCount > 1;
-        for (int i = 0; i < (int)CalibrationStep.Value; i++) {
-            _tempLine[i] =
-                 _placers[i].WasPlaced ? _placers[i].PlacedObj.position :
-                 _placers[i].PreviewObj.position;
-        } 
-        _inBetweenPlacersLine.SetPositions(_tempLine);
-    }
-
-    void UpdateSurface(Transform surface, Vector3 basketCornerPos) {
-        var canShowSurface = CalibrationStep.Value >= (Step.Calibrated - 1);
-        _courtSurface.gameObject.SetActive(canShowSurface);
-        _courtSurfacePreview.gameObject.SetActive(canShowSurface);
-        if (!canShowSurface)
+        var calibStep = (int)CalibrationStep.Value;
+        _inBetweenPlacersLine.enabled = calibStep >= 1;
+        if (!_inBetweenPlacersLine.enabled)  
             return;
-         
-        _courtSurface.gameObject.SetActive(CalibrationStep.Value == Step.Calibrated);
-        _courtSurfacePreview.gameObject.SetActive(CalibrationStep.Value != Step.Calibrated);
+        var pointCount = calibStep + 1;
+        if (_inBetweenPlacersLine.positionCount != pointCount)
+            _inBetweenPlacersLine.positionCount = pointCount; 
+        for (int i = 0; i < pointCount; i++) {
+            _tempLine[i] = _placers[i].PreviewOrPlacedPosition;
+        } 
 
+        if(pointCount == 3) {
+            var placedThirdPoint = _placers[2].PreviewOrPlacedPosition;
+            _tempLine[2] = _placers[2].PreviewObj.position;
+            _tempLine[2].y = _tempLine[1].y = _tempLine[0].y;
+            var surface = 
+                CreateSurface(_tempLine[0], _tempLine[1], _tempLine[2]);
+            var topCorner =
+                surface.Center + (surface.Rotation * surface.Size.XZToXYZ() / 2f);
+            _tempLine[2] = topCorner;
+        }
+
+        _inBetweenPlacersLine.SetPositions(_tempLine);
+    }   
+    void UpdateSurface(Transform surface, Vector3 basketCornerPos) { 
         var center = GetPlacer(Step.CalibratingCenter).PlacedObj.position;
         var centerCorner = GetPlacer(Step.CalibratingCenterCorner).PlacedObj.position;
         basketCornerPos.y = centerCorner.y = center.y;
-        surface.position = center;
+        var surfaceDat = CreateSurface(center, centerCorner, basketCornerPos);
 
-        Vector3 basketPos = FindFourthVertex(center, centerCorner, basketCornerPos); 
-
-        var forw = center.DirectionTo(basketPos);
-        var right = center.DirectionTo(centerCorner);
-        var up = Vector3.Cross(forw, right);
-
-        var length = Vector3.Distance(basketCornerPos, centerCorner);
-        var width = Vector3.Distance(center, centerCorner); 
-        surface.LookAt(forw, up);
-        surface.localScale = new Vector3(width, 0f, length);  
+        surface.SetPositionAndRotation(surfaceDat.Center, surfaceDat.Rotation);   
+        surface.localScale = surfaceDat.Size.XZToXYZ();  
+    }
+    public struct SurfaceData {
+        public Vector3 Center;
+        public Vector2 Size;
+        public Vector3 Forward;
+        public Quaternion Rotation;
     }
 
-    public static Vector3 FindFourthVertex(Vector3 a, Vector3 b, Vector3 c) {
-        // Calculate the vectors between the points
-        Vector3 ab = b - a;
-        Vector3 bc = c - b;
-        Vector3 ca = a - c;
-        if (Mathf.Abs(Vector3.Dot(ab, ca)) < 1e-5f)  
-            return b + c - a; 
-        if (Mathf.Abs(Vector3.Dot(ab, bc)) < 1e-5f)  
-            return a + c - b;
-         return a + b - c;
+    public static SurfaceData CreateSurface(
+        Vector3 centerBottom,
+        Vector3 bottomCorner,
+        Vector3 userPoint) {
+        // Width axis
+        Vector3 right = (bottomCorner - centerBottom).normalized;
+
+        // Width
+        float width = Vector3.Distance(centerBottom, bottomCorner) * 2f;
+
+        // Perpendicular axis on floor
+        Vector3 forward = Vector3.Cross(Vector3.up, right).normalized;
+
+        // Vector to user's third point
+        Vector3 toUser = userPoint - centerBottom;
+
+        // Remove any width component
+        Vector3 projected =
+            Vector3.ProjectOnPlane(toUser, right);
+
+        // Determine side
+        if (Vector3.Dot(projected, forward) < 0f)
+            forward = -forward;
+
+        // Length is distance along forward axis only
+        float length =
+            Mathf.Abs(Vector3.Dot(toUser, forward));
+
+        // Center of rectangle
+        Vector3 center =
+            centerBottom +
+            forward * (length * 0.5f);
+
+        return new SurfaceData {
+            Center = center,
+            Size = new Vector2(width, length),
+            Forward = forward,
+            Rotation = Quaternion.LookRotation(forward, Vector3.up)
+        };
     }
+
+
 
     public void OnConfirmedCalibrationStep() {
         _logger.Log("Confirmed " + CalibrationStep.Value);
@@ -143,5 +177,10 @@ public class Calibration : MonoBehaviour {
     public void Backtrack() {
         _logger.Log("Backtracking " + CalibrationStep.Value);
         SetState(CalibrationStep.Value - 1);
+    }
+
+    private void OnDisable() {
+        foreach (var placer in _placers)
+            placer.gameObject.SetActive(false);
     }
 } 
