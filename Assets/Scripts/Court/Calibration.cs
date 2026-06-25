@@ -14,11 +14,12 @@ public class Calibration : MonoBehaviour {
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
     [SerializeField] LineRenderer _pinchLine;
     [SerializeField] EnvironmentRaycastManager _raycastManager;
-    [SerializeField] Transform _courtSurface, _courtSurfacePreview;
+    [SerializeField] SurfaceHandler _courtSurface, _courtSurfacePreview;
     [SerializeField] LineRenderer _inBetweenPlacersLine;
     public float MinPinchForLine = 0.2f, PinchThreshold = 0.85f;
     Awaitable _calibrationAwait;
-    CustomLogger _logger;
+    CustomLogger _logger; 
+
     PlaceWithPinch GetPlacer(Step s) {
         var idx = (int)s;
         if (_placers.ValidIndex(idx))
@@ -98,7 +99,6 @@ public class Calibration : MonoBehaviour {
         } 
 
         if(pointCount == 3) {
-            var placedThirdPoint = _placers[2].PreviewOrPlacedPosition;
             _tempLine[2] = _placers[2].PreviewObj.position;
             _tempLine[2].y = _tempLine[1].y = _tempLine[0].y;
             var surface = 
@@ -110,20 +110,12 @@ public class Calibration : MonoBehaviour {
 
         _inBetweenPlacersLine.SetPositions(_tempLine);
     }   
-    void UpdateSurface(Transform surface, Vector3 basketCornerPos) { 
+    void UpdateSurface(SurfaceHandler surface, Vector3 basketCornerPos) { 
         var center = GetPlacer(Step.CalibratingCenter).PlacedObj.position;
         var centerCorner = GetPlacer(Step.CalibratingCenterCorner).PlacedObj.position;
         basketCornerPos.y = centerCorner.y = center.y;
         var surfaceDat = CreateSurface(center, centerCorner, basketCornerPos);
-
-        surface.SetPositionAndRotation(surfaceDat.Center, surfaceDat.Rotation);   
-        surface.localScale = surfaceDat.Size.XZToXYZ();  
-    }
-    public struct SurfaceData {
-        public Vector3 Center;
-        public Vector2 Size;
-        public Vector3 Forward;
-        public Quaternion Rotation;
+        surface.SetSurface(surfaceDat);
     }
 
     public static SurfaceData CreateSurface(

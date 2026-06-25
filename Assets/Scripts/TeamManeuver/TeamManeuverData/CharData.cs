@@ -12,7 +12,7 @@ using UnityEngine.Scripting;
 [ExecuteInEditMode]
 [System.Serializable]
 public class CharData {
-    static readonly Vector2 FieldStandardSize = new Vector2(28f, 15f);
+    static public readonly Vector2 FieldStandardSize = new Vector2(28f, 15f);
     static public ValueDropdownList<AnimationClip> _animationDropdown = new();
     static public AnimationClip GetAnimation(string name) {
         foreach(var animPair in _animationDropdown) { 

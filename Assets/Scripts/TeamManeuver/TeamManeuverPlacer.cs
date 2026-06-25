@@ -10,9 +10,11 @@ using UnityEngine.UIElements;
 public class TeamManeuverPlacer : MonoBehaviour { 
     [SerializeField] CharComponent _templateChar; 
     [SerializeField] Transform _courtTf;
+    [SerializeField] SurfaceHandler _courtSurface;
     [SerializeField] NetTeamManeuverManager _manager;
     [SerializeField, ReadOnly] List<CharComponent> _placedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] TeamManeuverData _currentActive;
+    
     public IReadOnlyList<CharComponent> PlacedChars => _placedChars;
 
     private void Awake() {
@@ -35,13 +37,15 @@ public class TeamManeuverPlacer : MonoBehaviour {
 
         var pos = _currentActive.OriginPoint;
         var rot = Quaternion.Euler(0f, _currentActive.OriginYRotation, 0f);
-        transform.SetPositionAndRotation(pos, rot);
+        _courtSurface.Place(_courtTf);
+        _courtTf.SetLocalPositionAndRotation(pos, rot);
 
         int i = 0;
         for (; i < _currentActive.CharsData.Count; i++) {
             if (_placedChars.Count <= i) {
-                var spawned = Instantiate(_templateChar, _courtTf);
+                var spawned = Instantiate(_templateChar);
                 spawned.gameObject.SetActive(true);
+                _courtSurface.Place(spawned.transform);
                 _placedChars.Add(spawned);
             }
             _placedChars[i].SetData(_currentActive.CharsData[i]);
