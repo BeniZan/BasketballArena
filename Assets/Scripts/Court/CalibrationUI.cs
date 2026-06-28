@@ -1,15 +1,16 @@
 using Sirenix.OdinInspector;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CalibrationUI : MonoBehaviour {
-    [SerializeField] Calibration _calibration;
+    [SerializeField] Calibration _calibration; 
     [SerializeField] GameObject[] _tabs;
     [SerializeField] Button _next, _previous;
     [SerializeField] Camera _cam;
     [SerializeField] OVRHand _hand;
     [SerializeField, Get] Canvas _canvas;
-    private void Awake() {
+    private void Start() {
         _next.onClick.AddListener(OnNext);
         _previous.onClick.AddListener(OnPrevious);
         _calibration.CalibrationStep.Sub(OnState);

@@ -99,7 +99,7 @@ public class Calibration : MonoBehaviour {
         } 
 
         if(pointCount == 3) {
-            _tempLine[2] = _placers[2].PreviewObj.position;
+            _tempLine[2] = _placers[2].PreviewOrPlacedPosition;
             _tempLine[2].y = _tempLine[1].y = _tempLine[0].y;
             var surface = 
                 CreateSurface(_tempLine[0], _tempLine[1], _tempLine[2]);

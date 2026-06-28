@@ -22,7 +22,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     enum AutoSetupConfig { None, XRClient, CoachHost}
     [SerializeField] AutoSetupConfig _editorAutoSetupConfig;
 #endif
-    protected override void Awake() {
+    protected void Start() {
         base.Awake();
 
         _netMng.OnConnectionEvent += NetMng_OnConnectionEvent;

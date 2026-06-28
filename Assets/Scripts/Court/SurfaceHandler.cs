@@ -14,12 +14,11 @@ public class SurfaceHandler : MonoBehaviour {
     public void SetSurface(SurfaceData surface) {
         Surface = surface;
         transform.SetPositionAndRotation(surface.Center, surface.Rotation);
-        ScalingTransform.localScale = surface.Size.XZToXYZ();
+        ScalingTransform.localScale = surface.Size;
     }
 
     public void Place(Transform tf) {
         tf.parent = transform;
         tf.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
     }
-
 }

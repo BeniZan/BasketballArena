@@ -10,11 +10,11 @@
       "hash": "fd8ff1fb700caf062eb5cce364c1d0a85f99ebe6"
     },
     "com.meta.xr.mrutilitykit": {
-      "version": "201.0.0",
+      "version": "203.0.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.meta.xr.sdk.core": "201.0.0",
+        "com.meta.xr.sdk.core": "203.0.0",
         "com.unity.textmeshpro": "3.0.6",
         "com.unity.ai.navigation": "1.1.4",
         "com.unity.nuget.newtonsoft-json": "3.0.2"
@@ -22,7 +22,7 @@
       "url": "https://packages.unity.com"
     },
     "com.meta.xr.sdk.core": {
-      "version": "201.0.0",
+      "version": "203.0.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -37,7 +37,7 @@
       "url": "https://packages.unity.com"
     },
     "com.meta.xr.sdk.interaction": {
-      "version": "201.0.0",
+      "version": "203.0.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -47,12 +47,12 @@
       "url": "https://packages.unity.com"
     },
     "com.meta.xr.sdk.interaction.ovr": {
-      "version": "201.0.0",
+      "version": "203.0.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.meta.xr.sdk.core": "201.0.0",
-        "com.meta.xr.sdk.interaction": "201.0.0"
+        "com.meta.xr.sdk.core": "203.0.0",
+        "com.meta.xr.sdk.interaction": "203.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -167,7 +167,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.multiplayer.tools": {
-      "version": "2.2.8",
+      "version": "2.2.9",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -182,7 +182,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
-      "version": "2.11.0",
+      "version": "2.13.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -289,7 +289,7 @@
       }
     },
     "com.unity.timeline": {
-      "version": "1.8.10",
+      "version": "1.8.12",
       "depth": 0,
       "source": "registry",
       "dependencies": {

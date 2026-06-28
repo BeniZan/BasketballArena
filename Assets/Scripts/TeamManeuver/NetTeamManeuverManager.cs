@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
@@ -10,13 +11,13 @@ using UnityEngine.Networking;
 public class NetTeamManeuverManager : NetworkBehaviour
 {
     static public NetTeamManeuverManager Instance { get; private set; }
-    [SerializeField, ReadOnly] List<TeamManeuverData> _allTeamManeuvers;
-    NetworkVariable<string> _syncActiveManeuver 
-        = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [SerializeField, Sirenix.OdinInspector.ReadOnly] List<TeamManeuverData> _allTeamManeuvers;
+    NetworkVariable<FixedString512Bytes> _syncActiveManeuver 
+        = new(new FixedString512Bytes(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     Notifier<TeamManeuverData> _activeManeuver = new();
     public ReadOnlyNotifier<TeamManeuverData> ActiveManeuver => _activeManeuver;
-
+    public IReadOnlyList<TeamManeuverData> AllTeamManeuvers => _allTeamManeuvers;
 #if UNITY_EDITOR
     private void OnValidate() {
         _allTeamManeuvers =
@@ -33,13 +34,15 @@ public class NetTeamManeuverManager : NetworkBehaviour
         }
         Instance = this;
         _syncActiveManeuver.OnValueChanged += OnSyncManeuverChange;
-        OnSyncManeuverChange(default, _syncActiveManeuver.Value);
+        OnSyncManeuverChange(new FixedString512Bytes(), _syncActiveManeuver.Value);
     }
 
-    void OnSyncManeuverChange(string _, string cur) {
-        _activeManeuver.Value = GetTeamManeuver(cur);
+    void OnSyncManeuverChange(FixedString512Bytes _, FixedString512Bytes cur) {
+        var name = cur.ToString();
+        _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetTeamManeuver(name);
     }
 
-    public void Server_SetTeamManeuver(TeamManeuverData teamManeuver) => _syncActiveManeuver.Value = teamManeuver.name;
+    public void Server_SetTeamManeuver(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;
+    public void Server_SetTeamManeuver(TeamManeuverData teamManeuver) => _syncActiveManeuver.Value = teamManeuver ? teamManeuver.name : "";
     public TeamManeuverData GetTeamManeuver(string teamManeuverName) => _allTeamManeuvers.Find(tm => tm.name == teamManeuverName);
 }
