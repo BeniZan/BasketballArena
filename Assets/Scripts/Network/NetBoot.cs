@@ -22,9 +22,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     enum AutoSetupConfig { None, XRClient, CoachHost}
     [SerializeField] AutoSetupConfig _editorAutoSetupConfig;
 #endif
-    protected void Start() {
-        base.Awake();
-
+    private void Start() {
         _netMng.OnConnectionEvent += NetMng_OnConnectionEvent;
         DontDestroyOnLoad(gameObject);
 
@@ -36,12 +34,6 @@ public class NetBoot : SingletonMono<NetBoot> {
         var isXR = deviceModel.Contains("quest") || deviceModel.Contains("oculus");
         SetupPlayerType(isXR);
 #endif
-    }
-
-    void UnsetPlayerType() {
-        _netMng.Shutdown();
-        _playerType.Value = PlayerType.NotSetup;
-        LocalXRDeviceToggle.SetActive(false);
     }
 
     public void SetupPlayerType(bool isXR) {
@@ -82,6 +74,11 @@ public class NetBoot : SingletonMono<NetBoot> {
     }
 
 #if UNITY_EDITOR
+    void UnsetPlayerType() {
+        _netMng.Shutdown();
+        _playerType.Value = PlayerType.NotSetup;
+        LocalXRDeviceToggle.SetActive(false);
+    }
     private void OnGUI() {
         if (!Application.isEditor)
             return;

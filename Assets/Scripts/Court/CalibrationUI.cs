@@ -24,8 +24,8 @@ public class CalibrationUI : MonoBehaviour {
         for(int i=0; i< _tabs.Length; i++) {
             _tabs[i].SetActive((int)_calibration.CalibrationStep.Value == i);
         }
-        _previous.gameObject.SetActive(state > Calibration.Step.NotCalibrated);
-        _next.gameObject.SetActive(state < Calibration.Step.Calibrated);
+        _previous.gameObject.SetActive(state > Calibration.Step.NotCalibrated );
+        _next.gameObject.SetActive(state < Calibration.Step.Calibrated && _calibration.CurrentPlacer.WasPlaced);
     }
     [Button, HorizontalGroup]
     void OnNext() => _calibration.OnConfirmedCalibrationStep();
