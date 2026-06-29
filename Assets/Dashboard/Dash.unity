@@ -408,6 +408,25 @@ MonoBehaviour:
   _iconMargin: {fileID: 21300000, guid: d6786c3f4d9fed24c8036dec94884ebe, type: 3}
   _iconRandomDrill: {fileID: 21300000, guid: 51699416a373ff4409e819ddd26e5aa8, type: 3}
   _iconAnalytics: {fileID: 21300000, guid: ed32b56bb65e73e40b63f34e486bdb03, type: 3}
+  _pickAndRollDrills:
+  - High Screen
+  - Side P&R
+  - Horns
+  - Spain P&R
+  - Step-Up
+  - Drag Screen
+  _shootingDrills:
+  - Catch & Shoot
+  - Off The Dribble
+  - Spot-Up Corner
+  - Pull-Up Mid
+  - Transition 3
+  - Free Throws
+  _postPlaysDrills:
+  - Drop Step
+  - Up & Under
+  - Seal & Feed
+  - Face Up
 --- !u!114 &1488999919
 MonoBehaviour:
   m_ObjectHideFlags: 0

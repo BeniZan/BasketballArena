@@ -2,13 +2,13 @@
     width: 100%;
     height: 100%;
     flex-direction: row;
-    background-color: #000000;
+    background-color: rgb(0, 0, 0);
 }
 
 .left-sidebar {
     width: 279px;
     height: 100%;
-    background-color: #0A0A0A;
+    background-color: rgb(10, 10, 10);
     border-right-width: 1px;
     border-right-color: rgba(255, 255, 255, 0.06);
     flex-direction: column;
@@ -62,7 +62,7 @@
 
 .label-badge-text {
     font-size: 14px;
-    color: #00D4FF;
+    color: rgb(0, 212, 255);
 }
 
 .status-group {
@@ -73,20 +73,20 @@
 .status-dot {
     width: 6px;
     height: 6px;
-    background-color: #10B981;
+    background-color: rgb(16, 185, 129);
     border-radius: 3px;
     margin-right: 6px;
 }
 
 .status-percent {
     font-size: 10px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .toggle-switch {
     width: 40px;
     height: 24px;
-    background-color: #10B981;
+    background-color: rgb(16, 185, 129);
     border-radius: 12px;
     padding: 4px;
     justify-content: center;
@@ -95,7 +95,7 @@
 .toggle-knob {
     width: 16px;
     height: 16px;
-    background-color: #FFFFFF;
+    background-color: rgb(255, 255, 255);
     border-radius: 8px;
 }
 
@@ -117,7 +117,7 @@
 
 .off-def-btn-text {
     font-size: 11px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .off-def-btn.active {
@@ -125,7 +125,7 @@
 }
 
 .off-def-btn.active .off-def-btn-text {
-    color: #FFFFFF;
+    color: rgb(255, 255, 255);
 }
 
 .coach-view-card {
@@ -153,20 +153,20 @@
 
 .coach-view-text {
     font-size: 11px;
-    color: #FFFFFF;
+    color: rgb(255, 255, 255);
 }
 
 .coach-view-toggle {
     width: 40px;
     height: 24px;
-    background-color: rgba(255, 255, 255, 0.10);
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 4px;
     justify-content: center;
 }
 
 .coach-view-toggle.active {
-    background-color: #FF6B00;
+    background-color: rgb(255, 107, 0);
 }
 
 .bottom-info {
@@ -180,17 +180,16 @@
 .bottom-info-dot {
     width: 8px;
     height: 8px;
-    background-color: #10B981;
+    background-color: rgb(16, 185, 129);
     border-radius: 4px;
     margin-right: 8px;
 }
 
 .bottom-info-text {
     font-size: 10px;
-    color: #10B981;
+    color: rgb(16, 185, 129);
 }
 
-/* Center Pane */
 .center-pane {
     flex-grow: 1;
     height: 100%;
@@ -207,7 +206,7 @@
 
 .stream-title {
     font-size: 10px;
-    color: #00D4FF;
+    color: rgb(0, 212, 255);
 }
 
 .stream-mode-toggles {
@@ -229,7 +228,7 @@
 }
 
 .stream-toggle-btn.active {
-    background-color: #FFFFFF;
+    background-color: rgb(255, 255, 255);
 }
 
 .stream-toggle-icon {
@@ -241,16 +240,16 @@
 
 .stream-toggle-text {
     font-size: 10px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .stream-toggle-btn.active .stream-toggle-text {
-    color: #000000;
+    color: rgb(0, 0, 0);
 }
 
 .stream-viewport {
     flex-grow: 1;
-    background-color: #000000;
+    background-color: rgb(0, 0, 0);
     border-radius: 14px;
     border-width: 1px;
     border-color: rgba(255, 255, 255, 0.05);
@@ -272,13 +271,13 @@
 
 .viewport-header {
     font-size: 14px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
     margin-bottom: 4px;
 }
 
 .viewport-subtext {
     font-size: 11px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .bottom-control-bar {
@@ -288,7 +287,7 @@
 
 .control-bar-inner {
     height: 56px;
-    background-color: #0A0A0A;
+    background-color: rgb(10, 10, 10);
     border-radius: 6px;
     flex-direction: row;
     align-items: center;
@@ -304,24 +303,24 @@
 
 .status-lbl {
     font-size: 11px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .status-dot-divider {
     font-size: 11px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
     margin-left: 8px;
     margin-right: 8px;
 }
 
 .status-timer {
     font-size: 11px;
-    color: #FFFFFF;
+    color: rgb(255, 255, 255);
 }
 
 .status-rep {
     font-size: 11px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .controls-group {
@@ -353,50 +352,54 @@
 }
 
 .playback-btn.start {
-    background-color: rgba(255, 107, 0, 0.10);
+    background-color: rgba(255, 107, 0, 0.1);
     width: 77px;
 }
+
 .playback-btn.start .playback-text {
-    color: #FFFFFF;
+    color: rgb(255, 255, 255);
 }
 
 .playback-btn.next {
-    background-color: rgba(0, 212, 255, 0.10);
+    background-color: rgba(0, 212, 255, 0.1);
     width: 73px;
 }
+
 .playback-btn.next .playback-text {
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .playback-btn.pause {
     background-color: rgba(255, 255, 255, 0.03);
     width: 67px;
 }
+
 .playback-btn.pause .playback-text {
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .playback-btn.stop {
     background-color: rgba(239, 68, 68, 0.12);
     width: 62px;
 }
+
 .playback-btn.stop .playback-text {
-    color: #FFFFFF;
+    color: rgb(255, 255, 255);
 }
 
 .playback-btn.force {
     background-color: rgba(255, 255, 255, 0.03);
     width: 60px;
 }
+
 .playback-btn.force .playback-text {
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
-/* Right Sidebar */
 .right-sidebar {
     width: 419px;
     height: 100%;
-    background-color: #0A0A0A;
+    background-color: rgb(10, 10, 10);
     border-left-width: 1px;
     border-left-color: rgba(255, 255, 255, 0.06);
     flex-direction: column;
@@ -417,16 +420,16 @@
 
 .section-title {
     font-size: 11px;
-    color: #00D4FF;
+    color: rgb(0, 212, 255);
 }
 
 .section-title.orange {
-    color: #FF6B00;
+    color: rgb(255, 107, 0);
 }
 
 .section-subtitle {
     font-size: 9px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .exercise-list {
@@ -434,7 +437,11 @@
     margin-top: 10px;
 }
 
-.exercise-item-btn {
+.exercise-foldout {
+    flex-direction: column;
+}
+
+.exercise-foldout-header {
     height: 44px;
     flex-direction: row;
     align-items: center;
@@ -443,6 +450,65 @@
     border-width: 0;
     padding-left: 0;
     padding-right: 0;
+}
+
+.exercise-chevron {
+    width: 6px;
+    height: 6px;
+    margin-left: 2px;
+    margin-right: 12px;
+    border-top-width: 1.5px;
+    border-right-width: 1.5px;
+    border-top-color: rgb(100, 116, 139);
+    border-right-color: rgb(100, 116, 139);
+    rotate: 45deg;
+    transition: rotate 0.15s ease-out;
+}
+
+.exercise-foldout.expanded .exercise-chevron {
+    rotate: 135deg;
+}
+
+.exercise-foldout-content {
+    flex-direction: column;
+    display: none;
+    padding-left: 6px;
+    margin-bottom: 6px;
+}
+
+.exercise-foldout.expanded .exercise-foldout-content {
+    display: flex;
+}
+
+.exercise-sub-item {
+    height: 34px;
+    flex-direction: row;
+    align-items: center;
+    background-color: transparent;
+    border-width: 0;
+    padding-left: 0;
+}
+
+.exercise-sub-icon {
+    width: 0;
+    height: 0;
+    margin-left: 7px;
+    margin-right: 13px;
+    border-top-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 5px;
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-left-color: rgb(71, 85, 105);
+}
+
+.exercise-sub-text {
+    font-size: 12px;
+    color: rgb(148, 163, 184);
+}
+
+.exercise-sub-item:hover .exercise-sub-text {
+    color: rgb(229, 231, 235);
 }
 
 .exercise-left-group {
@@ -459,7 +525,7 @@
 
 .exercise-text {
     font-size: 12px;
-    color: #E5E7EB;
+    color: rgb(229, 231, 235);
 }
 
 .exercise-badge {
@@ -477,7 +543,7 @@
 
 .exercise-badge-text {
     font-size: 10px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .training-flow {
@@ -512,13 +578,13 @@
 
 .build-session-heading {
     font-size: 11px;
-    color: #FF6B00;
+    color: rgb(255, 107, 0);
     margin-bottom: 4px;
 }
 
 .build-session-subtext {
     font-size: 9px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .drill-list-scrollview {
@@ -561,7 +627,7 @@
 
 .random-drill-text {
     font-size: 11px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .analytics-section {
@@ -591,11 +657,11 @@
 
 .analytics-text {
     font-size: 10px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .pro-badge {
-    background-color: rgba(255, 107, 0, 0.20);
+    background-color: rgba(255, 107, 0, 0.2);
     border-radius: 14px;
     width: 27px;
     height: 28px;
@@ -606,7 +672,7 @@
 
 .pro-badge-text {
     font-size: 8px;
-    color: #FF6B00;
+    color: rgb(255, 107, 0);
 }
 
 .upgrade-btn {
@@ -621,12 +687,11 @@
 
 .upgrade-btn-text {
     font-size: 9px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
 }
 
 .analytics-desc {
     font-size: 9px;
-    color: #64748B;
+    color: rgb(100, 116, 139);
     margin-top: 10px;
 }
-

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 
+[ExecuteAlways]
 public class CoachDashboardUIToolkitController : MonoBehaviour
 {
     [Header("Fonts")]
@@ -29,6 +30,13 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     [SerializeField] private Sprite _iconRandomDrill;
     [SerializeField] private Sprite _iconAnalytics;
 
+    [Header("Exercise Foldouts")]
+    [SerializeField] private string[] _pickAndRollDrills = { "High Screen", "Side P&R", "Horns", "Spain P&R", "Step-Up", "Drag Screen" };
+    [SerializeField] private string[] _shootingDrills = { "Catch & Shoot", "Off The Dribble", "Spot-Up Corner", "Pull-Up Mid", "Transition 3", "Free Throws" };
+    [SerializeField] private string[] _postPlaysDrills = { "Drop Step", "Up & Under", "Seal & Feed", "Face Up" };
+
+    private readonly Dictionary<string, System.Action> _foldoutToggleHandlers = new Dictionary<string, System.Action>();
+
     private UIDocument _uiDocument;
     private VisualElement _root;
 
@@ -49,9 +57,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private Button _h2OffenseBtn;
     private Button _h2DefenseBtn;
 
-    private Button _pickAndRollBtn;
-    private Button _shootingBtn;
-    private Button _postPlaysBtn;
     private Button _randomDrillBtn;
 
     private Label _drillsCountText;
@@ -68,22 +73,39 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private void Awake()
     {
         _uiDocument = GetComponent<UIDocument>();
-        if (_uiDocument == null)
+        if (_uiDocument == null && Application.isPlaying)
         {
             Debug.LogError("UIDocument component is required on the same GameObject!");
             return;
         }
     }
 
-    // Setup runs in Start() so the UIDocument has already built its visual tree
-    // in its own OnEnable() before we query elements (avoids ordering NRE).
+    private void OnEnable()
+    {
+        InitializeUI();
+    }
+
     private void Start()
+    {
+        InitializeUI();
+    }
+
+    private void OnValidate()
+    {
+        InitializeUI();
+    }
+
+    private void InitializeUI()
     {
         if (_uiDocument == null) _uiDocument = GetComponent<UIDocument>();
         _root = _uiDocument != null ? _uiDocument.rootVisualElement : null;
         if (_root == null)
         {
-            Debug.LogError("CoachDashboardUIToolkitController: rootVisualElement is null. Is a PanelSettings and Source Asset assigned to the UIDocument?");
+            // Avoid logging errors in Edit Mode if UIDocument has not fully loaded its tree yet
+            if (Application.isPlaying)
+            {
+                Debug.LogError("CoachDashboardUIToolkitController: rootVisualElement is null. Is a PanelSettings and Source Asset assigned to the UIDocument?");
+            }
             return;
         }
 
@@ -106,46 +128,63 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _h2OffenseBtn = _root.Q<Button>("h2OffenseBtn");
         _h2DefenseBtn = _root.Q<Button>("h2DefenseBtn");
 
-        _pickAndRollBtn = _root.Q<Button>("pickAndRollBtn");
-        _shootingBtn = _root.Q<Button>("shootingBtn");
-        _postPlaysBtn = _root.Q<Button>("postPlaysBtn");
         _randomDrillBtn = _root.Q<Button>("randomDrillBtn");
 
         _drillsCountText = _root.Q<Label>("drillsCountText");
         _buildSessionPlaceholder = _root.Q<VisualElement>("buildSessionPlaceholder");
         _drillListContainer = _root.Q<ScrollView>("drillListContainer");
 
-        // Wire event handlers (null-guarded)
-        if (_startBtn != null) _startBtn.clicked += StartTimer;
-        if (_pauseBtn != null) _pauseBtn.clicked += PauseTimer;
-        if (_stopBtn != null) _stopBtn.clicked += StopTimer;
-        if (_nextBtn != null) _nextBtn.clicked += NextRep;
-        if (_forceBtn != null) _forceBtn.clicked += ForceSession;
-
-        if (_realisticBtn != null) _realisticBtn.clicked += () => SetStreamMode(true);
-        if (_hologramBtn != null) _hologramBtn.clicked += () => SetStreamMode(false);
-
-        if (_h1OffenseBtn != null) _h1OffenseBtn.clicked += () => ToggleOffDef(true, true);
-        if (_h1DefenseBtn != null) _h1DefenseBtn.clicked += () => ToggleOffDef(true, false);
-        if (_h2OffenseBtn != null) _h2OffenseBtn.clicked += () => ToggleOffDef(false, true);
-        if (_h2DefenseBtn != null) _h2DefenseBtn.clicked += () => ToggleOffDef(false, false);
-
-        if (_pickAndRollBtn != null) _pickAndRollBtn.clicked += () => AddDrill("PICK & ROLL");
-        if (_shootingBtn != null) _shootingBtn.clicked += () => AddDrill("SHOOTING");
-        if (_postPlaysBtn != null) _postPlaysBtn.clicked += () => AddDrill("POST PLAYS");
-        if (_randomDrillBtn != null) _randomDrillBtn.clicked += AddRandomDrill;
-
         // Apply visual Sprites and Fonts
         ApplySprites();
         ApplyTypography();
 
-        // Initial setup
-        SetStreamMode(true);
-        ToggleOffDef(true, true);
-        ToggleOffDef(false, true);
+        // Build collapsible exercise category foldouts (works in EditMode preview and PlayMode)
+        SetupExerciseFoldout("pickAndRoll", _pickAndRollDrills);
+        SetupExerciseFoldout("shooting", _shootingDrills);
+        SetupExerciseFoldout("postPlays", _postPlaysDrills);
+
+        // Initial setup/visual values that can be shown in editor too
         UpdateTimerDisplay();
         UpdateRepDisplay();
         UpdateDrillsDisplay();
+
+        // Wire event handlers and run play-mode specific visual initializations
+        if (Application.isPlaying)
+        {
+            // Unsubscribe first to avoid double registration in EditMode -> PlayMode transitions
+            if (_startBtn != null) _startBtn.clicked -= StartTimer;
+            if (_pauseBtn != null) _pauseBtn.clicked -= PauseTimer;
+            if (_stopBtn != null) _stopBtn.clicked -= StopTimer;
+            if (_nextBtn != null) _nextBtn.clicked -= NextRep;
+            if (_forceBtn != null) _forceBtn.clicked -= ForceSession;
+
+            if (_startBtn != null) _startBtn.clicked += StartTimer;
+            if (_pauseBtn != null) _pauseBtn.clicked += PauseTimer;
+            if (_stopBtn != null) _stopBtn.clicked += StopTimer;
+            if (_nextBtn != null) _nextBtn.clicked += NextRep;
+            if (_forceBtn != null) _forceBtn.clicked += ForceSession;
+
+            if (_realisticBtn != null) _realisticBtn.clicked += () => SetStreamMode(true);
+            if (_hologramBtn != null) _hologramBtn.clicked += () => SetStreamMode(false);
+
+            if (_h1OffenseBtn != null) _h1OffenseBtn.clicked += () => ToggleOffDef(true, true);
+            if (_h1DefenseBtn != null) _h1DefenseBtn.clicked += () => ToggleOffDef(true, false);
+            if (_h2OffenseBtn != null) _h2OffenseBtn.clicked += () => ToggleOffDef(false, true);
+            if (_h2DefenseBtn != null) _h2DefenseBtn.clicked += () => ToggleOffDef(false, false);
+
+            if (_randomDrillBtn != null) _randomDrillBtn.clicked += AddRandomDrill;
+
+            SetStreamMode(true);
+            ToggleOffDef(true, true);
+            ToggleOffDef(false, true);
+        }
+        else
+        {
+            // In editor mode, let's also visually apply some sensible defaults to the layout (like active tabs) so it looks right in scene view
+            SetStreamMode(true);
+            ToggleOffDef(true, true);
+            ToggleOffDef(false, true);
+        }
     }
 
     private void Update()
@@ -256,6 +295,58 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         }
     }
 
+    private void SetupExerciseFoldout(string baseName, string[] drills)
+    {
+        var foldout = _root.Q<VisualElement>(baseName + "Foldout");
+        var header = _root.Q<Button>(baseName + "Header");
+        var content = _root.Q<VisualElement>(baseName + "Content");
+        var badge = _root.Q<Label>(baseName + "Badge");
+        if (foldout == null || header == null || content == null) return;
+
+        drills = drills ?? new string[0];
+
+        // Auto-derive the count badge from the number of sub-drills
+        if (badge != null) badge.text = drills.Length.ToString();
+
+        // Chevron caret + rotation are drawn entirely via USS (no sprite needed).
+
+        // Rebuild sub-drill rows(Clear prevents duplicates across OnEnable/OnValidate)
+        content.Clear();
+        foreach (var drillName in drills)
+        {
+            var row = new Button { name = baseName + "_" + drillName };
+            row.AddToClassList("exercise-sub-item");
+
+            var icon = new UnityEngine.UIElements.Image();
+            icon.AddToClassList("exercise-sub-icon");
+
+            var lbl = new Label(drillName);
+            lbl.AddToClassList("exercise-sub-text");
+            if (_barlow700 != null) lbl.style.unityFontDefinition = new StyleFontDefinition(_barlow700);
+
+            row.Add(icon);
+            row.Add(lbl);
+
+            if (Application.isPlaying)
+            {
+                string captured = drillName;
+                row.clicked += () => AddDrill(captured);
+            }
+
+            content.Add(row);
+        }
+
+        // Header toggles expand/collapse. Unsubscribe any previous handler first to
+        // avoid double-toggling when InitializeUI runs multiple times.
+        if (_foldoutToggleHandlers.TryGetValue(baseName, out var prev))
+        {
+            header.clicked -= prev;
+        }
+        System.Action toggle = () => foldout.ToggleInClassList("expanded");
+        header.clicked += toggle;
+        _foldoutToggleHandlers[baseName] = toggle;
+    }
+
     private void AddDrill(string drillName)
     {
         _addedDrills.Add(drillName);
@@ -326,7 +417,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private void SetImageSprite(string name, Sprite sprite)
     {
         if (sprite == null) return;
-        var img = _root.Q<Image>(name);
+        var img = _root.Q<UnityEngine.UIElements.Image>(name);
         if (img != null)
         {
             img.sprite = sprite;
