@@ -587,9 +587,10 @@
     color: rgb(100, 116, 139);
 }
 
-.drill-list-scrollview {
+.drill-list-view {
     width: 100%;
     height: 100%;
+    flex-grow: 1;
 }
 
 .drill-item-uss {
@@ -599,12 +600,37 @@
     border-radius: 4px;
     margin-bottom: 4px;
     padding-left: 12px;
-    justify-content: center;
+    padding-right: 6px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .drill-item-text-uss {
     font-size: 11px;
     color: rgba(255, 255, 255, 0.85);
+    flex-grow: 1;
+}
+
+.drill-item-active {
+    background-color: rgba(255, 107, 0, 0.22);
+    border-width: 1px;
+    border-color: rgb(255, 107, 0);
+}
+
+.drill-item-close {
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border-width: 0;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 12px;
+    padding: 0;
+    -unity-text-align: middle-center;
+}
+
+.drill-item-close:hover {
+    color: rgb(239, 68, 68);
 }
 
 .random-drill-btn {

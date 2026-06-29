@@ -61,48 +61,70 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private Label _drillsCountText;
     private VisualElement _buildSessionPlaceholder;
-    private ScrollView _drillListContainer;
+    private ListView _drillListView;
 
     // State variables
     private float _elapsedTime = 0f;
     private bool _isTimerRunning = false;
-    private int _repCount = 0;
-    private int _totalReps = 0;
-    private List<string> _addedDrills = new List<string>();
+    private readonly TrainingSession _session = new TrainingSession();
 
     private void Awake()
     {
-        _uiDocument = GetComponent<UIDocument>();
-        if (_uiDocument == null && Application.isPlaying)
-        {
-            Debug.LogError("UIDocument component is required on the same GameObject!");
-            return;
-        }
+        //_uiDocument = GetComponent<UIDocument>();
+        //if (_uiDocument == null && Application.isPlaying)
+        //{
+        //    Debug.LogError("UIDocument component is required on the same GameObject!");
+        //    return;
+        //}
     }
 
     private void OnEnable()
     {
-        InitializeUI();
+        // Early attempt. The UIDocument may not have built its rootVisualElement yet
+        // (its OnEnable order is not guaranteed relative to ours), so stay silent if
+        // it isn't ready — Start() runs later and will retry.
+        InitializeUI(false);
     }
 
     private void Start()
     {
-        InitializeUI();
+        // Last-resort attempt: by now the UIDocument has definitely built its tree, so
+        // if the root is still null it's a genuine misconfiguration worth reporting.
+        InitializeUI(true);
     }
 
     private void OnValidate()
     {
-        InitializeUI();
+#if UNITY_EDITOR
+        // OnValidate fires at awkward times (play-mode entry, asset reimport) when the
+        // document may be mid-rebuild. Never run during play mode, and defer in edit mode
+        // until the UIDocument has had a chance to (re)build its visual tree.
+        if (Application.isPlaying) return;
+        UnityEditor.EditorApplication.delayCall += () =>
+        {
+            if (this == null) return; // component may have been destroyed in the meantime
+            _uiDocument = GetComponent<UIDocument>();
+            InitializeUI(false);
+        };
+#endif
     }
 
-    private void InitializeUI()
+    private void OnDisable()
+    {
+        _session.OnDrillsChanged -= HandleDrillsChanged;
+        _session.OnActiveDrillChanged -= HandleActiveDrillChanged;
+        if (_drillListView != null) _drillListView.itemIndexChanged -= OnDrillReordered;
+    }
+
+    private void InitializeUI(bool logIfNotReady = false)
     {
         if (_uiDocument == null) _uiDocument = GetComponent<UIDocument>();
         _root = _uiDocument != null ? _uiDocument.rootVisualElement : null;
         if (_root == null)
         {
-            // Avoid logging errors in Edit Mode if UIDocument has not fully loaded its tree yet
-            if (Application.isPlaying)
+            // Only treat a null root as an error from the last-resort Start() path in play
+            // mode; early/edit-mode attempts are expected to no-op until the tree is built.
+            if (Application.isPlaying && logIfNotReady)
             {
                 Debug.LogError("CoachDashboardUIToolkitController: rootVisualElement is null. Is a PanelSettings and Source Asset assigned to the UIDocument?");
             }
@@ -132,7 +154,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         _drillsCountText = _root.Q<Label>("drillsCountText");
         _buildSessionPlaceholder = _root.Q<VisualElement>("buildSessionPlaceholder");
-        _drillListContainer = _root.Q<ScrollView>("drillListContainer");
+        _drillListView = _root.Q<ListView>("drillListContainer");
 
         // Apply visual Sprites and Fonts
         ApplySprites();
@@ -142,6 +164,15 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         SetupExerciseFoldout("pickAndRoll", _pickAndRollDrills);
         SetupExerciseFoldout("shooting", _shootingDrills);
         SetupExerciseFoldout("postPlays", _postPlaysDrills);
+
+        // Bind the data-driven Training Flow ListView and observe the session model.
+        SetupDrillListView();
+
+        // Unsubscribe-first guard so EditMode <-> PlayMode reloads don't double-subscribe.
+        _session.OnDrillsChanged -= HandleDrillsChanged;
+        _session.OnDrillsChanged += HandleDrillsChanged;
+        _session.OnActiveDrillChanged -= HandleActiveDrillChanged;
+        _session.OnActiveDrillChanged += HandleActiveDrillChanged;
 
         // Initial setup/visual values that can be shown in editor too
         UpdateTimerDisplay();
@@ -215,6 +246,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _isTimerRunning = true;
         _statusText.text = "RUNNING";
         _statusText.style.color = new StyleColor(new Color(16f/255f, 185f/255f, 129f/255f, 1f)); // Green
+        // Activate the first drill if the session hasn't started yet.
+        if (_session.ActiveIndex < 0) _session.Start();
     }
 
     private void PauseTimer()
@@ -228,29 +261,23 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     {
         _isTimerRunning = false;
         _elapsedTime = 0f;
-        _repCount = 0;
-        _totalReps = 0;
         _statusText.text = "READY";
         _statusText.style.color = new StyleColor(new Color(100f/255f, 116f/255f, 139f/255f, 1f)); // Gray
         UpdateTimerDisplay();
-        UpdateRepDisplay();
+        _session.Reset(); // clears active drill -> HandleActiveDrillChanged updates repText + highlight
     }
 
     private void NextRep()
     {
         if (_isTimerRunning)
         {
-            _repCount++;
-            _totalReps = Mathf.Max(_totalReps, _repCount);
-            UpdateRepDisplay();
+            _session.Next(); // advances active drill -> HandleActiveDrillChanged updates repText + highlight
         }
     }
 
     private void ForceSession()
     {
-        _repCount += 5;
-        _totalReps = Mathf.Max(_totalReps, _repCount);
-        UpdateRepDisplay();
+        _session.ForceToEnd();
     }
 
     private void UpdateTimerDisplay()
@@ -262,7 +289,11 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void UpdateRepDisplay()
     {
-        _repText.text = string.Format("REP {0}/{1}", _repCount, _totalReps);
+        if (_repText == null) return;
+        var active = _session.ActiveDrill;
+        _repText.text = active == null
+            ? "REP 0/0"
+            : string.Format("{0} · REP {1}/{2}", active, _session.ActiveIndex + 1, _session.Drills.Count);
     }
 
     private void ToggleOffDef(bool isH1, bool isOffense)
@@ -347,13 +378,88 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _foldoutToggleHandlers[baseName] = toggle;
     }
 
+    // ---- Training Flow ListView ------------------------------------------------
+
+    private void SetupDrillListView()
+    {
+        if (_drillListView == null) return;
+
+        _drillListView.itemsSource = _session.Drills;
+        _drillListView.fixedItemHeight = 36;
+        _drillListView.selectionType = SelectionType.Single;
+        _drillListView.reorderable = true;
+        _drillListView.reorderMode = ListViewReorderMode.Animated;
+        _drillListView.makeItem = MakeDrillItem;
+        _drillListView.bindItem = BindDrillItem;
+
+        // Unsubscribe-first guard against EditMode <-> PlayMode reloads.
+        _drillListView.itemIndexChanged -= OnDrillReordered;
+        _drillListView.itemIndexChanged += OnDrillReordered;
+
+        _drillListView.RefreshItems();
+    }
+
+    private VisualElement MakeDrillItem()
+    {
+        var item = new VisualElement();
+        item.AddToClassList("drill-item-uss");
+
+        var label = new Label();
+        label.AddToClassList("drill-item-text-uss");
+        if (_barlow700 != null)
+        {
+            label.style.unityFontDefinition = new StyleFontDefinition(_barlow700);
+        }
+
+        var close = new Button { text = "\u2715" }; // ✕
+        close.AddToClassList("drill-item-close");
+        close.clicked += () =>
+        {
+            if (item.userData is int idx) _session.RemoveAt(idx);
+        };
+
+        item.Add(label);
+        item.Add(close);
+        return item;
+    }
+
+    private void BindDrillItem(VisualElement element, int index)
+    {
+        if (index < 0 || index >= _session.Drills.Count) return;
+
+        element.userData = index; // read by the Close button click handler
+        var label = element.Q<Label>(className: "drill-item-text-uss");
+        if (label != null) label.text = _session.Drills[index];
+        element.EnableInClassList("drill-item-active", index == _session.ActiveIndex);
+    }
+
+    private void OnDrillReordered(int oldIndex, int newIndex)
+    {
+        // ListView already reordered itemsSource (== _session.Drills); just fix the active index.
+        _session.OnReordered(oldIndex, newIndex);
+    }
+
+    // ---- Session event handlers ------------------------------------------------
+
+    private void HandleDrillsChanged()
+    {
+        if (_drillListView != null) _drillListView.RefreshItems();
+        UpdateDrillsDisplay();
+    }
+
+    private void HandleActiveDrillChanged()
+    {
+        UpdateRepDisplay();
+        if (_drillListView != null)
+        {
+            _drillListView.RefreshItems(); // re-evaluate the .drill-item-active highlight
+            if (_session.ActiveIndex >= 0) _drillListView.ScrollToItem(_session.ActiveIndex);
+        }
+    }
+
     private void AddDrill(string drillName)
     {
-        _addedDrills.Add(drillName);
-        UpdateDrillsDisplay();
-
-        // Create visual drill element
-        CreateVisualDrillItem(drillName);
+        _session.AddDrill(drillName); // -> HandleDrillsChanged refreshes the list + count
     }
 
     private void AddRandomDrill()
@@ -363,34 +469,20 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         AddDrill(drill);
     }
 
-    private void CreateVisualDrillItem(string drillName)
-    {
-        var item = new VisualElement();
-        item.AddToClassList("drill-item-uss");
-
-        var label = new Label(drillName);
-        label.AddToClassList("drill-item-text-uss");
-        if (_barlow700 != null)
-        {
-            label.style.unityFontDefinition = new StyleFontDefinition(_barlow700);
-        }
-
-        item.Add(label);
-        _drillListContainer.Add(item);
-    }
-
     private void UpdateDrillsDisplay()
     {
-        _drillsCountText.text = string.Format("{0} drills", _addedDrills.Count);
-        if (_addedDrills.Count > 0)
+        int count = _session.Drills.Count;
+        if (_drillsCountText != null) _drillsCountText.text = string.Format("{0} drills", count);
+
+        if (count > 0)
         {
-            _buildSessionPlaceholder.style.display = DisplayStyle.None;
-            _drillListContainer.style.display = DisplayStyle.Flex;
+            if (_buildSessionPlaceholder != null) _buildSessionPlaceholder.style.display = DisplayStyle.None;
+            if (_drillListView != null) _drillListView.style.display = DisplayStyle.Flex;
         }
         else
         {
-            _buildSessionPlaceholder.style.display = DisplayStyle.Flex;
-            _drillListContainer.style.display = DisplayStyle.None;
+            if (_buildSessionPlaceholder != null) _buildSessionPlaceholder.style.display = DisplayStyle.Flex;
+            if (_drillListView != null) _drillListView.style.display = DisplayStyle.None;
         }
     }
 

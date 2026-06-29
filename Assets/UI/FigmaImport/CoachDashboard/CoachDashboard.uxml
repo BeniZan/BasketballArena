@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/FigmaImport/CoachDashboard/CoachDashboard.uss?fileID=7433441132597879392&amp;guid=b8050dce562aa5f4985b2d592fc275f5&amp;type=3#CoachDashboard"/>
+    <Style src="project://database/Assets/UI/FigmaImport/CoachDashboard/CoachDashboard.uss?fileID=7433441132597879392&amp;guid=b8050dce562aa5f4985b2d592fc275f5&amp;type=3"/>
     <ui:VisualElement class="dashboard-root">
         <ui:VisualElement class="left-sidebar">
             <ui:VisualElement class="logo-area">
@@ -89,7 +89,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="bottom-control-bar">
-                <ui:VisualElement class="control-bar-inner">
+                <ui:VisualElement name="controller" class="control-bar-inner">
                     <ui:VisualElement class="status-label-group">
                         <ui:Label name="statusText" text="READY" class="status-lbl"/>
                         <ui:Label text="·" class="status-dot-divider"/>
@@ -168,7 +168,7 @@
                 </ui:ScrollView>
             </ui:VisualElement>
             <ui:VisualElement class="separator"/>
-            <ui:VisualElement class="training-flow">
+            <ui:VisualElement name="trainingFlow" class="training-flow">
                 <ui:VisualElement name="headDrillsCount" class="section-header">
                     <ui:Label text="TRAINING FLOW" class="section-title orange"/>
                     <ui:Label name="drillsCountText" text="0 drills" class="section-subtitle"/>
