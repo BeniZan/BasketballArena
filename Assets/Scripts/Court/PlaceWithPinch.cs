@@ -10,13 +10,37 @@ public class PlaceWithPinch : MonoBehaviour {
     [SerializeField] LineRenderer _lineRend;
     [SerializeField] EnvironmentRaycastManager _raycastManager;
     [SerializeField] Transform _preview;
-    [SerializeField] PlaceWithAnchor _placeObj;
+    [SerializeField] Transform _placeObj;
+    public string Description;
     public float PinchThreshold = 0.7f;
-    [NonSerialized, ShowInInspector] public bool WasPlaced;
+    [NonSerialized, ShowInInspector] public bool WasPlaced; 
+    public Transform PreviewObj => _preview;
+    public Transform PlacedObj => _placeObj;
+    bool _isPlacing;
+    public Vector3 PreviewOrPlacedPosition => WasPlaced ? _placeObj.position : _preview.position;
+    public bool IsPlacing {
+        get => isActiveAndEnabled && _isPlacing;
+        set {
+            enabled = _isPlacing = value;
+            if(!_isPlacing)
+                _preview.gameObject.SetActive(_isPlacing);
+        }
+    }
 
     private void Awake() {
-        _placeObj.Target.gameObject.SetActive(false);
+        IsPlacing = _isPlacing;
     }
+
+    private void OnEnable() {
+        _preview.gameObject.SetActive(true);
+        _lineRend.enabled = true;
+    }
+
+    private void OnDisable() {
+        _preview.gameObject.SetActive(false); 
+        _lineRend.enabled = false;
+    }
+
 
     private void Update() { 
         var pinchValue = _xrPlayer.LocalRightHand.GetFingerPinchStrength(0);  
@@ -29,14 +53,19 @@ public class PlaceWithPinch : MonoBehaviour {
         _preview.gameObject.SetActive(rayHit); 
         _preview.position = hitPoint;
         if (isPinching && rayHit) {
-            _placeObj.Target.gameObject.SetActive(true);
-            _placeObj.RequestMove(new Pose() { position = hitPoint, rotation = Quaternion.identity });
+            _placeObj.gameObject.SetActive(true); 
+            _placeObj.transform.position = hitPoint;
             WasPlaced = true;
         } 
     }
 
     bool Raycast(Ray ray, out Vector3 hit) {
         if (Application.isEditor) {
+            if (!MRUK.Instance) {
+                hit = default;
+                return false;
+            }
+
             var room = MRUK.Instance.GetCurrentRoom();
             if (!room) {
                 hit = default;
@@ -64,6 +93,5 @@ public class PlaceWithPinch : MonoBehaviour {
         _lineRend.startColor = color;
         _lineRend.endColor = color;
     }
-
 
 }

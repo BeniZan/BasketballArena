@@ -4,30 +4,44 @@ using System;
 using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
+[DefaultExecutionOrder(-1000)]
 public class NetBoot : SingletonMono<NetBoot> {
     public enum PlayerType { NotSetup, XRPlayer, Coach }
     Notifier<PlayerType> _playerType = new Notifier<PlayerType>(PlayerType.NotSetup);
     [SerializeField, Get] NetworkManager _netMng;
     [SerializeField] NetworkObject _CoachHostPrefab, _XRClientPrefab;
-    [SerializeField] GameObject LocalXRDevice;
+    [SerializeField] GameObject LocalXRDeviceToggle;
     GameObject _spawnedXRDevice;
     public ReadOnlyNotifier<PlayerType> Type => _playerType;
     public bool IsXR => _playerType.Value == PlayerType.XRPlayer;
     public bool IsCoach => _playerType.Value == PlayerType.Coach;
     public bool PlayerTypeReady => _playerType.Value != PlayerType.NotSetup;
     public bool IsConnectionAwaiting => _netMng.IsListening && _netMng.IsClient && !_netMng.IsConnectedClient;
-    public bool IsConnected => _netMng.IsListening && _netMng.IsConnectedClient;  
+    public bool IsConnected => _netMng.IsListening && _netMng.IsConnectedClient;
+#if UNITY_EDITOR
+    enum AutoSetupConfig { None, XRClient, CoachHost}
+    [SerializeField] AutoSetupConfig _editorAutoSetupConfig;
+#endif
     protected override void Awake() {
         base.Awake();
 
         _netMng.OnConnectionEvent += NetMng_OnConnectionEvent;
         DontDestroyOnLoad(gameObject);
 
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
+        if (_editorAutoSetupConfig != AutoSetupConfig.None)
+            SetupPlayerType(_editorAutoSetupConfig == AutoSetupConfig.XRClient);
+#else
         var deviceModel = SystemInfo.deviceModel.ToLower();
         var isXR = deviceModel.Contains("quest") || deviceModel.Contains("oculus");
         SetupPlayerType(isXR);
 #endif
+    }
+
+    void UnsetPlayerType() {
+        _netMng.Shutdown();
+        _playerType.Value = PlayerType.NotSetup;
+        LocalXRDeviceToggle.SetActive(false);
     }
 
     public void SetupPlayerType(bool isXR) {
@@ -38,7 +52,7 @@ public class NetBoot : SingletonMono<NetBoot> {
         var type = isXR ? PlayerType.XRPlayer : PlayerType.Coach;
         _playerType.Value = type;
         StartNetwork(isXR);
-        LocalXRDevice.SetActive(isXR);
+        LocalXRDeviceToggle.SetActive(isXR);
     } 
 
     private void NetMng_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {
@@ -88,8 +102,8 @@ public class NetBoot : SingletonMono<NetBoot> {
 
     void ConnectionAwaitingGUI() {
         GUILayout.Label("Connecting...");
-        if(GUILayout.Button("Cancel"))
-            _netMng.Shutdown();
+        if (GUILayout.Button("Cancel")) 
+            UnsetPlayerType();
     }
 
     void ConnectedGUI() {

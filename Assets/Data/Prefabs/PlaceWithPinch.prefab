@@ -51,7 +51,7 @@ MonoBehaviour:
   _lineRend: {fileID: 4045666745126117985}
   _raycastManager: {fileID: 0}
   _preview: {fileID: 8869241014712928960}
-  _placeObj: {fileID: 2583518817218316186}
+  _placeObj: {fileID: 3543322273358360773}
   PinchThreshold: 0.7
 --- !u!1 &4872983188469118177
 GameObject:
@@ -235,7 +235,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3543322273358360773}
-  - component: {fileID: 2583518817218316186}
   m_Layer: 0
   m_Name: Placement
   m_TagString: Untagged
@@ -258,16 +257,3 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6309286299028076609}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2583518817218316186
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6971256035335256651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb0759fcaf5048019bc91417cdeabb24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: meta.xr.mrutilitykit::Meta.XR.MRUtilityKit.BuildingBlocks.PlaceWithAnchor
-  Target: {fileID: 3543322273358360773}

@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7f63e253653e34893818f789375768, type: 3}
+  m_Name: Scene_02_a_converted_move_4
+  m_EditorClassIdentifier: Assembly-CSharp::TeamManeuver
+  OriginPoint: {x: 0, y: 0, z: 0}
+  OriginYRotation: 0
+  CharsData:
+  - FieldStandardPosition: {x: 5.4968977, y: 5.713391}
+    yRotation: 149.19618
+    Animation: {fileID: 7400000, guid: e4d5634eff5459d4ab2ae477d6dc485f, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 2.3520832, y: 3.5727491}
+    yRotation: 57.48695
+    Animation: {fileID: 7400000, guid: 5a95f096a073196448e5825df4fc0088, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 2.0683732, y: 4.481208}
+    yRotation: 142.24292
+    Animation: {fileID: 7400000, guid: 9cd18eac125b23543bcaa8655ee77235, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -2.896158, y: 6.6906486}
+    yRotation: 147.70572
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -7.10456, y: 4.8480706}
+    yRotation: 58.84288
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -2.3004172, y: -0.08003569}
+    yRotation: 4.4117403
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 5.2830105, y: 10.893637}
+    yRotation: 240.45589
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -1.8232801, y: 2.7094316}
+    yRotation: 125.46039
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 3.6092925, y: 10.053091}
+    yRotation: 57.838184
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0

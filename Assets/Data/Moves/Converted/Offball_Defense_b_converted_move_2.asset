@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7f63e253653e34893818f789375768, type: 3}
+  m_Name: Offball_Defense_b_converted_move_2
+  m_EditorClassIdentifier: Assembly-CSharp::TeamManeuver
+  OriginPoint: {x: 0, y: 0, z: 0}
+  OriginYRotation: 0
+  CharsData:
+  - FieldStandardPosition: {x: 3.3890464, y: 3.4499974}
+    yRotation: 150.65976
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -0.17287874, y: 1.6125569}
+    yRotation: 146.14548
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 2.4087548, y: 9.049963}
+    yRotation: 153.75534
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -3.6800454, y: 6.2842054}
+    yRotation: 129.88506
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -0.13940763, y: 7.1092906}
+    yRotation: 144.06516
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -1.9473236, y: -0.25528383}
+    yRotation: 0.813876
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 5.849313, y: 4.786405}
+    yRotation: 295.26248
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 4.9364557, y: 11.1863}
+    yRotation: 221.08263
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -7.0022297, y: 4.867032}
+    yRotation: 60.179977
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
