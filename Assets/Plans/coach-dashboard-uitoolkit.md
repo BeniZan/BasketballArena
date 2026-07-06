@@ -591,3 +591,60 @@ ListView gives drag-reorder for free via `reorderable`/`reorderMode`, virtualiza
 - **repText sync:** With drills present, START sets active to the first drill; `repText` shows `"<DRILL> · REP 1/N"`. NEXT advances to the next drill and updates the text; the active row is highlighted (orange border/background) and scrolled into view. STOP resets to `"REP 0/0"` and clears the highlight.
 - **Reorder/delete vs active:** Deleting or moving the active drill updates `repText` and the highlight correctly (active follows its drill on move; clamps sensibly on delete).
 - **EditMode/PlayMode:** No duplicate event subscriptions or console errors entering/exiting Play Mode (unsubscribe-first guards + `OnDisable`).
+
+---
+
+# Amendment C — Bugfix: Drills Don't Appear in Training Flow (ScrollView vs ListView)
+
+## C.0 Symptom (reported by user)
+When selecting a training type from the Exercise Library (sub-drill click), nothing appears in the Training Flow `drillListContainer`. The "Build Your Session" placeholder disappears but no drill rows are shown — the area is empty.
+
+## C.1 Root Cause (confirmed by static analysis)
+Plan **Step B3** (convert `drillListContainer` from `ScrollView` → `ListView`) was **never applied** to the UXML, even though the controller (Step B4) was rewritten to use a `ListView`. The result is a hard type/name mismatch:
+
+- **UXML** `Assets/UI/FigmaImport/CoachDashboard/CoachDashboard.uxml` line 182 (current, WRONG):
+  ```xml
+  <ui:ScrollView name="drillListContainer" class="drill-list-scrollview" style="display: none;"/>
+  ```
+- **Controller** `CoachDashboardUIToolkitController.cs` line 157:
+  ```csharp
+  _drillListView = _root.Q<ListView>("drillListContainer"); // returns null — element is a ScrollView
+  ```
+
+Consequences when `_drillListView == null`:
+1. `SetupDrillListView()` returns early — `itemsSource`/`makeItem`/`bindItem`/`reorderable` never configured.
+2. `HandleDrillsChanged()` skips `_drillListView.RefreshItems()` (null guard) → no rows render.
+3. `UpdateDrillsDisplay()` hides `buildSessionPlaceholder` (count > 0) but cannot show the null ListView → empty area.
+
+Secondary issue: UXML class `drill-list-scrollview` does not match the USS rule `.drill-list-view`, so the container also lacks its width/height/flex sizing.
+
+## C.2 Fix — single UXML edit
+In `Assets/UI/FigmaImport/CoachDashboard/CoachDashboard.uxml`, replace line 182:
+```xml
+<ui:ScrollView name="drillListContainer" class="drill-list-scrollview" style="display: none;"/>
+```
+with a `ListView` matching the controller and USS:
+```xml
+<ui:ListView name="drillListContainer" class="drill-list-view"
+             reorderable="true" reorder-mode="Animated"
+             virtualization-method="DynamicHeight"
+             show-border="false" selection-type="Single"
+             style="display: none;"/>
+```
+No controller or USS changes are required — the controller (Step B4) and USS `.drill-list-view` / `.drill-item-*` rules (Step B5) are already in place and correct. This is the missing Step B3.
+
+## C.3 Implementation Steps
+
+### Step C1: Apply the UXML ListView swap
+- **Description:** Edit `CoachDashboard.uxml` line 182 per C.2 — change the `drillListContainer` element from `ScrollView` (class `drill-list-scrollview`) to `ListView` (class `drill-list-view`) with the reorder/selection attributes.
+- **Assigned role:** developer | **Dependencies:** None | **Parallelizable:** No
+
+### Step C2: Verify in Play Mode
+- **Description:** Open `Assets/Dashboard/Dash.unity`, enter Play Mode, expand an Exercise Library category, and click a sub-drill. Confirm the drill row appears in the Training Flow, the placeholder hides, the `N drills` counter increments, the ✕ delete works, and drag-reorder works. Confirm no console errors.
+- **Assigned role:** developer | **Dependencies:** Step C1 | **Parallelizable:** No
+
+## C.4 Verification & Testing (Amendment C)
+- **Add:** Clicking a sub-drill now adds a visible row to the Training Flow ListView; the "Build Your Session" placeholder hides and the `N drills` count increments.
+- **Delete / Reorder:** Per-row ✕ removes the correct row; drag reorders rows (animated handle).
+- **repText sync:** START highlights the first drill and shows `"<DRILL> · REP 1/N"`; NEXT advances and scrolls the active row into view.
+- **No console errors** entering/exiting Play Mode; `_drillListView` is non-null after the swap.

@@ -154,7 +154,30 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         _drillsCountText = _root.Q<Label>("drillsCountText");
         _buildSessionPlaceholder = _root.Q<VisualElement>("buildSessionPlaceholder");
+
+        // Robustly acquire the Training Flow ListView. The runtime UI Toolkit importer in
+        // this project does not reliably instantiate a <ui:ListView> from UXML (it can fall
+        // back to a ScrollView), which would leave _drillListView null and nothing rendered.
+        // So if the named element is missing or is not a real ListView, we create the
+        // ListView in C# (guaranteed correct type) and insert it where the UXML element was.
         _drillListView = _root.Q<ListView>("drillListContainer");
+        if (_drillListView == null)
+        {
+            var existing = _root.Q<VisualElement>("drillListContainer");
+            VisualElement parent = existing != null ? existing.parent : _root.Q<VisualElement>(className: "training-flow-content");
+            int insertIndex = (existing != null && parent != null) ? parent.IndexOf(existing) : -1;
+            if (existing != null) existing.RemoveFromHierarchy();
+
+            _drillListView = new ListView { name = "drillListContainer" };
+            _drillListView.AddToClassList("drill-list-view");
+            _drillListView.style.display = DisplayStyle.None;
+
+            if (parent != null)
+            {
+                if (insertIndex >= 0 && insertIndex <= parent.childCount) parent.Insert(insertIndex, _drillListView);
+                else parent.Add(_drillListView);
+            }
+        }
 
         // Apply visual Sprites and Fonts
         ApplySprites();
