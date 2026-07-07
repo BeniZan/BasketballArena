@@ -3976,7 +3976,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 65c6e778-10b3-4490-89da-008a18aa116a
-  instanceId: e448fef1-3e9d-4b4e-ad32-18e38ba19933
+  instanceId: 49343623-00b5-4669-b622-c1e2c587975a
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 8567f25e-711a-4b11-9c24-c59866c57c50
@@ -6206,7 +6206,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 5817f7c0-f2a5-45f9-a5ca-64264e0166e8
-  instanceId: 9f9e8bab-e3d6-41a7-995a-d8fa227b930e
+  instanceId: fefc6f42-3efd-4c1d-aeb4-0b3c0595f23f
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -19678,7 +19678,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 3ce5fc30-a5c9-4ad0-a76d-3583bcd405b0
-  instanceId: 22ea0a3a-f0cb-4d13-a560-56a9e41848f9
+  instanceId: 6883a034-62a0-47d0-a0a5-c3298b85a0d2
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -48303,7 +48303,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 81f55626-5fad-45e9-a1df-184f330da7ba
-  instanceId: bae04936-7e61-4cae-bd1e-fba129ce3d52
+  instanceId: 98671906-8620-49eb-a49c-e918d9bad455
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 2063f481-1b63-4eda-9ee8-a00df98536bc
@@ -49572,7 +49572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: e47682b9-c270-40b1-b16d-90b627a5ce1b
-  instanceId: 7fc538d4-23fa-4359-9316-e5b313cb28c0
+  instanceId: 4c55b80e-fc4c-4bc3-8662-985816ecfb97
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -55949,7 +55949,6 @@ GameObject:
   - component: {fileID: 6914738047965725255}
   - component: {fileID: 4804860861371666592}
   - component: {fileID: 7845992966334461610}
-  - component: {fileID: 5812823325863592032}
   - component: {fileID: 2707485237981679372}
   m_Layer: 3
   m_Name: Test Moves GUI
@@ -55966,7 +55965,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5428819872074687974}
   m_LocalRotation: {x: -0, y: -0.262947, z: -0, w: 0.9648103}
-  m_LocalPosition: {x: 0, y: 0, z: 0.495}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.001, y: 0.001, z: 0.001}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -55976,8 +55975,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -30.49, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.404, y: 0}
-  m_SizeDelta: {x: 0.48, y: 0.23}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 480, y: 360}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &3180990084824760912
 Canvas:
@@ -56069,36 +56068,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5428819872074687974}
   m_CullTransparentMesh: 1
---- !u!114 &5812823325863592032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5428819872074687974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &2707485237981679372
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67904,7 +67873,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 80aa2eb2-af2f-40a9-ad9e-18044ce65bee
-  instanceId: 8808c3c6-1775-4186-ab3b-260e3872f5cb
+  instanceId: 8975d71c-3ee2-4812-9455-9d6561c3ec25
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -69231,7 +69200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: f0540b20-dfd6-420e-b20d-c270f88dc77e
-  instanceId: 99809ce2-3b09-4f10-8efa-f8555b2c36fd
+  instanceId: 8c174642-acb6-409f-a969-b7e057c1f4b7
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -70454,7 +70423,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: d4413f4f-542f-451f-92ee-4801f27d676a
-  instanceId: c0eaac09-b0c7-40b8-8e5e-cc90a5d905de
+  instanceId: 6acceb32-5254-48d9-8deb-70e0a8c7bb6e
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -72990,7 +72959,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 5817f7c0-f2a5-45f9-a5ca-64264e0166e8
-  instanceId: a0026ba7-c1f9-4a06-a417-322adff477f0
+  instanceId: e92f8272-8d6f-4a90-bbb5-ae1c8f9e488b
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -86216,7 +86185,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8712643589950374014
 RectTransform:
   m_ObjectHideFlags: 0
@@ -86225,7 +86194,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8001532354415529362}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.00020088804}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -86234,10 +86203,10 @@ RectTransform:
   - {fileID: 2803654566422575338}
   m_Father: {fileID: 2506956006654819979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 565.81, y: 226.8}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -0.00018310547, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5734429654078724638
 CanvasRenderer:
@@ -90490,7 +90459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 8b26b298-7bf4-490e-b245-a039c0184303
-  instanceId: 85c4bb2f-ea65-479e-a8fe-85b477e0692d
+  instanceId: 07814b5f-975a-4b49-bce3-8f39324cae59
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -94351,7 +94320,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 8b26b298-7bf4-490e-b245-a039c0184303
-  instanceId: 0d169040-f778-442a-ad16-1c978b01ad88
+  instanceId: dded50fa-c5c7-4704-af4e-1461d35fea29
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -98432,7 +98401,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _position: {x: 0, y: 0, z: 0}
-  _size: {x: 0.48, y: 0.23, z: 0.01}
+  _size: {x: 480, y: 360, z: 0.01}
 --- !u!114 &2870744364369309108
 MonoBehaviour:
   m_ObjectHideFlags: 0

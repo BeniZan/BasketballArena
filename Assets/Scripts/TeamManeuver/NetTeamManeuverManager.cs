@@ -15,9 +15,11 @@ public class NetTeamManeuverManager : NetworkBehaviour
     NetworkVariable<FixedString512Bytes> _syncActiveManeuver 
         = new(new FixedString512Bytes(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    Notifier<TeamManeuverData> _activeManeuver = new();
+    [ShowInInspector]
+    readonly Notifier<TeamManeuverData> _activeManeuver =  new();
     public ReadOnlyNotifier<TeamManeuverData> ActiveManeuver => _activeManeuver;
     public IReadOnlyList<TeamManeuverData> AllTeamManeuvers => _allTeamManeuvers;
+    public int ActiveManeuverIdx => _activeManeuver.Value ? _allTeamManeuvers.IndexOf(_activeManeuver.Value) : -1;
 #if UNITY_EDITOR
     private void OnValidate() {
         _allTeamManeuvers =

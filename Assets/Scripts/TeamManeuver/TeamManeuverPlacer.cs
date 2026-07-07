@@ -37,7 +37,7 @@ public class TeamManeuverPlacer : MonoBehaviour {
 
         var pos = _currentActive.OriginPoint;
         var rot = Quaternion.Euler(0f, _currentActive.OriginYRotation, 0f);
-        _courtSurface.Place(_courtTf);
+        _courtSurface.ParentAndPlace(_courtTf);
         _courtTf.SetLocalPositionAndRotation(pos, rot);
 
         int i = 0;
@@ -45,7 +45,7 @@ public class TeamManeuverPlacer : MonoBehaviour {
             if (_placedChars.Count <= i) {
                 var spawned = Instantiate(_templateChar);
                 spawned.gameObject.SetActive(true);
-                _courtSurface.Place(spawned.transform);
+                _courtSurface.ParentAndPlace(spawned.transform);
                 _placedChars.Add(spawned);
             }
             _placedChars[i].SetData(_currentActive.CharsData[i]);

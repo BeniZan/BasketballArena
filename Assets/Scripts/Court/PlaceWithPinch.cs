@@ -13,6 +13,7 @@ public class PlaceWithPinch : MonoBehaviour {
     [SerializeField] Transform _placeObj;
     public string Description;
     public float PinchThreshold = 0.7f;
+    public event Action OnPlaced;   
     [NonSerialized, ShowInInspector] public bool WasPlaced; 
     public Transform PreviewObj => _preview;
     public Transform PlacedObj => _placeObj;
@@ -56,6 +57,7 @@ public class PlaceWithPinch : MonoBehaviour {
             _placeObj.gameObject.SetActive(true); 
             _placeObj.transform.position = hitPoint;
             WasPlaced = true;
+            OnPlaced?.Invoke();
         } 
     }
 

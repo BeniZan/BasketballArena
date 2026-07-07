@@ -1,5 +1,6 @@
 using Meta.XR; 
 using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI; 
@@ -19,6 +20,7 @@ public class Calibration : MonoBehaviour {
     public float MinPinchForLine = 0.2f, PinchThreshold = 0.85f;
     Awaitable _calibrationAwait;
     CustomLogger _logger; 
+    public IReadOnlyList<PlaceWithPinch> Placers => _placers;
 
     PlaceWithPinch GetPlacer(Step s) {
         var idx = (int)s;
@@ -79,6 +81,7 @@ public class Calibration : MonoBehaviour {
         } 
         catch(System.Exception ex) { Debug.LogException(ex); } 
         finally {
+            _courtSurfacePreview.gameObject.SetActive(IsCalibrating);
             CalibrationStep.Value = Step.Calibrated;
             _calibrationAwait = null;
             _logger.Log("Calibration Done");

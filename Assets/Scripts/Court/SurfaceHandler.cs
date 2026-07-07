@@ -17,7 +17,7 @@ public class SurfaceHandler : MonoBehaviour {
         ScalingTransform.localScale = surface.Size;
     }
 
-    public void Place(Transform tf) {
+    public void ParentAndPlace(Transform tf) {
         tf.parent = transform;
         tf.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
     }
