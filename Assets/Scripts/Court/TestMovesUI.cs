@@ -17,11 +17,14 @@ public class TestMovesUI : MonoBehaviour {
                 .Select(m => new TMP_Dropdown.OptionData(m.name)));
             _dropdown.options = options;
             _dropdown.onValueChanged.AddListener(OnDropdown);
-            var idx = manager.ActiveManeuverIdx;
-            _dropdown.SetValueWithoutNotify(idx);
+            SetDropdownValue();
             manager.ActiveManeuver.Sub(OnActiveManeuver);
         }
         else gameObject.SafeDestroy();
+    }
+
+    private void OnEnable() {
+        SetDropdownValue();
     }
 
     void OnDropdown(int i) {
@@ -29,10 +32,12 @@ public class TestMovesUI : MonoBehaviour {
         manager.Server_SetTeamManeuver(i);
     }
 
-    void OnActiveManeuver(TeamManeuverData _) {
+    void OnActiveManeuver(TeamManeuverData _) => SetDropdownValue();
+
+    void SetDropdownValue() {
         _dropdown.SetValueWithoutNotify(NetTeamManeuverManager.Instance.ActiveManeuverIdx);
     }
-     
+
     void OnCalibrationState(Calibration.Step step) {
         gameObject.SetActive(step == Calibration.Step.Calibrated);
     }

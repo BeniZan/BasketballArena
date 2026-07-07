@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 #if UNITY_EDITOR
 using Sirenix.Utilities.Editor;
 #endif
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -14,7 +15,9 @@ public class TeamManeuverPlacer : MonoBehaviour {
     [SerializeField] NetTeamManeuverManager _manager;
     [SerializeField, ReadOnly] List<CharComponent> _placedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] TeamManeuverData _currentActive;
-    
+
+    public event Action OnManuverPlaced;
+
     public IReadOnlyList<CharComponent> PlacedChars => _placedChars;
 
     private void Awake() {
@@ -28,7 +31,8 @@ public class TeamManeuverPlacer : MonoBehaviour {
             Deactivate();
         if (move) 
             _currentActive = move;
-        UpdateChars(); 
+        UpdateChars();
+        OnManuverPlaced?.Invoke();
     }
 
     public void UpdateChars() {
