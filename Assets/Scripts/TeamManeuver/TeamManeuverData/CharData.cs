@@ -13,6 +13,7 @@ using UnityEngine.Scripting;
 [System.Serializable]
 public class CharData {
     static public readonly Vector2 FieldStandardSize = new Vector2(28f, 15f);
+#if UNITY_EDITOR
     static public ValueDropdownList<AnimationClip> _animationDropdown = new();
     static public AnimationClip GetAnimation(string name) {
         foreach(var animPair in _animationDropdown) { 
@@ -21,9 +22,6 @@ public class CharData {
         }
         return null;
     }
-
-#if UNITY_EDITOR   
-
     static CharData() {
         EditorApplication.delayCall += LoadAnimations;
         EditorApplication.projectChanged += LoadAnimations;
@@ -48,7 +46,9 @@ public class CharData {
     public Vector2 FieldStandardPosition;
     [PropertyRange(0f, 360f)]
     public float yRotation;
+#if UNITY_EDITOR
     [ValueDropdown(nameof(_animationDropdown), AppendNextDrawer = true)]
+#endif
     public AnimationClip Animation; 
     public float AnimationTimeOffset;
     public bool IsFriendly;

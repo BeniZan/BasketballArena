@@ -1,3 +1,4 @@
+using SingletonBehaviors;
 using Sirenix.OdinInspector;
 using System;
 using System.Security.Cryptography.X509Certificates;
@@ -6,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.EventSystems;
 using UnityEngine.Playables;
- 
+
 [SelectionBase]
 public class CharComponent : MonoBehaviour {
     [SerializeField] Animator _anim;
@@ -17,7 +18,6 @@ public class CharComponent : MonoBehaviour {
     public AnimationClip Clip => _clipPlayable.IsValid() ? _clipPlayable.GetAnimationClip() : null;
     PlayableGraph _graph;
     AnimationClipPlayable _clipPlayable;
-
     public void SetData(CharData data) {
         _data = data;
         if(data != null) { 
@@ -27,8 +27,6 @@ public class CharComponent : MonoBehaviour {
             SetAnim(data.Animation);
         }
     } 
-
-
     private void OnEnable() {
         _anim.fireEvents = false;
         _graph = PlayableGraph.Create("SingleAnimationGraph");
@@ -46,12 +44,7 @@ public class CharComponent : MonoBehaviour {
         if (_clipPlayable.IsValid())
             _clipPlayable.SetTime(time + (_data?.AnimationTimeOffset ?? 0f) );
         _graph.Evaluate();
-    }
-
-    private void Update() {
-        SetData(_data); 
-    }  
-
+    } 
     void SetAnim(AnimationClip clip) {
         if (clip == Clip)
             return;
