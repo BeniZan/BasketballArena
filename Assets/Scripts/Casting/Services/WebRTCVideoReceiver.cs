@@ -5,93 +5,99 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using WebSocketSharp;
+using Sirenix.OdinInspector;
+using Unity.Netcode;
 
 public class WebRTCVideoReceiver : MonoBehaviour
 {
+    public const string TYPE_ANSWER = "answer";
+    public const string TYPE_CANDIDATE = "candidate";
+    public const string REQUEST_VIDEO = "start";
+    public const string STOP_VIDEO = "stop";
+
     public RawImage displayImage;
     public string signalingServerUrl = "ws://127.0.0.1:8080/"; // או ה-IP של השרת
-    
-    private RTCPeerConnection peerConnection;
-    private WebSocket ws;
-    private ConnectionStatusUI statusUI;
 
-    // הודעות מה-WebSocket מגיעות ב-thread רקע; נצבור אותן כאן ונעבד ב-thread הראשי דרך Update
+    [SerializeField] WebSocketHandler _socket = new WebSocketHandler();
+
+    private RTCPeerConnection peerConnection; 
+
+    // הודעות מה-WebSocket מגיעות ב-thread רקע; נצבור אותן כאן ונעבד ב- או ה-IP של השרתthread הראשי דרך Update
     private readonly ConcurrentQueue<string> signalingQueue = new ConcurrentQueue<string>();
 
     // candidates שהגיעו לפני שנקבע ה-remote description, נשמרים עד שאפשר להוסיף אותם
     private readonly List<RTCIceCandidateInit> pendingCandidates = new List<RTCIceCandidateInit>();
     private bool remoteDescriptionSet = false;
-
-    void Start()
-    {
-        // פאנל הסטטוס נוצר אוטומטית - אין צורך בחיווט ב-Inspector
-        statusUI = gameObject.AddComponent<ConnectionStatusUI>();
-
-        // הפעלת מנוע ה-WebRTC - חובה כדי שהווידאו יפוענח ויוצג
+    CustomLogger _logger;
+    [ShowInInspector]
+    public WebSocketState SocketState => _socket?.ReadyState ?? WebSocketState.Closed;
+    private void OnEnable() {
+        _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] ");
+        NetworkManager.Singleton.OnServerStarted += OnServerStarted;
+        NetworkManager.Singleton.OnServerStopped += OnServerStopped;
+        if (NetworkManager.Singleton.IsServer) {
+            StartConnection();
+        }
+    }
+    void OnServerStarted() => StartConnection();
+    void OnServerStopped(bool _) => CloseConnection();
+    public void StartConnection()
+    { 
+        _logger = new CustomLogger(this, Color.cyan, "[WebRTC-Receiver] ");
+        _logger.Log("Starting WebRTC connection...");
+        // The WebRTC update loop must run on the main thread
         StartCoroutine(WebRTC.Update());
 
+        // Use local-only ICE candidates (no STUN/TURN).
         var config = new RTCConfiguration
         {
-            iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } }
+            iceServers = new[] { new RTCIceServer { urls = new[] { "stun:stun.l.google.com:19302" } } },
+            iceTransportPolicy = RTCIceTransportPolicy.All
         };
-        peerConnection = new RTCPeerConnection(ref config);
+        _socket = new WebSocketHandler();
+        peerConnection = new RTCPeerConnection(ref config) {
+            OnConnectionStateChange = state => _logger.Log($"Connection change: {state}"),
+            OnIceConnectionChange = state => _logger.Log($"ICE Connection change: {state}"),
+            
+            // קבלת וידאו והצגתו על המסך
+            OnTrack = e => {
+                _logger.Log($"Track received: {e.Track.Kind}");
+                if (e.Track is VideoStreamTrack videoTrack) {
+                    videoTrack.OnVideoReceived += tex => {
+                        _logger.Log("Received video track");
+                        displayImage.texture = tex;
+                    };
+                }
+                else _logger.Log("Received unused track of type: " + e.Track.Kind);
+            },
 
-        peerConnection.OnConnectionStateChange = state => statusUI.Report($"חיבור WebRTC: {state}");
-        peerConnection.OnIceConnectionChange = state => statusUI.Report($"ICE: {state}");
-
-        // קבלת וידאו והצגתו על המסך
-        peerConnection.OnTrack = e =>
-        {
-            statusUI.Report($"התקבל Track: {e.Track.Kind}");
-            if (e.Track is VideoStreamTrack videoTrack)
-            {
-                videoTrack.OnVideoReceived += tex =>
-                {
-                    statusUI.Report("וידאו מתקבל ✓");
-                    displayImage.texture = tex;
+            OnIceCandidate = candidate => {
+                var c = new IceCandidateData {
+                    candidate = candidate.Candidate,
+                    sdpMid = candidate.SdpMid,
+                    sdpMLineIndex = candidate.SdpMLineIndex ?? 0
                 };
+                SignalingMessage msg = new SignalingMessage { type = TYPE_CANDIDATE, data = JsonUtility.ToJson(c) };
+                if (_socket != null && _socket.ReadyState == WebSocketState.Open) {
+                    _socket.Send(JsonUtility.ToJson(msg));
+                }
             }
         };
 
-        peerConnection.OnIceCandidate = candidate =>
-        {
-            var c = new IceCandidateData
-            {
-                candidate = candidate.Candidate,
-                sdpMid = candidate.SdpMid,
-                sdpMLineIndex = candidate.SdpMLineIndex ?? 0
-            };
-            SignalingMessage msg = new SignalingMessage { type = "candidate", data = JsonUtility.ToJson(c) };
-            if (ws != null && ws.ReadyState == WebSocketState.Open)
-            {
-                ws.Send(JsonUtility.ToJson(msg));
-            }
-        };
-
-        ws = new WebSocket(signalingServerUrl);
-        ws.OnMessage += OnSignalingMessage;
-        ws.OnOpen += (s, e) =>
-        {
-            statusUI.Report("מחובר לשרת האיתות ✓");
-            // הכרזת נוכחות - מודיעים לצד השני שאנחנו כאן
-            SignalingMessage hello = new SignalingMessage { type = "hello", data = "receiver" };
-            ws.Send(JsonUtility.ToJson(hello));
-        };
-        ws.OnError += (s, e) => statusUI.Report($"שגיאת WebSocket: {e.Message}");
-        ws.OnClose += (s, e) => statusUI.Report($"החיבור נסגר ({e.Code})");
-
+        _socket.Connect(signalingServerUrl);
+        _socket.Socket.OnMessage += OnSignalingMessage;
         // ניסיון חוזר עד שמתחברים (מטפל גם במקרה שהשרת עוד לא מוכן)
         StartCoroutine(KeepConnected());
     }
 
     private IEnumerator KeepConnected()
     {
-        while (ws != null)
+        while (_socket != null)
         {
-            if (ws.ReadyState != WebSocketState.Open && ws.ReadyState != WebSocketState.Connecting)
+            if (_socket.ReadyState != WebSocketState.Open && _socket.ReadyState != WebSocketState.Connecting)
             {
-                statusUI.Report("מתחבר לשרת...");
-                ws.ConnectAsync();
+                _logger.Log("Connecting...");
+                _socket.ConnectAsync();
             }
             yield return new WaitForSeconds(2f);
         }
@@ -113,25 +119,14 @@ public class WebRTCVideoReceiver : MonoBehaviour
 
     private void ProcessSignalingMessage(string data)
     {
-        SignalingMessage msg = JsonUtility.FromJson<SignalingMessage>(data);
-
-        if (msg.type == "hello")
-        {
-            statusUI.Report("השולח נכנס לשרת ✓");
-            // משיבים ack כדי שגם השולח ידע שאנחנו כאן
-            SignalingMessage ack = new SignalingMessage { type = "hello-ack", data = "receiver" };
-            ws.Send(JsonUtility.ToJson(ack));
-        }
-        else if (msg.type == "hello-ack")
-        {
-            statusUI.Report("השולח נכנס לשרת ✓");
-        }
-        else if (msg.type == "offer")
+        _logger.Log($"Received message :\n{data}");
+        SignalingMessage msg = JsonUtility.FromJson<SignalingMessage>(data); 
+        if (msg.type == WebRTCVideoSender.TYPE_OFFER)
         {
             RTCSessionDescription desc = JsonUtility.FromJson<RTCSessionDescription>(msg.data);
             StartCoroutine(HandleOffer(desc));
         }
-        else if (msg.type == "candidate")
+        else if (msg.type ==  TYPE_CANDIDATE)
         {
             IceCandidateData c = JsonUtility.FromJson<IceCandidateData>(msg.data);
             RTCIceCandidateInit candInit = new RTCIceCandidateInit
@@ -155,6 +150,7 @@ public class WebRTCVideoReceiver : MonoBehaviour
 
     private IEnumerator HandleOffer(RTCSessionDescription offerDesc)
     {
+        _logger.Log("Handling offer...");
         yield return peerConnection.SetRemoteDescription(ref offerDesc);
         remoteDescriptionSet = true;
 
@@ -171,14 +167,20 @@ public class WebRTCVideoReceiver : MonoBehaviour
         var answerDesc = answerOp.Desc;
         yield return peerConnection.SetLocalDescription(ref answerDesc);
 
-        SignalingMessage msgAnswer = new SignalingMessage { type = "answer", data = JsonUtility.ToJson(answerDesc) };
-        ws.Send(JsonUtility.ToJson(msgAnswer));
+        SignalingMessage msgAnswer = new SignalingMessage { type = TYPE_ANSWER, data = JsonUtility.ToJson(answerDesc) };
+        _socket.Send(JsonUtility.ToJson(msgAnswer));
     }
 
-    void OnDestroy()
-    {
+    void CloseConnection() { 
+        if(SocketState == WebSocketState.Open) {
+            _logger.Log("Closing connection...");
+        }
         peerConnection?.Dispose();
-        ws?.Close();
-        
+        _socket?.Close();
+        _socket = null;
+        StopAllCoroutines();
     }
+    private void OnDisable() {
+        CloseConnection();
+    } 
 }

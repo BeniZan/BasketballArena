@@ -9,21 +9,24 @@ public class NetBoot : SingletonMono<NetBoot> {
     public enum PlayerType { NotSetup, XRPlayer, Coach }
     Notifier<PlayerType> _playerType = new Notifier<PlayerType>(PlayerType.NotSetup);
     [SerializeField, Get] NetworkManager _netMng;
-    [SerializeField] NetworkObject _CoachHostPrefab, _XRClientPrefab;
-    [SerializeField] GameObject LocalXRDeviceToggle;
-    GameObject _spawnedXRDevice;
-    public ReadOnlyNotifier<PlayerType> Type => _playerType;
+    [SerializeField] NetworkObject  _XRClientPrefab;
+    [SerializeField] GameObject LocalXRDeviceToggle, _localCoachHostToggle;
+    public ReadOnlyNotifier<PlayerType> PlayType => _playerType;
     public bool IsXR => _playerType.Value == PlayerType.XRPlayer;
     public bool IsCoach => _playerType.Value == PlayerType.Coach;
     public bool PlayerTypeReady => _playerType.Value != PlayerType.NotSetup;
     public bool IsConnectionAwaiting => _netMng.IsListening && _netMng.IsClient && !_netMng.IsConnectedClient;
-    public bool IsConnected => _netMng.IsListening && _netMng.IsConnectedClient;
+    public bool IsConnected => _netMng.IsListening && (_netMng.IsConnectedClient || _netMng.IsServer);
+    CustomLogger _logger;
 #if UNITY_EDITOR
     enum AutoSetupConfig { None, XRClient, CoachHost}
     [SerializeField] AutoSetupConfig _editorAutoSetupConfig;
 #endif
     private void Start() {
-        _netMng.OnConnectionEvent += NetMng_OnConnectionEvent;
+        _logger = new CustomLogger(this, Color.softBlue);
+        _netMng.OnConnectionEvent += NetMng_OnConnectionEvent; 
+        _netMng.OnServerStarted += NetMng_OnServerStarted;
+        _netMng.OnPreShutdown += NetMng_OnShutdown; 
         DontDestroyOnLoad(gameObject);
 
 #if UNITY_EDITOR
@@ -36,36 +39,54 @@ public class NetBoot : SingletonMono<NetBoot> {
 #endif
     }
 
+    private void NetMng_OnServerStarted() {
+        _logger.Log("Server started");
+    }
+    private void NetMng_OnShutdown() {
+        _logger.Log("Server shutdown");
+        UnsetPlayerType();
+    }
+
+    void UnsetPlayerType() {
+        _logger.Log("Unset player type");
+        if(!_netMng.ShutdownInProgress)
+            _netMng.Shutdown();
+        _playerType.Value = PlayerType.NotSetup;
+        LocalXRDeviceToggle.SetActive(false);
+        _localCoachHostToggle.SetActive(false);
+    }
+
     public void SetupPlayerType(bool isXR) {
         if (PlayerTypeReady) {
-            Debug.LogWarning("Player type already setup, ignoring LocalSetup call");
+            _logger.LogWarning("Player type already setup, ignoring another setup call");
             return;
         }
         var type = isXR ? PlayerType.XRPlayer : PlayerType.Coach;
+        _logger.Log("setting up player type as: " + type);
         _playerType.Value = type;
         StartNetwork(isXR);
         LocalXRDeviceToggle.SetActive(isXR);
-    } 
+        _localCoachHostToggle.SetActive(!isXR);
+    }
 
     private void NetMng_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {
-        var isLocalClientEvent = data.ClientId == nm.LocalClientId; 
-        if (data.EventType == ConnectionEvent.ClientDisconnected && isLocalClientEvent) {
-            _playerType.Value = PlayerType.NotSetup;
-            return;
+        var isLocalClientEvent = data.ClientId == nm.LocalClientId;
+        if (isLocalClientEvent) {
+            if (data.EventType == ConnectionEvent.ClientConnected)
+                _logger.Log("Connected");
+            if(data.EventType == ConnectionEvent.ClientDisconnected) {
+                _logger.Log("Disconnected");
+                UnsetPlayerType();
+            }
         }
-         
-        if(data.EventType == ConnectionEvent.ClientConnected) {
-            var isCoach = data.ClientId == NetworkManager.ServerClientId; // coach only if we're setup as server
-            if (nm.IsServer) {
-                var prefab = isCoach ? _CoachHostPrefab : _XRClientPrefab;
-                nm.SpawnManager.InstantiateAndSpawn(prefab, data.ClientId, true, true);
-            }  
+        else {
+            _logger.Log($"ConnectionEvent: client[{data.ClientId}] -> {data.EventType}");
         } 
     }
 
     void StartNetwork(bool isClient) {
         if (!PlayerTypeReady) {
-            Debug.LogError("Player type not setup, cannot connect");
+            _logger.LogError("Player type not setup, cannot connect");
             return;
         }
         if (isClient)
@@ -74,21 +95,24 @@ public class NetBoot : SingletonMono<NetBoot> {
     }
 
 #if UNITY_EDITOR
-    void UnsetPlayerType() {
-        _netMng.Shutdown();
-        _playerType.Value = PlayerType.NotSetup;
-        LocalXRDeviceToggle.SetActive(false);
-    }
+   
     private void OnGUI() {
         if (!Application.isEditor)
             return;
 
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         try {
-            if (PlayerTypeReady) {
-                if (IsConnectionAwaiting) { ConnectionAwaitingGUI(); }
-                else if (IsConnected) { ConnectedGUI(); }
-                else { GUILayout.Label("Player type setup but not conneting"); }
+            if (PlayerTypeReady) { 
+                if (IsConnectionAwaiting) { 
+                    ConnectionAwaitingGUI(); 
+                }
+                else if (IsConnected) 
+                    { 
+                    ConnectedGUI(); 
+                } 
+                else {
+                    GUILayout.Label("Player type setup but network manager connection not setup");
+                }
             }
             else {
                 PlayerTypeSetupGUI();
@@ -112,11 +136,16 @@ public class NetBoot : SingletonMono<NetBoot> {
     }
     
     void PlayerTypeSetupGUI() {
-        if (GUILayout.Button("Setup As Coach"))
+        if (GUILayout.Button("Setup As Coach")) {
             SetupPlayerType(false);
+            GUIUtility.keyboardControl = 0;
+        }
 
-        if (GUILayout.Button("Setup As XR Player"))
+        if (GUILayout.Button("Setup As XR Player")) {
             SetupPlayerType(true);
+            GUIUtility.keyboardControl = 0;
+        }
+
     }
 #endif
 }

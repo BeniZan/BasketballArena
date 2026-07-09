@@ -23,7 +23,7 @@ namespace Unity.WebRTC.Samples
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame) 
             {
                 BackButtonPressed();
             }
