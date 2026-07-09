@@ -94,8 +94,15 @@ public class NetBoot : SingletonMono<NetBoot> {
         else _netMng.StartServer();
     }
 
+    protected override void OnDestroy() {
+        base.OnDestroy();
+        _netMng.OnConnectionEvent -= NetMng_OnConnectionEvent;
+        _netMng.OnServerStarted -= NetMng_OnServerStarted;
+        _netMng.OnPreShutdown -= NetMng_OnShutdown;
+    }
+
 #if UNITY_EDITOR
-   
+
     private void OnGUI() {
         if (!Application.isEditor)
             return;
