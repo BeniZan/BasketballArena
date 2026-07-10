@@ -247,6 +247,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         {
             _elapsedTime += Time.deltaTime;
             UpdateTimerDisplay();
+            NetCoachDashboardState.Instance?.Server_SetElapsedTime(_elapsedTime);
         }
     }
 
@@ -262,6 +263,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
             _realisticBtn.RemoveFromClassList("active");
             _hologramBtn.AddToClassList("active");
         }
+
+        NetCoachDashboardState.Instance?.Server_SetStreamMode(realistic);
     }
 
     private void StartTimer()
@@ -271,6 +274,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _statusText.style.color = new StyleColor(new Color(16f/255f, 185f/255f, 129f/255f, 1f)); // Green
         // Activate the first drill if the session hasn't started yet.
         if (_session.ActiveIndex < 0) _session.Start();
+
+        NetCoachDashboardState.Instance?.Server_SetTimerRunning(true);
     }
 
     private void PauseTimer()
@@ -278,6 +283,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _isTimerRunning = false;
         _statusText.text = "PAUSED";
         _statusText.style.color = new StyleColor(new Color(255f/255f, 107f/255f, 0f, 1f)); // Orange
+
+        NetCoachDashboardState.Instance?.Server_SetTimerRunning(false);
     }
 
     private void StopTimer()
@@ -288,6 +295,9 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _statusText.style.color = new StyleColor(new Color(100f/255f, 116f/255f, 139f/255f, 1f)); // Gray
         UpdateTimerDisplay();
         _session.Reset(); // clears active drill -> HandleActiveDrillChanged updates repText + highlight
+
+        NetCoachDashboardState.Instance?.Server_SetTimerRunning(false);
+        NetCoachDashboardState.Instance?.Server_SetElapsedTime(0f);
     }
 
     private void NextRep()
@@ -347,6 +357,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
                 _h2DefenseBtn.AddToClassList("active");
             }
         }
+
+        NetCoachDashboardState.Instance?.Server_SetOffense(isH1, isOffense);
     }
 
     private void SetupExerciseFoldout(string baseName, string[] drills)
@@ -468,6 +480,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     {
         if (_drillListView != null) _drillListView.RefreshItems();
         UpdateDrillsDisplay();
+
+        NetCoachDashboardState.Instance?.Server_SetDrills(_session.Drills);
     }
 
     private void HandleActiveDrillChanged()
@@ -478,6 +492,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
             _drillListView.RefreshItems(); // re-evaluate the .drill-item-active highlight
             if (_session.ActiveIndex >= 0) _drillListView.ScrollToItem(_session.ActiveIndex);
         }
+
+        NetCoachDashboardState.Instance?.Server_SetActiveIndex(_session.ActiveIndex);
     }
 
     private void AddDrill(string drillName)
