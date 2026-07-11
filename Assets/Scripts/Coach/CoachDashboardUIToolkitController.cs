@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using System.Linq;
 
 [ExecuteAlways]
 public class CoachDashboardUIToolkitController : MonoBehaviour
@@ -182,6 +183,10 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         // Apply visual Sprites and Fonts
         ApplySprites();
         ApplyTypography();
+
+        _pickAndRollDrills = NetTeamManeuverManager.Instance.AllTeamManeuvers.Select(t => t.name).ToArray();
+        _shootingDrills = new string[0];
+        _postPlaysDrills = new string[0];
 
         // Build collapsible exercise category foldouts (works in EditMode preview and PlayMode)
         SetupExerciseFoldout("pickAndRoll", _pickAndRollDrills);
