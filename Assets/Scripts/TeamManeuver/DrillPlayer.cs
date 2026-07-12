@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 public class DrillPlayer : SingletonMono<DrillPlayer> {
-    public TeamManeuverData CurrentPlayingManeuverData => NetTeamManeuverManager.Instance.ActiveManeuver;
+    public TeamManeuverData CurrentPlayingDrillData => NetTeamManeuverManager.Instance.ActiveManeuver;
     [SerializeField] DrillActivator _maneuverPlacer;
      
     public bool IsPlaying; // PLAY OR PAUSE

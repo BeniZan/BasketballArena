@@ -41,11 +41,11 @@ public class NetTeamManeuverManager : NetworkBehaviour
 
     void OnSyncManeuverChange(FixedString512Bytes _, FixedString512Bytes cur) {
         var name = cur.ToString();
-        _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetTeamManeuver(name);
+        _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetDrill(name);
         DrillActivator.Instance.Activate(_activeManeuver.Value);
     }
 
-    public void Server_SetActiveTeamManeuver(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;
-    public void Server_SetActiveTeamManeuver(TeamManeuverData teamManeuver) => _syncActiveManeuver.Value = teamManeuver ? teamManeuver.name : "";
-    public TeamManeuverData GetTeamManeuver(string teamManeuverName) => _allTeamManeuvers.Find(tm => tm.name == teamManeuverName);
+    public void Server_SetActiveDrill(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;
+    public void Server_SetActiveDrill(TeamManeuverData teamManeuver) => _syncActiveManeuver.Value = teamManeuver ? teamManeuver.name : "";
+    public TeamManeuverData GetDrill(string teamManeuverName) => _allTeamManeuvers.Find(tm => tm.name == teamManeuverName);
 }

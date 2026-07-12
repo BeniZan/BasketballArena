@@ -256,7 +256,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         // Activate the first drill if the session hasn't started yet.
         if (_session.ActiveIndex < 0) {
             _session.Start();
-            NetTeamManeuverManager.Instance.Server_SetActiveTeamManeuver(_session.ActiveIndex);
+            NetTeamManeuverManager.Instance.Server_SetActiveDrill(_session.ActiveIndex);
         }
 
         DrillPlayer.Instance.IsPlaying = true;
