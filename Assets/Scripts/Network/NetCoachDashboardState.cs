@@ -27,9 +27,7 @@ public class NetCoachDashboardState : NetworkBehaviour
     readonly NetworkVariable<int> _syncActiveIndex =
         new(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     readonly NetworkVariable<bool> _syncIsTimerRunning =
-        new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    readonly NetworkVariable<float> _syncElapsedTime =
-        new(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server); 
     readonly NetworkVariable<bool> _syncIsRealisticStream =
         new(true, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     readonly NetworkVariable<bool> _syncH1Offense =
@@ -40,15 +38,13 @@ public class NetCoachDashboardState : NetworkBehaviour
     readonly List<string> _mirroredDrills = new();
 
     readonly Notifier<int> _activeIndex = new(-1);
-    readonly Notifier<bool> _isTimerRunning = new(false);
-    readonly Notifier<float> _elapsedTime = new(0f);
+    readonly Notifier<bool> _isTimerRunning = new(false); 
     readonly Notifier<bool> _isRealisticStream = new(true);
     readonly Notifier<bool> _h1Offense = new(true);
     readonly Notifier<bool> _h2Offense = new(true);
 
     public ReadOnlyNotifier<int> ActiveIndex => _activeIndex;
-    public ReadOnlyNotifier<bool> IsTimerRunning => _isTimerRunning;
-    public ReadOnlyNotifier<float> ElapsedTime => _elapsedTime;
+    public ReadOnlyNotifier<bool> IsTimerRunning => _isTimerRunning; 
     public ReadOnlyNotifier<bool> IsRealisticStream => _isRealisticStream;
     public ReadOnlyNotifier<bool> H1Offense => _h1Offense;
     public ReadOnlyNotifier<bool> H2Offense => _h2Offense;
@@ -69,16 +65,14 @@ public class NetCoachDashboardState : NetworkBehaviour
 
         _syncDrills.OnListChanged += OnSyncDrillsChanged;
         _syncActiveIndex.OnValueChanged += (_, cur) => _activeIndex.Value = cur;
-        _syncIsTimerRunning.OnValueChanged += (_, cur) => _isTimerRunning.Value = cur;
-        _syncElapsedTime.OnValueChanged += (_, cur) => _elapsedTime.Value = cur;
+        _syncIsTimerRunning.OnValueChanged += (_, cur) => _isTimerRunning.Value = cur; 
         _syncIsRealisticStream.OnValueChanged += (_, cur) => _isRealisticStream.Value = cur;
         _syncH1Offense.OnValueChanged += (_, cur) => _h1Offense.Value = cur;
         _syncH2Offense.OnValueChanged += (_, cur) => _h2Offense.Value = cur;
 
         RebuildMirroredDrills();
         _activeIndex.Value = _syncActiveIndex.Value;
-        _isTimerRunning.Value = _syncIsTimerRunning.Value;
-        _elapsedTime.Value = _syncElapsedTime.Value;
+        _isTimerRunning.Value = _syncIsTimerRunning.Value; 
         _isRealisticStream.Value = _syncIsRealisticStream.Value;
         _h1Offense.Value = _syncH1Offense.Value;
         _h2Offense.Value = _syncH2Offense.Value;
@@ -125,13 +119,7 @@ public class NetCoachDashboardState : NetworkBehaviour
         if (!IsServer) { Debug.LogWarning("Server_SetTimerRunning called on non-server"); return; }
         _syncIsTimerRunning.Value = running;
     }
-
-    public void Server_SetElapsedTime(float elapsed)
-    {
-        if (!IsServer) { Debug.LogWarning("Server_SetElapsedTime called on non-server"); return; }
-        _syncElapsedTime.Value = elapsed;
-    }
-
+     
     public void Server_SetStreamMode(bool isRealistic)
     {
         if (!IsServer) { Debug.LogWarning("Server_SetStreamMode called on non-server"); return; }

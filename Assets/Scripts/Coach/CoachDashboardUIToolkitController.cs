@@ -65,8 +65,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private ListView _drillListView;
 
     // State variables
-    private float _elapsedTime = 0f;
-    private bool _isTimerRunning = false;
     private readonly TrainingSession _session = new TrainingSession();
 
     private void Awake()
@@ -93,23 +91,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         // if the root is still null it's a genuine misconfiguration worth reporting.
         InitializeUI(true);
     }
-
-    private void OnValidate()
-    {
-#if UNITY_EDITOR
-        // OnValidate fires at awkward times (play-mode entry, asset reimport) when the
-        // document may be mid-rebuild. Never run during play mode, and defer in edit mode
-        // until the UIDocument has had a chance to (re)build its visual tree.
-        if (Application.isPlaying) return;
-        UnityEditor.EditorApplication.delayCall += () =>
-        {
-            if (this == null) return; // component may have been destroyed in the meantime
-            _uiDocument = GetComponent<UIDocument>();
-            InitializeUI(false);
-        };
-#endif
-    }
-
+     
     private void OnDisable()
     {
         _session.OnDrillsChanged -= HandleDrillsChanged;
@@ -248,12 +230,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void Update()
     {
-        if (_isTimerRunning)
-        {
-            _elapsedTime += Time.deltaTime;
-            UpdateTimerDisplay();
-            NetCoachDashboardState.Instance?.Server_SetElapsedTime(_elapsedTime);
-        }
+        UpdateTimerDisplay(); 
     }
 
     private void SetStreamMode(bool realistic)
@@ -274,7 +251,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void StartTimer()
     {
-        _isTimerRunning = true;
         _statusText.text = "RUNNING";
         _statusText.style.color = new StyleColor(new Color(16f/255f, 185f/255f, 129f/255f, 1f)); // Green
         // Activate the first drill if the session hasn't started yet.
@@ -285,7 +261,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void PauseTimer()
     {
-        _isTimerRunning = false;
         _statusText.text = "PAUSED";
         _statusText.style.color = new StyleColor(new Color(255f/255f, 107f/255f, 0f, 1f)); // Orange
 
@@ -293,21 +268,18 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     }
 
     private void StopTimer()
-    {
-        _isTimerRunning = false;
-        _elapsedTime = 0f;
+    { 
         _statusText.text = "READY";
         _statusText.style.color = new StyleColor(new Color(100f/255f, 116f/255f, 139f/255f, 1f)); // Gray
         UpdateTimerDisplay();
         _session.Reset(); // clears active drill -> HandleActiveDrillChanged updates repText + highlight
 
-        NetCoachDashboardState.Instance?.Server_SetTimerRunning(false);
-        NetCoachDashboardState.Instance?.Server_SetElapsedTime(0f);
+        NetCoachDashboardState.Instance?.Server_SetTimerRunning(false); 
     }
 
     private void NextRep()
     {
-        if (_isTimerRunning)
+        if (ManeuverPlayer.Instance.IsPlaying)
         {
             _session.Next(); // advances active drill -> HandleActiveDrillChanged updates repText + highlight
         }
@@ -320,8 +292,9 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void UpdateTimerDisplay()
     {
-        int minutes = Mathf.FloorToInt(_elapsedTime / 60f);
-        int seconds = Mathf.FloorToInt(_elapsedTime % 60f);
+        var elapsedTime = ManeuverPlayer.Instance.AnimationTime;
+        int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60f);
         _timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 

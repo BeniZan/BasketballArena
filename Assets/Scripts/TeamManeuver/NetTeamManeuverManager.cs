@@ -44,7 +44,7 @@ public class NetTeamManeuverManager : NetworkBehaviour
         _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetTeamManeuver(name);
     }
 
-    public void Server_SetTeamManeuver(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;
-    public void Server_SetTeamManeuver(TeamManeuverData teamManeuver) => _syncActiveManeuver.Value = teamManeuver ? teamManeuver.name : "";
+    public void Server_SetActiveTeamManeuver(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;
+    public void Server_SetActiveTeamManeuver(TeamManeuverData teamManeuver) => _syncActiveManeuver.Value = teamManeuver ? teamManeuver.name : "";
     public TeamManeuverData GetTeamManeuver(string teamManeuverName) => _allTeamManeuvers.Find(tm => tm.name == teamManeuverName);
 }

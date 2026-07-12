@@ -29,7 +29,7 @@ public class TestMovesUI : MonoBehaviour {
 
     void OnDropdown(int i) {
         var manager = NetTeamManeuverManager.Instance;
-        manager.Server_SetTeamManeuver(i);
+        manager.Server_SetActiveTeamManeuver(i);
     }
 
     void OnActiveManeuver(TeamManeuverData _) => SetDropdownValue();

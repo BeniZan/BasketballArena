@@ -535,9 +535,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 775255778}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ebe460de4eca224a8836928f39fee84, type: 3}
+  m_Script: {fileID: 11500000, guid: 311666f039a5db14b9ab1a134754bdec, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ManuverPlayer
+  m_EditorClassIdentifier: Assembly-CSharp::ManeuverPlayer
   _maneuverPlacer: {fileID: 775255782}
   IsPlaying: 0
   AnimationTime: 0
@@ -1324,7 +1324,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2e9f77b57d44d94a8fdf112bec24e49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WebRTCVideoReceiver
-  displayImage: {fileID: 872978949640052922}
 --- !u!114 &872978949640052922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1370,7 +1369,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1462456409553910029
 GameObject:
   m_ObjectHideFlags: 0
@@ -1775,9 +1774,9 @@ SceneRoots:
   m_Roots:
   - {fileID: 410087041}
   - {fileID: 4155387273900902609}
+  - {fileID: 1859018662}
   - {fileID: 775255781}
   - {fileID: 1372235279}
   - {fileID: 3246143308539208844}
   - {fileID: 1009212371}
   - {fileID: 194375948}
-  - {fileID: 1859018662}

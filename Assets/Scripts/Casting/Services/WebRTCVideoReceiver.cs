@@ -8,9 +8,9 @@ using WebSocketSharp;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using System;
+using UnityEngine.UIElements;
 
-public class WebRTCVideoReceiver : MonoBehaviour {  
-    public RawImage displayImage;  
+public class WebRTCVideoReceiver : MonoBehaviour {   
     private RTCPeerConnection peerConnection;
     Queue<RTCIceCandidateInit> _pendingCandidates = new Queue<RTCIceCandidateInit>();
     bool _setupRemoteDescription;
@@ -43,7 +43,7 @@ public class WebRTCVideoReceiver : MonoBehaviour {
                 if (e.Track is VideoStreamTrack videoTrack) {
                     videoTrack.OnVideoReceived += tex => {
                         _logger.Log("Received video track");
-                        displayImage.texture = tex;
+                        InitializeTexture(tex); 
                     };
                 }
                 else
@@ -53,6 +53,10 @@ public class WebRTCVideoReceiver : MonoBehaviour {
 
         WebRTCHandshakeManager.Instance.OnClientHandshakeReceived += Instance_OnOfferReceived; 
         WebRTCHandshakeManager.Instance.OnICECandidateReceived += OnReceivedICE;
+    }
+
+    private void InitializeTexture(Texture tex) {
+        //todo
     }
 
     private void Instance_OnOfferReceived(WebRTCHandshakeManager.Handshake handshake) {

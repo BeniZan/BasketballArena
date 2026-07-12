@@ -1,11 +1,12 @@
 using SingletonBehaviors;
 using UnityEngine;
 
-public class ManuverPlayer : SingletonMono<ManuverPlayer> {
+public class ManeuverPlayer : SingletonMono<ManeuverPlayer> {
+    public TeamManeuverData CurrentPlayingManeuverData => NetTeamManeuverManager.Instance.ActiveManeuver;
     [SerializeField] TeamManeuverPlacer _maneuverPlacer;
-    public bool IsPlaying;
+    public bool IsPlaying; // PLAY OR PAUSE
     public float AnimationTime;
-    protected override void Awake() {
+    protected override void Awake() { 
         base.Awake();
         _maneuverPlacer.OnManuverPlaced += ManeuverPlacer_OnManuverPlaced;
     }
