@@ -1,3 +1,4 @@
+using SingletonBehaviors;
 using Sirenix.OdinInspector;
 #if UNITY_EDITOR
 using Sirenix.Utilities.Editor;
@@ -8,24 +9,20 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
  
-public class TeamManeuverPlacer : MonoBehaviour { 
+public class DrillActivator : SingletonMono<DrillActivator> { 
     [SerializeField] CharComponent _templateChar; 
     [SerializeField] Transform _courtTf;
     [SerializeField] SurfaceHandler _courtSurface;
     [SerializeField] NetTeamManeuverManager _manager;
     [SerializeField, ReadOnly] List<CharComponent> _placedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] TeamManeuverData _currentActive;
-
     public event Action OnManuverPlaced;
-
     public IReadOnlyList<CharComponent> PlacedChars => _placedChars;
-
-    private void Awake() {
+    protected override void Awake() {
+        base.Awake();
         _manager.ActiveManeuver.Sub(OnTeamManeverChange);
     }
-
     void OnTeamManeverChange(TeamManeuverData data)  => Activate(data); 
-
     public void Activate(TeamManeuverData move) {
         if (_currentActive)
             Deactivate();
@@ -34,7 +31,6 @@ public class TeamManeuverPlacer : MonoBehaviour {
         UpdateChars();
         OnManuverPlaced?.Invoke();
     }
-
     public void UpdateChars() {
         if (!_currentActive)
             return;
@@ -60,7 +56,6 @@ public class TeamManeuverPlacer : MonoBehaviour {
             _placedChars.RemoveAt(i);
         }
     } 
-
     public void Deactivate() {
         foreach (var placedChar in _placedChars)
             if(placedChar)
@@ -68,11 +63,9 @@ public class TeamManeuverPlacer : MonoBehaviour {
         _placedChars.Clear();
         _currentActive = null; 
     }
-
     private void OnEnable() {
         Activate(_currentActive);
     }
-
     private void OnDrawGizmosSelected() {
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(transform.position, Vector3.one * 0.1f);

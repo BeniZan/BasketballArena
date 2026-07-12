@@ -42,6 +42,7 @@ public class NetTeamManeuverManager : NetworkBehaviour
     void OnSyncManeuverChange(FixedString512Bytes _, FixedString512Bytes cur) {
         var name = cur.ToString();
         _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetTeamManeuver(name);
+        DrillActivator.Instance.Activate(_activeManeuver.Value);
     }
 
     public void Server_SetActiveTeamManeuver(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;

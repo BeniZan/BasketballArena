@@ -254,9 +254,12 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _statusText.text = "RUNNING";
         _statusText.style.color = new StyleColor(new Color(16f/255f, 185f/255f, 129f/255f, 1f)); // Green
         // Activate the first drill if the session hasn't started yet.
-        if (_session.ActiveIndex < 0) _session.Start();
+        if (_session.ActiveIndex < 0) {
+            _session.Start();
+            NetTeamManeuverManager.Instance.Server_SetActiveTeamManeuver(_session.ActiveIndex);
+        }
 
-        NetCoachDashboardState.Instance?.Server_SetTimerRunning(true);
+        DrillPlayer.Instance.IsPlaying = true;
     }
 
     private void PauseTimer()
@@ -279,7 +282,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void NextRep()
     {
-        if (ManeuverPlayer.Instance.IsPlaying)
+        if (DrillPlayer.Instance.IsPlaying)
         {
             _session.Next(); // advances active drill -> HandleActiveDrillChanged updates repText + highlight
         }
@@ -292,7 +295,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void UpdateTimerDisplay()
     {
-        var elapsedTime = ManeuverPlayer.Instance.AnimationTime;
+        var elapsedTime = DrillPlayer.Instance.AnimationTime;
         int minutes = Mathf.FloorToInt(elapsedTime / 60f);
         int seconds = Mathf.FloorToInt(elapsedTime % 60f);
         _timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);

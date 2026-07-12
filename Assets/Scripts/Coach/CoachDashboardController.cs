@@ -118,7 +118,7 @@ public class CoachDashboardController : MonoBehaviour
     {
         _isTimerRunning = true;
         _statusText.text = "RUNNING";
-        _statusText.color = new Color(16f/255f, 185f/255f, 129f/255f, 1f); // Green
+        _statusText.color = new Color(16f/255f, 185f/255f, 129f/255f, 1f); // Green  
     }
 
     private void PauseTimer()
