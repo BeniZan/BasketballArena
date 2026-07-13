@@ -8,9 +8,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [DefaultExecutionOrder(-1000)]
-public class NetTeamManeuverManager : NetworkBehaviour
+public class NetDrillsActivator : NetworkBehaviour
 {
-    static public NetTeamManeuverManager Instance { get; private set; }
+    static public NetDrillsActivator Instance { get; private set; }
     [SerializeField, Sirenix.OdinInspector.ReadOnly] List<DrillData> _allTeamManeuvers;
     NetworkVariable<FixedString512Bytes> _syncActiveManeuver 
         = new(new FixedString512Bytes(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -30,7 +30,7 @@ public class NetTeamManeuverManager : NetworkBehaviour
 #endif
     void Awake() {
         if (Instance) {
-            Debug.LogError("Two " + nameof(NetTeamManeuverManager) + " exists");
+            Debug.LogError("Two " + nameof(NetDrillsActivator) + " exists");
             Destroy(this);
             return;
         }
@@ -42,7 +42,7 @@ public class NetTeamManeuverManager : NetworkBehaviour
     void OnSyncManeuverChange(FixedString512Bytes _, FixedString512Bytes cur) {
         var name = cur.ToString();
         _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetDrill(name);
-        DrillSurfaceActivator.Instance.Activate(_activeManeuver.Value);
+        DrillActivator.Instance.Activate(_activeManeuver.Value);
     }
 
     public void Server_SetActiveDrill(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;

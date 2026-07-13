@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// Server-authoritative bridge that broadcasts the Coach Dashboard's live state
 /// (Training Flow drills, active drill, timer, stream mode, H1/H2 offense-defense)
-/// to every connected client. Mirrors the <see cref="NetTeamManeuverManager"/> pattern:
+/// to every connected client. Mirrors the <see cref="NetDrillsActivator"/> pattern:
 /// server-write <see cref="NetworkVariable{T}"/>/<see cref="NetworkList{T}"/> plus a manual
 /// (non-<c>SingletonMono</c>) <see cref="Instance"/>, since <see cref="NetworkBehaviour"/>
 /// already derives from <see cref="MonoBehaviour"/>.

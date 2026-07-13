@@ -9,11 +9,11 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
  
-public class DrillSurfaceActivator : SingletonMono<DrillSurfaceActivator> { 
+public class DrillActivator : SingletonMono<DrillActivator> { 
     [SerializeField] CharComponent _templateChar; 
     [SerializeField] Transform _courtTf;
     [SerializeField] SurfaceHandler _courtSurface;
-    [SerializeField] NetTeamManeuverManager _manager;
+    [SerializeField] NetDrillsActivator _manager;
     [SerializeField, ReadOnly] List<CharComponent> _placedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
     public event Action OnDrillChange;

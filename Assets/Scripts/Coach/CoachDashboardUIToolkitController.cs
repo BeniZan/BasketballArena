@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
-
-[ExecuteAlways]
+ 
 public class CoachDashboardUIToolkitController : MonoBehaviour
 {
     [Header("Fonts")]
@@ -166,7 +165,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         ApplySprites();
         ApplyTypography();
 
-        _pickAndRollDrills = NetTeamManeuverManager.Instance.AllTeamManeuvers.Select(t => t.name).ToArray();
+        _pickAndRollDrills = NetDrillsActivator.Instance.AllTeamManeuvers.Select(t => t.name).ToArray();
         _shootingDrills = new string[0];
         _postPlaysDrills = new string[0];
 
@@ -256,7 +255,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         // Activate the first drill if the session hasn't started yet.
         if (_session.ActiveIndex < 0) {
             _session.Start();
-            NetTeamManeuverManager.Instance.Server_SetActiveDrill(_session.ActiveIndex);
+            NetDrillsActivator.Instance.Server_SetActiveDrill(_session.ActiveIndex);
         }
 
         DrillPlayer.Instance.IsPlaying = true;

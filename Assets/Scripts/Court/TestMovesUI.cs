@@ -11,7 +11,7 @@ public class TestMovesUI : MonoBehaviour {
         if (Debug.isDebugBuild) {
             _calib.CalibrationStep.Sub(OnCalibrationState);
             var optionLst = new Dropdown.OptionData();
-            var manager = NetTeamManeuverManager.Instance;
+            var manager = NetDrillsActivator.Instance;
             var options = new List<TMP_Dropdown.OptionData>
                 (manager.AllTeamManeuvers
                 .Select(m => new TMP_Dropdown.OptionData(m.name)));
@@ -28,14 +28,14 @@ public class TestMovesUI : MonoBehaviour {
     }
 
     void OnDropdown(int i) {
-        var manager = NetTeamManeuverManager.Instance;
+        var manager = NetDrillsActivator.Instance;
         manager.Server_SetActiveDrill(i);
     }
 
     void OnActiveManeuver(DrillData _) => SetDropdownValue();
 
     void SetDropdownValue() {
-        _dropdown.SetValueWithoutNotify(NetTeamManeuverManager.Instance.ActiveManeuverIdx);
+        _dropdown.SetValueWithoutNotify(NetDrillsActivator.Instance.ActiveManeuverIdx);
     }
 
     void OnCalibrationState(Calibration.Step step) {
