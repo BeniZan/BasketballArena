@@ -9,27 +9,27 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
  
-public class DrillActivator : SingletonMono<DrillActivator> { 
+public class DrillSurfaceActivator : SingletonMono<DrillSurfaceActivator> { 
     [SerializeField] CharComponent _templateChar; 
     [SerializeField] Transform _courtTf;
     [SerializeField] SurfaceHandler _courtSurface;
     [SerializeField] NetTeamManeuverManager _manager;
     [SerializeField, ReadOnly] List<CharComponent> _placedChars = new List<CharComponent>();
-    [ShowInInspector, ReadOnly, HideInEditorMode] TeamManeuverData _currentActive;
-    public event Action OnManuverPlaced;
+    [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
+    public event Action OnDrillChange;
     public IReadOnlyList<CharComponent> PlacedChars => _placedChars;
     protected override void Awake() {
         base.Awake();
         _manager.ActiveManeuver.Sub(OnTeamManeverChange);
     }
-    void OnTeamManeverChange(TeamManeuverData data)  => Activate(data); 
-    public void Activate(TeamManeuverData move) {
+    void OnTeamManeverChange(DrillData data)  => Activate(data); 
+    public void Activate(DrillData move) {
         if (_currentActive)
             Deactivate();
         if (move) 
             _currentActive = move;
         UpdateChars();
-        OnManuverPlaced?.Invoke();
+        OnDrillChange?.Invoke();
     }
     public void UpdateChars() {
         if (!_currentActive)
@@ -48,7 +48,7 @@ public class DrillActivator : SingletonMono<DrillActivator> {
                 _courtSurface.ParentAndPlace(spawned.transform);
                 _placedChars.Add(spawned);
             }
-            _placedChars[i].SetData(_currentActive.CharsData[i]);
+            _placedChars[i].SetData(_currentActive.CharsData[i], _currentActive.MirrorLeftRight);
         }
         while(i < _placedChars.Count) {
             if (_placedChars[i])
@@ -61,7 +61,8 @@ public class DrillActivator : SingletonMono<DrillActivator> {
             if(placedChar)
                 placedChar.gameObject.SafeDestroy();
         _placedChars.Clear();
-        _currentActive = null; 
+        _currentActive = null;
+        OnDrillChange?.Invoke();
     }
     private void OnEnable() {
         Activate(_currentActive);

@@ -11,20 +11,20 @@ using UnityEngine.Networking;
 public class NetTeamManeuverManager : NetworkBehaviour
 {
     static public NetTeamManeuverManager Instance { get; private set; }
-    [SerializeField, Sirenix.OdinInspector.ReadOnly] List<TeamManeuverData> _allTeamManeuvers;
+    [SerializeField, Sirenix.OdinInspector.ReadOnly] List<DrillData> _allTeamManeuvers;
     NetworkVariable<FixedString512Bytes> _syncActiveManeuver 
         = new(new FixedString512Bytes(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     [ShowInInspector]
-    readonly Notifier<TeamManeuverData> _activeManeuver =  new();
-    public ReadOnlyNotifier<TeamManeuverData> ActiveManeuver => _activeManeuver;
-    public IReadOnlyList<TeamManeuverData> AllTeamManeuvers => _allTeamManeuvers;
+    readonly Notifier<DrillData> _activeManeuver =  new();
+    public ReadOnlyNotifier<DrillData> ActiveManeuver => _activeManeuver;
+    public IReadOnlyList<DrillData> AllTeamManeuvers => _allTeamManeuvers;
     public int ActiveManeuverIdx => _activeManeuver.Value ? _allTeamManeuvers.IndexOf(_activeManeuver.Value) : -1;
 #if UNITY_EDITOR
     private void OnValidate() {
         _allTeamManeuvers =
-            AssetDatabase.FindAssets("t:" + nameof(TeamManeuverData))
-            .Select(tms => AssetDatabase.LoadAssetByGUID<TeamManeuverData>(new GUID(tms))).ToList();
+            AssetDatabase.FindAssets("t:" + nameof(DrillData))
+            .Select(tms => AssetDatabase.LoadAssetByGUID<DrillData>(new GUID(tms))).ToList();
         _allTeamManeuvers.RemoveDestroyed();
     }
 #endif
@@ -42,10 +42,10 @@ public class NetTeamManeuverManager : NetworkBehaviour
     void OnSyncManeuverChange(FixedString512Bytes _, FixedString512Bytes cur) {
         var name = cur.ToString();
         _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetDrill(name);
-        DrillActivator.Instance.Activate(_activeManeuver.Value);
+        DrillSurfaceActivator.Instance.Activate(_activeManeuver.Value);
     }
 
     public void Server_SetActiveDrill(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;
-    public void Server_SetActiveDrill(TeamManeuverData teamManeuver) => _syncActiveManeuver.Value = teamManeuver ? teamManeuver.name : "";
-    public TeamManeuverData GetDrill(string teamManeuverName) => _allTeamManeuvers.Find(tm => tm.name == teamManeuverName);
+    public void Server_SetActiveDrill(DrillData teamManeuver) => _syncActiveManeuver.Value = teamManeuver ? teamManeuver.name : "";
+    public DrillData GetDrill(string teamManeuverName) => _allTeamManeuvers.Find(tm => tm.name == teamManeuverName);
 }

@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.boxqkrtm.ide.cursor": "https://github.com/boxqkrtm/com.unity.ide.cursor.git",
+    "com.bz.unityutils": "https://github.com/BeniZan/Drills.git",
     "com.meta.xr.mrutilitykit": "203.0.0",
     "com.meta.xr.sdk.interaction.ovr": "203.0.0",
     "com.tox.unityutils": "https://github.com/ToxPlayers/UnityUtils.git",

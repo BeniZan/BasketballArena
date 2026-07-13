@@ -9,6 +9,13 @@
       },
       "hash": "fd8ff1fb700caf062eb5cce364c1d0a85f99ebe6"
     },
+    "com.bz.unityutils": {
+      "version": "https://github.com/BeniZan/Drills.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8d49db138eaa19fdc3f6c62172561f4f3d41f6bf"
+    },
     "com.meta.xr.mrutilitykit": {
       "version": "203.0.0",
       "depth": 0,

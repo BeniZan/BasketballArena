@@ -32,7 +32,7 @@ public class TestMovesUI : MonoBehaviour {
         manager.Server_SetActiveDrill(i);
     }
 
-    void OnActiveManeuver(TeamManeuverData _) => SetDropdownValue();
+    void OnActiveManeuver(DrillData _) => SetDropdownValue();
 
     void SetDropdownValue() {
         _dropdown.SetValueWithoutNotify(NetTeamManeuverManager.Instance.ActiveManeuverIdx);
