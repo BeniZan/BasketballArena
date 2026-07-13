@@ -5,7 +5,10 @@ using UnityEngine;
 using static UnityEngine.ParticleSystem;
 
 public class DrillPlayer : NetworkBehaviour {
-    static public DrillPlayer Instance; 
+    static DrillPlayer _instance;
+    static public DrillPlayer Instance {
+        get => _instance = _instance != null ? _instance : FindFirstObjectByType<DrillPlayer>();
+    }
     public DrillData CurrentPlayingDrillData => NetDrillsActivator.Instance.ActiveManeuver;
     [SerializeField] DrillActivator _drillActivator;
 
@@ -52,6 +55,7 @@ public class DrillPlayer : NetworkBehaviour {
     }
 
     private void Awake() {
+        _instance = this;
         _drillActivator.OnDrillChange += DrillActivator_OnDrillChange;
     }
 
@@ -68,6 +72,12 @@ public class DrillPlayer : NetworkBehaviour {
     private void Update() {
         foreach (var c in _drillActivator.PlacedChars)
             c.SetAnimationTime(AnimationTime); 
+    }
+
+    public override void OnDestroy() {
+        base.OnDestroy();
+        if (_instance == this)
+            _instance = null;
     }
 
 }

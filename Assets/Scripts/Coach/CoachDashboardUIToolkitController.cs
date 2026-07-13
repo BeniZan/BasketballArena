@@ -266,7 +266,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _statusText.text = "PAUSED";
         _statusText.style.color = new StyleColor(new Color(255f/255f, 107f/255f, 0f, 1f)); // Orange
 
-        NetCoachDashboardState.Instance?.Server_SetTimerRunning(false);
+        DrillPlayer.Instance.IsPlaying = false;
+        //NetCoachDashboardState.Instance?.Server_SetTimerRunning(false);
     }
 
     private void StopTimer()
@@ -276,7 +277,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         UpdateTimerDisplay();
         _session.Reset(); // clears active drill -> HandleActiveDrillChanged updates repText + highlight
 
-        NetCoachDashboardState.Instance?.Server_SetTimerRunning(false); 
+        DrillPlayer.Instance.IsPlaying = false;
+        //NetCoachDashboardState.Instance?.Server_SetTimerRunning(false); 
     }
 
     private void NextRep()
