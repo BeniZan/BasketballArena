@@ -3,9 +3,10 @@ using UnityEngine;
 public class CoachOnlyGo : MonoBehaviour
 {
     void Awake() {
-        NetBoot.Instance.PlayType.Sub(OnPlayerType);
+        NetBoot.Instance.OnPlayerTypeSetup += Instance_OnPlayerTypeSetup; 
     }
-    void OnPlayerType(NetBoot.PlayerType playerType) {
-         gameObject.SetActive(playerType == NetBoot.PlayerType.Coach);
-    }
+
+    private void Instance_OnPlayerTypeSetup(NetBoot obj) {
+        gameObject.SetActive(obj.IsCoach);
+    } 
 }

@@ -6,18 +6,18 @@ using UnityEditor;
 using UnityEngine;
 [DefaultExecutionOrder(-1000)]
 public class NetBoot : SingletonMono<NetBoot> {
-    public enum PlayerType { NotSetup, XRPlayer, Coach }
-    Notifier<PlayerType> _playerType = new Notifier<PlayerType>(PlayerType.NotSetup);
+    [Flags] enum PlayerType { NotSetup = 1 << 0, XRPlayer = 1 << 1, Coach = 1 << 2 }
+    PlayerType _playerType;
     [SerializeField, Get] NetworkManager _netMng;
     [SerializeField] NetworkObject  _XRClientPrefab;
     [SerializeField] GameObject LocalXRDeviceToggle, _localCoachHostToggle;
-    public ReadOnlyNotifier<PlayerType> PlayType => _playerType;
-    public bool IsXR => _playerType.Value == PlayerType.XRPlayer;
-    public bool IsCoach => _playerType.Value == PlayerType.Coach;
-    public bool PlayerTypeReady => _playerType.Value != PlayerType.NotSetup;
+    public bool IsXR => _playerType.HasFlag(PlayerType.XRPlayer);
+    public bool IsCoach => _playerType.HasFlag(PlayerType.Coach);
+    public bool PlayerTypeReady => IsXR || IsCoach;
     public bool IsConnectionAwaiting => _netMng.IsListening && _netMng.IsClient && !_netMng.IsConnectedClient;
     public bool IsConnected => _netMng.IsListening && (_netMng.IsConnectedClient || _netMng.IsServer);
     CustomLogger _logger;
+    public event Action<NetBoot> OnPlayerTypeSetup;
 #if UNITY_EDITOR
     enum AutoSetupConfig { None, XRClient, CoachHost}
     [SerializeField] AutoSetupConfig _editorAutoSetupConfig;
@@ -51,23 +51,35 @@ public class NetBoot : SingletonMono<NetBoot> {
         _logger.Log("Unset player type");
         if(!_netMng.ShutdownInProgress)
             _netMng.Shutdown();
-        _playerType.Value = PlayerType.NotSetup;
-        LocalXRDeviceToggle.SetActive(false);
-        _localCoachHostToggle.SetActive(false);
+        _playerType = PlayerType.NotSetup; 
+        OnSetPlayerType();
     }
 
-    public void SetupPlayerType(bool isXR) {
+    public void SetupPlayerType(bool isXR) => SetupPlayerType(isXR, !isXR);
+    public void SetupPlayerType(bool isXR, bool isCoach) {
         if (PlayerTypeReady) {
             _logger.LogWarning("Player type already setup, ignoring another setup call");
             return;
         }
-        var type = isXR ? PlayerType.XRPlayer : PlayerType.Coach;
-        _logger.Log("setting up player type as: " + type);
-        _playerType.Value = type;
-        StartNetwork(isXR);
-        LocalXRDeviceToggle.SetActive(isXR);
-        _localCoachHostToggle.SetActive(!isXR);
+        PlayerType type = 0;
+        if (isXR)
+            type |= PlayerType.XRPlayer;
+        if (isCoach)
+            type |= PlayerType.Coach;
+         
+        _logger.Log($"setting up player type as: [{type}]");
+        _playerType = type;
+        OnSetPlayerType();
     }
+
+    void OnSetPlayerType() {
+        SetupNetwork();
+        LocalXRDeviceToggle.SetActive(IsXR);
+        _localCoachHostToggle.SetActive(!IsXR && IsCoach);
+        OnPlayerTypeSetup?.Invoke(this);
+    }
+
+    public void SetupAsXRCoachDebug() => SetupPlayerType(true, true);
 
     private void NetMng_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {
         var isLocalClientEvent = data.ClientId == nm.LocalClientId;
@@ -84,14 +96,20 @@ public class NetBoot : SingletonMono<NetBoot> {
         } 
     }
 
-    void StartNetwork(bool isClient) {
+    void SetupNetwork() {
         if (!PlayerTypeReady) {
-            _logger.LogError("Player type not setup, cannot connect");
+            _logger.Log("Player type not setup, shutting down...");
+            _netMng.Shutdown();
             return;
         }
-        if (isClient)
-            _netMng.StartClient();
-        else _netMng.StartServer();
+
+        if (IsCoach) {
+            if (IsXR)
+                _netMng.StartHost();
+            else
+                _netMng.StartServer();
+        }
+        else _netMng.StartClient(); 
     }
 
     protected override void OnDestroy() {
