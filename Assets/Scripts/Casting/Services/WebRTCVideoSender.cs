@@ -9,7 +9,7 @@ using Sirenix.OdinInspector;
 using System.Collections.Generic;
 
 public enum WebRTCState { Disconnected, Connecting, Connected } 
-public class WebRTCVideoSender : NetworkBehaviour
+public class WebRTCVideoSender : MonoBehaviour
 {
     public const string TYPE_OFFER = "offer";
 

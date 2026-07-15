@@ -1,5 +1,6 @@
 using Meta.XR; 
 using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -10,7 +11,7 @@ public class Calibration : MonoBehaviour {
         CalibratingCenter, CalibratingCenterCorner, CalibratingBasketCorner,
         Calibrated 
     }
-    public Notifier<Step> CalibrationStep = new Notifier<Step>();
+    [NonSerialized, ShowInInspector] public Notifier<Step> CalibrationStep = new Notifier<Step>(Step.NotCalibrated);
     [SerializeField] PlaceWithPinch[] _placers;
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
     [SerializeField] LineRenderer _pinchLine;
@@ -31,6 +32,7 @@ public class Calibration : MonoBehaviour {
     [ShowInInspector]
     public bool IsCalibrating => 
         (int)CalibrationStep.Value > (int)Step.NotCalibrated && (int)CalibrationStep.Value < (int)Step.Calibrated;
+    public bool IsDoneCalibration => CalibrationStep.Value == Step.Calibrated;
 
     public PlaceWithPinch CurrentPlacer {
         get {
@@ -46,7 +48,7 @@ public class Calibration : MonoBehaviour {
     }
 
     void SetState(Step step) {
-        _logger.Log($"changing calibration step {CalibrationStep}->{step}");
+        _logger.Log($"changing calibration step {CalibrationStep.Value}->{step}");
         var stepInt = (int)step;
         for (int i = 0; i < _placers.Length; i++) {
             _placers[i].IsPlacing = (i == stepInt);
@@ -160,9 +162,7 @@ public class Calibration : MonoBehaviour {
             Forward = forward,
             Rotation = Quaternion.LookRotation(forward, Vector3.up)
         };
-    }
-
-
+    } 
 
     public void OnConfirmedCalibrationStep() {
         _logger.Log("Confirmed " + CalibrationStep.Value);
@@ -172,10 +172,5 @@ public class Calibration : MonoBehaviour {
     public void Backtrack() {
         _logger.Log("Backtracking " + CalibrationStep.Value);
         SetState(CalibrationStep.Value - 1);
-    }
-
-    private void OnDisable() {
-        foreach (var placer in _placers)
-            placer.gameObject.SetActive(false);
-    }
+    } 
 } 

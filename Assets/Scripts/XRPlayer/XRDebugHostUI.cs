@@ -11,23 +11,39 @@ public class XRDebugHostUI : MonoBehaviour
     [SerializeField] UnityEngine.UI.Image _loadingImg;
     [SerializeField] ShapeRecognizerActiveState _handShape;
     [SerializeField] RealTimer _timeHandShapeActive = new(3f);
-
+    [SerializeField] Calibration _calib;
     bool _isActive;
-
-    void Start()
+    bool _wasToggled;
+    void Awake()
     {
-        NetBoot.Instance.OnPlayerTypeSetup += Instance_OnPlayerTypeSetup;
-        Instance_OnPlayerTypeSetup(NetBoot.Instance);
+        _uiDoc.enabled = false;
+        _calib.CalibrationStep.Sub(OnCalibStep);
+        var boot = NetBoot.Instance;
+        boot.OnPlayerTypeSetup += ShouldToggle;
+        ShouldToggle(boot);
     }
-
-    private void Instance_OnPlayerTypeSetup(NetBoot boot) {
-        gameObject.SetActive(boot.IsCoach);
+    void OnCalibStep(Calibration.Step step) => ShouldToggle(NetBoot.Instance);
+    void ShouldToggle(NetBoot boot) {
+        gameObject.SetActive(Debug.isDebugBuild && _calib.IsDoneCalibration);
     } 
-
-    // Update is called once per frame
+     
+    private void OnDestroy() {
+        _calib.CalibrationStep.Unsub(OnCalibStep);
+        if (NetBoot.Instance)
+            NetBoot.Instance.OnPlayerTypeSetup -= ShouldToggle;
+    }
+     
     void LateUpdate()
     {
-        transform.LookAt(_lookAt, _lookAt.up);
+        transform.LookAt( - transform.DirectionTo(_lookAt), _lookAt.up);
+
+        if(_handShape.Active && _wasToggled) {
+            return;
+        }
+
+        if (!_handShape.Active)
+            _wasToggled = false;
+
         if (_handShape.Active != _isActive) {
             _isActive = _handShape.Active;
             if(_isActive)
@@ -35,8 +51,11 @@ public class XRDebugHostUI : MonoBehaviour
         }
 
         if(_isActive && _timeHandShapeActive.TimerOver) {
+            _wasToggled = true;
+            _loadingImg.gameObject.SetActive(false);
             _timeHandShapeActive.Restart();
             NetBoot.Instance.SetupAsXRCoachDebug();
+            _uiDoc.enabled = NetBoot.Instance.IsCoach;
         }
 
         const float headStart = 0.15f; 

@@ -16,30 +16,23 @@ public class PlaceWithPinch : MonoBehaviour {
     public event Action OnPlaced;   
     [NonSerialized, ShowInInspector] public bool WasPlaced; 
     public Transform PreviewObj => _preview;
-    public Transform PlacedObj => _placeObj;
-    bool _isPlacing;
+    public Transform PlacedObj => _placeObj; 
     public Vector3 PreviewOrPlacedPosition => WasPlaced ? _placeObj.position : _preview.position;
     public bool IsPlacing {
-        get => isActiveAndEnabled && _isPlacing;
+        get => isActiveAndEnabled;
         set {
-            enabled = _isPlacing = value;
-            if(!_isPlacing)
-                _preview.gameObject.SetActive(_isPlacing);
+            enabled = value;
+            OnIsPlacing(value);
         }
     }
 
-    private void Awake() {
-        IsPlacing = _isPlacing;
-    }
+    private void OnEnable()  => OnIsPlacing(true); 
+    private void OnDisable() => OnIsPlacing(false); 
 
-    private void OnEnable() {
-        _preview.gameObject.SetActive(true);
-        _lineRend.enabled = true;
-    }
-
-    private void OnDisable() {
-        _preview.gameObject.SetActive(false); 
-        _lineRend.enabled = false;
+    void OnIsPlacing(bool enable) {
+        enabled = enable;
+        _lineRend.enabled = enable;
+        _preview.gameObject.SetActive(enable);
     }
 
 
@@ -62,8 +55,9 @@ public class PlaceWithPinch : MonoBehaviour {
     }
 
     bool Raycast(Ray ray, out Vector3 hit) {
-        if (Application.isEditor) {
+        if (XRDeviceInstance.ENABLE_MRUK) {
             if (!MRUK.Instance) {
+                Debug.LogWarning("MRUK enabled but no instance found");
                 hit = default;
                 return false;
             }
