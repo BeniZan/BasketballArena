@@ -28,8 +28,8 @@ public class CalibrationUI : MonoBehaviour {
         for(int i=0; i< _tabs.Length; i++) {
             _tabs[i].SetActive((int)_calibration.CalibrationStep.Value == i);
         }
-         _previous.interactable = step > (Calibration.Step.NotCalibrated+1);
-        _next.interactable = step < Calibration.Step.Calibrated && _calibration.CurrentPlacer.WasPlaced;
+        _previous.interactable = step > (Calibration.Step.NotCalibrated+1);
+        _next.interactable = step < Calibration.Step.Calibrated && _calibration.CurrentPlacer && _calibration.CurrentPlacer.WasPlaced;
     }
     [Button, HorizontalGroup]
     void OnNext() => _calibration.OnConfirmedCalibrationStep();

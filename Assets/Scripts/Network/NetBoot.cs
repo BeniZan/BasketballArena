@@ -45,7 +45,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     private void NetMng_OnShutdown() {
         _logger.Log("Server shutdown"); 
     }
-
+#if UNITY_EDITOR
     void UnsetPlayerType() {
         _logger.Log("Unset player type");
         if(!_netMng.ShutdownInProgress)
@@ -53,6 +53,7 @@ public class NetBoot : SingletonMono<NetBoot> {
         _playerType = PlayerType.NotSetup; 
         OnSetPlayerType();
     }
+#endif
     void SetupPlayerType(PlayerType player) => SetupPlayerType(player.HasFlag(PlayerType.XRPlayer), player.HasFlag(PlayerType.Coach));
     public void SetupPlayerType(bool isXR) => SetupPlayerType(isXR, !isXR);
     public void SetupPlayerType(bool isXR, bool isCoach) {
@@ -82,8 +83,7 @@ public class NetBoot : SingletonMono<NetBoot> {
             if (data.EventType == ConnectionEvent.ClientConnected)
                 _logger.Log("Connected");
             if(data.EventType == ConnectionEvent.ClientDisconnected) {
-                _logger.Log("Disconnected");
-                UnsetPlayerType();
+                _logger.Log("Disconnected"); 
             }
         }
         else {
@@ -91,14 +91,14 @@ public class NetBoot : SingletonMono<NetBoot> {
         } 
     }
 
-    void SetupNetwork() {
-        if (!PlayerTypeReady) {
-            _logger.Log("Player type not setup, shutting down...");
-            _netMng.Shutdown();
-            return;
-        }
+    void SetupNetwork() { 
         if(_netMng.IsServer || _netMng.IsClient)
             _netMng.Shutdown();
+
+        if (!PlayerTypeReady) {
+            _logger.Log("Player type not setup, ignoring SetupNetwork call...");
+            return;
+        }
 
         if (IsCoach) {
             if (IsXR)
@@ -134,7 +134,7 @@ public class NetBoot : SingletonMono<NetBoot> {
                     ConnectedGUI(); 
                 } 
                 else {
-                    GUILayout.Label("Player type setup but network manager connection not setup");
+                    GUILayout.Label($"Player type setup (xr:{IsXR}, coach:{IsCoach}) but network manager connection not setup");
                 }
             }
             else {
