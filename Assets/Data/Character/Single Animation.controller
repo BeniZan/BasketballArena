@@ -17,13 +17,13 @@ AnimatorState:
   m_WriteDefaultValues: 0
   m_Mirror: 0
   m_SpeedParameterActive: 0
-  m_MirrorParameterActive: 0
+  m_MirrorParameterActive: 1
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: d88360ca0494cce47b3d82eb0486031b, type: 2}
+  m_Motion: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
   m_Tag: 
   m_SpeedParameter: 
-  m_MirrorParameter: 
+  m_MirrorParameter: is_mirror
   m_CycleOffsetParameter: 
   m_TimeParameter: 
 --- !u!91 &9100000
@@ -41,7 +41,7 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
-  - m_Name: Action
+  - m_Name: is_mirror
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0

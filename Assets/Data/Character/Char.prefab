@@ -46,6 +46,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharComponent
   _anim: {fileID: 5544763772652617979}
+  _data:
+    FieldStandardPosition: {x: 0, y: 0}
+    yRotation: 0
+    Animation: {fileID: 0}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
   Head: {fileID: 7541221081243626369}
 --- !u!1001 &2132561006992997738
 PrefabInstance:
