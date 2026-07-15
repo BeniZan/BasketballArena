@@ -11,6 +11,19 @@ using System;
 using UnityEngine.UIElements;
 
 public class WebRTCVideoReceiver : MonoBehaviour {   
+    static WebRTCVideoReceiver _instance;
+    public static WebRTCVideoReceiver Instance {
+        get {
+            if (_instance)
+                return _instance;
+            return _instance = FindFirstObjectByType<WebRTCVideoReceiver>();
+        }
+    }
+    /// <summary>Latest texture received from the remote video track, or null when no stream is active.</summary>
+    public Texture VideoTexture { get; private set; }
+    /// <summary>Raised with the new texture when a stream starts, and with null when it ends.</summary>
+    public event Action<Texture> OnVideoTextureChanged;
+
     private RTCPeerConnection peerConnection;
     Queue<RTCIceCandidateInit> _pendingCandidates = new Queue<RTCIceCandidateInit>();
     bool _setupRemoteDescription;
@@ -56,7 +69,8 @@ public class WebRTCVideoReceiver : MonoBehaviour {
     }
 
     private void InitializeTexture(Texture tex) {
-        //todo
+        VideoTexture = tex;
+        OnVideoTextureChanged?.Invoke(tex);
     }
 
     private void Instance_OnOfferReceived(WebRTCHandshakeManager.Handshake handshake) {
@@ -100,6 +114,10 @@ public class WebRTCVideoReceiver : MonoBehaviour {
     }
 
     void CloseConnection() {  
+        if (VideoTexture != null) {
+            VideoTexture = null;
+            OnVideoTextureChanged?.Invoke(null);
+        }
         peerConnection?.Dispose(); 
         StopAllCoroutines();
     }

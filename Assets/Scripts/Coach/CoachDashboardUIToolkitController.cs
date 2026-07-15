@@ -63,6 +63,10 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private VisualElement _buildSessionPlaceholder;
     private ListView _drillListView;
 
+    private VisualElement _castingView;
+    private VisualElement _castingPlaceholder;
+    private UnityEngine.UIElements.Image _castingImage;
+
     // State variables
     private readonly TrainingSession _session = new TrainingSession();
 
@@ -96,6 +100,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _session.OnDrillsChanged -= HandleDrillsChanged;
         _session.OnActiveDrillChanged -= HandleActiveDrillChanged;
         if (_drillListView != null) _drillListView.itemIndexChanged -= OnDrillReordered;
+        if (WebRTCVideoReceiver.Instance != null)
+            WebRTCVideoReceiver.Instance.OnVideoTextureChanged -= HandleCastingTextureChanged;
     }
 
     private void InitializeUI(bool logIfNotReady = false)
@@ -136,6 +142,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         _drillsCountText = _root.Q<Label>("drillsCountText");
         _buildSessionPlaceholder = _root.Q<VisualElement>("buildSessionPlaceholder");
+
+        SetupCastingView();
 
         // Robustly acquire the Training Flow ListView. The runtime UI Toolkit importer in
         // this project does not reliably instantiate a <ui:ListView> from UXML (it can fall
@@ -230,6 +238,53 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private void Update()
     {
         UpdateTimerDisplay(); 
+
+        // The WebRTC texture is updated outside UI Toolkit, so force a repaint while streaming.
+        if (_castingImage != null && _castingImage.image != null)
+            _castingImage.MarkDirtyRepaint();
+    }
+
+    // ---- Casting view (player stream) -------------------------------------------
+
+    private void SetupCastingView()
+    {
+        _castingView = _root.Q<VisualElement>("castingView");
+        if (_castingView == null) return;
+
+        _castingPlaceholder = _castingView.Q<VisualElement>(className: "viewport-placeholder");
+
+        if (_castingImage == null)
+        {
+            _castingImage = new UnityEngine.UIElements.Image { name = "castingStreamImage" };
+            _castingImage.scaleMode = ScaleMode.ScaleAndCrop;
+            _castingImage.style.position = Position.Absolute;
+            _castingImage.style.left = 0;
+            _castingImage.style.right = 0;
+            _castingImage.style.top = 0;
+            _castingImage.style.bottom = 0;
+        }
+        if (_castingImage.parent != _castingView)
+            _castingView.Insert(0, _castingImage);
+
+        if (Application.isPlaying && WebRTCVideoReceiver.Instance != null)
+        {
+            WebRTCVideoReceiver.Instance.OnVideoTextureChanged -= HandleCastingTextureChanged;
+            WebRTCVideoReceiver.Instance.OnVideoTextureChanged += HandleCastingTextureChanged;
+        }
+
+        // Reflect the current stream state (covers re-initialization while already streaming).
+        HandleCastingTextureChanged(Application.isPlaying ? WebRTCVideoReceiver.Instance?.VideoTexture : null);
+    }
+
+    private void HandleCastingTextureChanged(Texture tex)
+    {
+        if (_castingImage == null) return;
+
+        _castingImage.image = tex;
+        bool streaming = tex != null;
+        _castingImage.style.display = streaming ? DisplayStyle.Flex : DisplayStyle.None;
+        if (_castingPlaceholder != null)
+            _castingPlaceholder.style.display = streaming ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     private void SetStreamMode(bool realistic)
@@ -253,10 +308,9 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _statusText.text = "RUNNING";
         _statusText.style.color = new StyleColor(new Color(16f/255f, 185f/255f, 129f/255f, 1f)); // Green
         // Activate the first drill if the session hasn't started yet.
-        if (_session.ActiveIndex < 0) {
+        // HandleActiveDrillChanged propagates the drill to NetDrillsActivator by name.
+        if (_session.ActiveIndex < 0)
             _session.Start();
-            NetDrillsActivator.Instance.Server_SetActiveDrill(_session.ActiveIndex);
-        }
 
         DrillPlayer.Instance.IsPlaying = true;
     }
@@ -277,7 +331,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         UpdateTimerDisplay();
         _session.Reset(); // clears active drill -> HandleActiveDrillChanged updates repText + highlight
 
-        DrillPlayer.Instance.IsPlaying = false;
+        DrillPlayer.Instance.RestartAndPause(); // resets the animation/timer to 0 and pauses
         //NetCoachDashboardState.Instance?.Server_SetTimerRunning(false); 
     }
 
@@ -476,6 +530,14 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         }
 
         NetCoachDashboardState.Instance?.Server_SetActiveIndex(_session.ActiveIndex);
+
+        // Resolve by name: the session list order differs from NetDrillsActivator's asset list,
+        // so indices are not interchangeable. Unknown names resolve to null and clear the drill.
+        if (Application.isPlaying && NetDrillsActivator.Instance != null)
+        {
+            var drill = NetDrillsActivator.Instance.GetDrill(_session.ActiveDrill ?? "");
+            NetDrillsActivator.Instance.Server_SetActiveDrill(drill);
+        }
     }
 
     private void AddDrill(string drillName)
