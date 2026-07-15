@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using SingletonBehaviors;
+using Sirenix.OdinInspector;
 using System;
 using Unity.Netcode;
 using UnityEditor;
@@ -16,11 +17,11 @@ public class NetBoot : SingletonMono<NetBoot> {
     public bool IsCoach => _playerType.HasFlag(PlayerType.Coach);
     public bool PlayerTypeReady => IsXR || IsCoach;
     public bool IsConnectionAwaiting => _netMng.IsListening && _netMng.IsClient && !_netMng.IsConnectedClient;
-    public bool IsConnected => _netMng.IsListening && (_netMng.IsConnectedClient || _netMng.IsServer);
+    public bool IsConnected =>  _netMng.IsServer || _netMng.IsConnectedClient;
     CustomLogger _logger;
     public event Action<NetBoot> OnPlayerTypeSetup;
-#if UNITY_EDITOR 
-    [SerializeField] PlayerType _editorAutoSetupConfig = PlayerType.NotSetup;
+#if UNITY_EDITOR  
+    [SerializeField] PlayerType _editorAutoSetupConfig = PlayerType.NotSetup; 
 #endif
     bool IsOnXRDevice() {
         var deviceModel = SystemInfo.deviceModel.ToLower();
@@ -65,7 +66,7 @@ public class NetBoot : SingletonMono<NetBoot> {
          
         _logger.Log($"setting up player type as: [{type}]");
         _playerType = type;
-        OnSetPlayerType();
+        OnSetPlayerType(); 
     }
 
     void OnSetPlayerType() {
@@ -152,9 +153,13 @@ public class NetBoot : SingletonMono<NetBoot> {
 
     void ConnectedGUI() {
         var lbl = $"Connected as: {(_netMng.IsHost ? "Host" : (_netMng.IsServer ? "Server" : "Client") )}";
-        if (PlayerTypeReady)
-            lbl += "\nPlaying as " + (IsXR ? "XRPlayer" : "Coach");
-        else lbl += "\nError: Connected but player type not setup";
+        if (!PlayerTypeReady)
+            lbl += "\nPlayer type not set up";
+        if (IsXR)
+            lbl += "\nXR Role set";
+        if (IsCoach)
+            lbl += "\nCoach Role set";
+        else lbl += "\nWarning: Connected but player type not setup";
         GUILayout.Label(lbl);
     }
     

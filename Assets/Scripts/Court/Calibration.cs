@@ -2,6 +2,7 @@ using Meta.XR;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI; 
@@ -11,7 +12,8 @@ public class Calibration : MonoBehaviour {
         CalibratingCenter, CalibratingCenterCorner, CalibratingBasketCorner,
         Calibrated 
     }
-    [NonSerialized, ShowInInspector] public Notifier<Step> CalibrationStep = new Notifier<Step>(Step.NotCalibrated);
+    [NonSerialized, ShowInInspector, HideReferenceObjectPicker] 
+    public Notifier<Step> CalibrationStep = new Notifier<Step>(Step.NotCalibrated);
     [SerializeField] PlaceWithPinch[] _placers;
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
     [SerializeField] LineRenderer _pinchLine;
@@ -29,7 +31,7 @@ public class Calibration : MonoBehaviour {
             return _placers[idx];
         return null;
     }
-    [ShowInInspector]
+    [ShowInInspector, PropertyOrder(-100)]
     public bool IsCalibrating => 
         (int)CalibrationStep.Value > (int)Step.NotCalibrated && (int)CalibrationStep.Value < (int)Step.Calibrated;
     public bool IsDoneCalibration => CalibrationStep.Value == Step.Calibrated;
@@ -46,6 +48,20 @@ public class Calibration : MonoBehaviour {
         _logger = new CustomLogger(this, Color.green);  
         await (_calibrationAwait = BeginCalibration());
     }
+#if UNITY_EDITOR
+    [SerializeField, BoxGroup("Auto Calibrate")] bool _editorAutoCalibrate;
+    [SerializeField, BoxGroup("Auto Calibrate")] Camera _centerCam;
+    private async Awaitable Start() {
+        await Awaitable.EndOfFrameAsync();
+        await Awaitable.NextFrameAsync();
+        await Awaitable.EndOfFrameAsync();
+
+        var playerPos = _centerCam.transform.position - (Vector3.up * 1.2f);
+        var surface = CreateSurface(playerPos, playerPos + Vector3.forward * 2, playerPos + Vector3.right * 2);
+        _courtSurface.SetSurface(surface);
+        SetState(Step.Calibrated);
+    }
+#endif
 
     void SetState(Step step) {
         _logger.Log($"changing calibration step {CalibrationStep.Value}->{step}");
@@ -53,6 +69,7 @@ public class Calibration : MonoBehaviour {
         for (int i = 0; i < _placers.Length; i++) {
             _placers[i].IsPlacing = (i == stepInt);
         }
+        _courtSurface.gameObject.SetActive(step == Step.Calibrated);
         CalibrationStep.Value = step;
     }
     async Awaitable BeginCalibration() {

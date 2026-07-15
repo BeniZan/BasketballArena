@@ -5,8 +5,11 @@ using TMPro;
 using System.Collections.Generic;
 using Oculus.Interaction.PoseDetection;
 using Sirenix.OdinInspector;
+using Oculus.Interaction.Input;
 
 public class TestMovesUI : MonoBehaviour {
+    [SerializeField] Canvas _mainCanvas;
+    [SerializeField] OVRHand _leftHand;
     [SerializeField] GameObject _debugCanvas;
     [SerializeField] Image _loadingImg;
     [SerializeField] TMPro.TMP_Dropdown _dropdown;
@@ -61,7 +64,7 @@ public class TestMovesUI : MonoBehaviour {
 
 
     private void LateUpdate() {
-        transform.LookAt(_centerEye.transform.DirectionTo(transform), _centerEye.transform.up);
+        _mainCanvas.enabled = _leftHand.IsTracked;
 
         if (_handShape.Active && _wasToggled) {
             return;
@@ -87,7 +90,7 @@ public class TestMovesUI : MonoBehaviour {
         const float headStart = 0.15f;
         _loadingImg.gameObject.SetActive(_handShape.Active && _timeHandShapeActive.TimeRunning > headStart);
         _loadingImg.fillAmount = _timeHandShapeActive.NormalizedTime;
-    }
+    } 
 
     [Button, HideInEditorMode]
     void ToggleCoachHostState() {

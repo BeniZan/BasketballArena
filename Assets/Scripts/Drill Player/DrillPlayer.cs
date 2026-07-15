@@ -21,6 +21,7 @@ public class DrillPlayer : NetworkBehaviour {
     NetworkVariable<AnimationPlaybackState> SyncState 
         = new NetworkVariable<AnimationPlaybackState>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     public AnimationPlaybackState PlaybackState { get => SyncState.Value; set => SyncState.Value = value; }
+    CustomLogger _logger;
     public float AnimationTime {
         get {
             if (PlaybackState.Speed == 0f)
@@ -47,6 +48,7 @@ public class DrillPlayer : NetworkBehaviour {
     public void Play() => SetSpeed(1f);
     public void Pause() => SetSpeed(0f);
     void SetSpeed(float speed) {
+        _logger.Log("Setting DrillPlayer Speed: " + speed);
         var state = PlaybackState;
         state.Time = AnimationTime;
         state.Speed = speed;
@@ -55,6 +57,7 @@ public class DrillPlayer : NetworkBehaviour {
     }
 
     private void Awake() {
+        _logger = new CustomLogger(this, Color.magenta);
         _instance = this;
         _drillActivator.OnDrillChange += DrillActivator_OnDrillChange;
     }

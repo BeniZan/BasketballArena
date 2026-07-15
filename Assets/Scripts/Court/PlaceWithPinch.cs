@@ -61,15 +61,17 @@ public class PlaceWithPinch : MonoBehaviour {
                 hit = default;
                 return false;
             }
+            try {
+                var room = MRUK.Instance.GetCurrentRoom();
+                if (room) {
+                    var isRayHit = room.Raycast(ray, 100f, out var rhit);
+                    hit = rhit.point;
+                    return isRayHit;
+                }
+            } catch (Exception ex) { Debug.LogException(ex);   }
+            hit = default;
+            return false;
 
-            var room = MRUK.Instance.GetCurrentRoom();
-            if (!room) {
-                hit = default;
-                return false;
-            }
-            var isRayHit = room.Raycast(ray, 100f, out var rhit);
-            hit = rhit.point;
-            return isRayHit;
         } 
 
         var isHit = _raycastManager.Raycast(ray, out var envHit);

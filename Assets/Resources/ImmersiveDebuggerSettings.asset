@@ -33,7 +33,7 @@ MonoBehaviour:
   showErrorLog: 1
   collapsedIdenticalLogEntries: 0
   maximumNumberOfLogEntries: 1000
-  panelDistance: 1
+  panelDistance: 2
   createEventSystem: 0
   automaticLayerCullingUpdate: 1
   panelLayer: 20
@@ -48,7 +48,7 @@ MonoBehaviour:
   useCustomIntegrationConfig: 0
   customIntegrationConfigClassName: 
   hierarchyViewShowsPrivateMembers: 0
-  clickButton: 8193
+  clickButton: 8192
   toggleFollowTranslationButton: 0
   toggleFollowRotationButton: 0
   immersiveDebuggerToggleDisplayButton: 2
