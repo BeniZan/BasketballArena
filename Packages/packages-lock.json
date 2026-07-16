@@ -16,6 +16,13 @@
       "dependencies": {},
       "hash": "8d49db138eaa19fdc3f6c62172561f4f3d41f6bf"
     },
+    "com.google.external-dependency-manager": {
+      "version": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "32c34224fd3f34c813c97c69508d2a3930105dc7"
+    },
     "com.meta.xr.mrutilitykit": {
       "version": "203.0.0",
       "depth": 0,
@@ -132,11 +139,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.27",
+      "version": "2.0.23",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.test-framework": "1.1.33"
+        "com.unity.test-framework": "1.1.9"
       },
       "url": "https://packages.unity.com"
     },

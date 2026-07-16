@@ -2,7 +2,6 @@ using UnityEngine;
 using Unity.WebRTC;
 using System.Collections;
 using System.Collections.Concurrent;
-using WebSocketSharp;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Sirenix.OdinInspector;
