@@ -1,4 +1,5 @@
 using System.Linq;
+using Unity.Android.Gradle;
 using Unity.Android.Gradle.Manifest;
 using UnityEditor.Android;
 using UnityEngine;
@@ -28,12 +29,19 @@ public class AndroidManifestModifier : AndroidProjectFilesModifier {
         var str = "";
         foreach(var file in projectFiles.AdditionalLibrariesBuildGradleFiles) {
             str = "name:" + file.Key;
-            var android = file.Value.Android;
-            foreach (var depID in android.GetElementDependenciesIDs()) {
-                str += android.GetElement(depID);
-            } 
+            var android = file.Value;
+            LogLoop(android, ref str);
         }
         _logger.Log(str);
+    }
+
+    string LogLoop(Unity.Android.Gradle.BaseElement block, ref string str) {
+        str += "\n "+ block.GetUniqueName() + ":";
+        if(block is BaseBlock bb)
+        foreach (var element in block.GetElementDependenciesIDs()) { 
+                LogLoop(bb.GetElement(element), ref str);
+        }
+        return str;
     }
 
     static bool ContainsQuestOrXrDependency(string value) {
