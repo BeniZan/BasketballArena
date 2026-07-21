@@ -2,10 +2,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections.Generic;
-using Oculus.Interaction.PoseDetection;
+using System.Collections.Generic; 
 using Sirenix.OdinInspector;
-using Oculus.Interaction.Input;
+using Oculus.Interaction.PoseDetection;
 
 public class TestMovesUI : MonoBehaviour {
     [SerializeField] Canvas _mainCanvas;
