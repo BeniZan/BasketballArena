@@ -4,6 +4,7 @@
     "com.bz.drills": "https://github.com/BeniZan/Drills.git",
     "com.google.external-dependency-manager": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",
     "com.meta.xr.mrutilitykit": "201.0.0",
+    "com.meta.xr.sdk.core": "201.0.0",
     "com.meta.xr.sdk.interaction.ovr": "201.0.0",
     "com.tox.unityutils": "https://github.com/ToxPlayers/UnityUtils.git",
     "com.unity.ai.navigation": "2.0.10",
