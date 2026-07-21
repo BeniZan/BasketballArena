@@ -304,6 +304,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f08eef99828037d4b8b35052b0ad8348, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeamManeuverManager
+  ShowTopMostFoldoutHeaderGroup: 1
+  _allTeamManeuvers:
+  - {fileID: 11400000, guid: 7161002f443647648a3edef55487e3cc, type: 2}
+  - {fileID: 11400000, guid: 57a59fbd776a7934c96c0c4b3eefa0d1, type: 2}
+  - {fileID: 11400000, guid: 502123242fefc6a41b11e3969eb8808f, type: 2}
+  - {fileID: 11400000, guid: e26d54e74e806e94e91c1ff9445fffe0, type: 2}
+  - {fileID: 11400000, guid: 124ab75d0fbf9674183febf18b6da644, type: 2}
+  - {fileID: 11400000, guid: 4365ea82b778b374fb9a8c00d2d8e3b0, type: 2}
 --- !u!4 &775255781
 Transform:
   m_ObjectHideFlags: 0
@@ -332,6 +340,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b787d1c81d19ff84f98dc69c2a709575, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeamManeuverPlacer
+  _templateChar: {fileID: 2499888353544917440, guid: 7daf483a6f4418b4cb16a2ed329ee9b1, type: 3}
+  _courtTf: {fileID: 2092168417}
+  _courtSurface: {fileID: 1009212372}
+  _manager: {fileID: 775255780}
+  _placedChars: []
 --- !u!114 &775255783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -344,6 +357,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef03bba461aa8054c9556b4b3041adee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DrillPlayer
+  ShowTopMostFoldoutHeaderGroup: 1
+  _drillActivator: {fileID: 775255782}
 --- !u!1 &860395427
 GameObject:
   m_ObjectHideFlags: 0
@@ -692,6 +707,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+--- !u!114 &1009212372 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4937654914315032758, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+  m_PrefabInstance: {fileID: 1009212371}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b1fd21727b8b144e8cb61db78e4534d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SurfaceHandler
 --- !u!1001 &1372235279
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -836,6 +862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7300d2ec6532ef349af17fa83f9973b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WebRTCHandshakeManager
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1001 &1980375211
 PrefabInstance:
   m_ObjectHideFlags: 0

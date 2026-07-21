@@ -9,12 +9,12 @@
       },
       "hash": "fd8ff1fb700caf062eb5cce364c1d0a85f99ebe6"
     },
-    "com.bz.unityutils": {
+    "com.bz.drills": {
       "version": "https://github.com/BeniZan/Drills.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "8d49db138eaa19fdc3f6c62172561f4f3d41f6bf"
+      "hash": "4fc5da8a77498f234ba6676c9f7f9be8a43d5982"
     },
     "com.google.external-dependency-manager": {
       "version": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",
