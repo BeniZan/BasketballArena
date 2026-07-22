@@ -13,6 +13,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     [SerializeField, Get] NetworkManager _netMng;
     [SerializeField] NetworkObject  _XRClientPrefab;
     [SerializeField] GameObject LocalXRDeviceToggle, _localCoachHostToggle;
+    public NetworkManager NetMnger => _netMng;
     public bool IsXR => _playerType.HasFlag(PlayerType.XRPlayer);
     public bool IsCoach => _playerType.HasFlag(PlayerType.Coach);
     public bool PlayerTypeReady => IsXR || IsCoach;

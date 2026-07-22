@@ -1,4 +1,6 @@
+using Meta.XR;
 using Meta.XR.BuildingBlocks;
+using Meta.XR.EnvironmentDepth;
 using Meta.XR.MRUtilityKit;
 using Oculus.Interaction;
 using Sirenix.OdinInspector;
@@ -12,7 +14,6 @@ using UnityEngine.XR.Management;
 public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstance> {
     const float RetryConnectXRDelay = 5f;
     private static WaitForSeconds _waitForRetryConnectXR = new WaitForSeconds(RetryConnectXRDelay);
-
     static public bool ENABLE_MRUK => Application.isEditor;
 	[field: SerializeField] public OVRHand LocalRightHand { get; private set; }
 	[field: SerializeField] public OVRHand LocalLeftHand { get; private set; }
@@ -21,11 +22,12 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     [field: SerializeField] public Transform CenterEyes { get; private set; }
     [SerializeField] MRUK _mruk;
     [SerializeField] EffectMesh _efMesh;
+    [SerializeField] EnvironmentDepthManager _depthManager;
     CustomLogger _logger;
     protected override void Awake() {
         base.Awake();
+        _depthManager.enabled = !ENABLE_MRUK;
         _logger = new CustomLogger(this, Color.green);
-        var enableMRUK = Application.isEditor;
         if(_mruk)
             _mruk.gameObject.SetActive(ENABLE_MRUK);
         if(_efMesh)
