@@ -4930,6 +4930,8 @@ MonoBehaviour:
   _data: {fileID: 0}
   _selector: {fileID: 3568246545956120392}
   _teleportArc: {fileID: 690610612346219613}
+  _equalDistanceThreshold: 0.1
+  _hmd: {fileID: 0}
   _context: {fileID: 0}
 --- !u!114 &690610612346219613
 MonoBehaviour:
@@ -6206,7 +6208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 5817f7c0-f2a5-45f9-a5ca-64264e0166e8
-  instanceId: 96b0d91b-04e5-44dd-a152-ae56d3f0a8af
+  instanceId: a32a5831-13a9-4ac6-9a36-482ac853c979
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -13606,6 +13608,7 @@ MonoBehaviour:
   _grabOrigin: {fileID: 2648093915385544063}
   _gripPoint: {fileID: 6442269478652571859}
   _pinchPoint: {fileID: 8487743469412098350}
+  _velocityCalculator: {fileID: 0}
   _distantCandidateComputer:
     _detectionFrustums:
       _selectionFrustum: {fileID: 3289886933951933851}
@@ -14782,7 +14785,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000022888184}
+  m_AnchoredPosition: {x: 0, y: -0.00046539307}
   m_SizeDelta: {x: 0, y: 28}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &1356812797772294098
@@ -15179,6 +15182,8 @@ MonoBehaviour:
   _data: {fileID: 0}
   _selector: {fileID: 1237540385176597923}
   _teleportArc: {fileID: 3032725100010289640}
+  _equalDistanceThreshold: 0.1
+  _hmd: {fileID: 0}
   _context: {fileID: 0}
 --- !u!114 &3032725100010289640
 MonoBehaviour:
@@ -19816,7 +19821,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 3ce5fc30-a5c9-4ad0-a76d-3583bcd405b0
-  instanceId: 414db3e2-af74-41a1-948f-38970e772737
+  instanceId: 5b94eec4-3d44-4fa8-b6f4-c0bb2988f642
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -19929,6 +19934,7 @@ MonoBehaviour:
   _gripCollider: {fileID: 5257386693549309707}
   _pinchPoint: {fileID: 7312299446256193462}
   _pinchCollider: {fileID: 9129871961736094006}
+  _velocityCalculator: {fileID: 0}
 --- !u!114 &9222234724294853699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20951,7 +20957,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1485527784797969730}
   m_HandleRect: {fileID: 1172947052043710161}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -22747,6 +22753,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03190b23f0f30f74dacc4ed3992541b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _leftEyeAnchor: {fileID: 0}
+  _rightEyeAnchor: {fileID: 0}
   _centerEyeCamera: {fileID: 6797402455720588834}
   _meshFilter: {fileID: 7630808595431911435}
   _aimingDirection: {x: 0, y: 0, z: 1}
@@ -26016,6 +26024,7 @@ MonoBehaviour:
   _gripCollider: {fileID: 8060353758303163026}
   _pinchPoint: {fileID: 7912868469909679346}
   _pinchCollider: {fileID: 7572228859795864782}
+  _velocityCalculator: {fileID: 0}
 --- !u!114 &186333831790795727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27027,6 +27036,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08f7cfb1f9629da4494ac0840f3a3cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _hand: {fileID: 0}
   _fingerFeatureStateProvider: {fileID: 8353894190729372070}
   _shapes:
   - {fileID: 11400000, guid: a4f76ee9a4bceba4385d001e7ee27427, type: 2}
@@ -31058,6 +31068,8 @@ MonoBehaviour:
   _data: {fileID: 0}
   _selector: {fileID: 2967658482727345944}
   _teleportArc: {fileID: 6714065928085858100}
+  _equalDistanceThreshold: 0.1
+  _hmd: {fileID: 0}
   _context: {fileID: 0}
 --- !u!114 &6714065928085858100
 MonoBehaviour:
@@ -35065,7 +35077,9 @@ MonoBehaviour:
   _data: {fileID: 0}
   _selector: {fileID: 5597948369403738186}
   _rigidbody: {fileID: 7228605331895210572}
+  _grabCenter: {fileID: 0}
   _grabTarget: {fileID: 5980199616389640518}
+  _velocityCalculator: {fileID: 0}
 --- !u!114 &1351574242817127818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35699,6 +35713,7 @@ MonoBehaviour:
   _grabOrigin: {fileID: 8752159046232902008}
   _gripPoint: {fileID: 2610026736611743764}
   _pinchPoint: {fileID: 3328642437027948427}
+  _velocityCalculator: {fileID: 0}
   _distantCandidateComputer:
     _detectionFrustums:
       _selectionFrustum: {fileID: 2092703505709302486}
@@ -39907,7 +39922,9 @@ MonoBehaviour:
   _data: {fileID: 0}
   _selector: {fileID: 1879759433482869619}
   _rigidbody: {fileID: 965440530731199479}
+  _grabCenter: {fileID: 0}
   _grabTarget: {fileID: 760846672924709042}
+  _velocityCalculator: {fileID: 0}
 --- !u!114 &2934957383787360175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48843,7 +48860,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 81f55626-5fad-45e9-a1df-184f330da7ba
-  instanceId: 3f18ac25-4d86-4ac0-9b27-e9f3d6c4cdea
+  instanceId: 76a1b517-983d-4a91-8e79-c90a8f12772b
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 2063f481-1b63-4eda-9ee8-a00df98536bc
@@ -50112,7 +50129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: e47682b9-c270-40b1-b16d-90b627a5ce1b
-  instanceId: 0629654a-0a48-4e17-9346-b7b23f5ef5d3
+  instanceId: 89dd46c0-e5bb-4621-adc8-6f5a42e14af4
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -50220,6 +50237,8 @@ MonoBehaviour:
   wideMotionModeHandPosesEnabled: 0
   _readOnlyFastMotionModeHandPosesEnabled: 0
   fastMotionModeHandPosesEnabled: 0
+  _readOnlyWideMotionMode2HandPosesEnabled: 0
+  wideMotionMode2HandPosesEnabled: 0
   dynamicResolutionVersion: 1
 --- !u!114 &6742799659885898385
 MonoBehaviour:
@@ -56656,6 +56675,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08f7cfb1f9629da4494ac0840f3a3cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Oculus.Interaction::Oculus.Interaction.PoseDetection.ShapeRecognizerActiveState
+  _hand: {fileID: 0}
   _fingerFeatureStateProvider: {fileID: 8353894190729372070}
   _shapes:
   - {fileID: 11400000, guid: 1a97b30c5c346474b90e2afebe095d95, type: 2}
@@ -62528,7 +62548,9 @@ MonoBehaviour:
   _maxIterationsPerFrame: 3
   _data: {fileID: 0}
   _selector: {fileID: 3167173733482373425}
+  _grabCenter: {fileID: 0}
   _grabTarget: {fileID: 4767328028881107595}
+  _velocityCalculator: {fileID: 0}
   _distantCandidateComputer:
     _detectionFrustums:
       _selectionFrustum: {fileID: 2863156833728435408}
@@ -63100,6 +63122,7 @@ MonoBehaviour:
   _gripCollider: {fileID: 5597143034731557266}
   _pinchPoint: {fileID: 4640484723747656079}
   _pinchCollider: {fileID: 236146279055006194}
+  _velocityCalculator: {fileID: 0}
 --- !u!114 &2758144300209976291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68607,7 +68630,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 80aa2eb2-af2f-40a9-ad9e-18044ce65bee
-  instanceId: d6ea624a-c3a4-4bf7-b874-4a438f091d5d
+  instanceId: 63b78f56-cec8-4466-8727-8c8f7a5f277c
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -69934,7 +69957,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: f0540b20-dfd6-420e-b20d-c270f88dc77e
-  instanceId: fc3f609f-040b-437d-ad0b-fea53856d4f7
+  instanceId: 8ca3810d-bdce-44e3-bce3-3eca74807ca7
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -70616,6 +70639,8 @@ MonoBehaviour:
   _data: {fileID: 0}
   _selector: {fileID: 8289813476442207727}
   _teleportArc: {fileID: 3653782118948704863}
+  _equalDistanceThreshold: 0.1
+  _hmd: {fileID: 0}
   _context: {fileID: 0}
 --- !u!114 &3653782118948704863
 MonoBehaviour:
@@ -72841,6 +72866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08f7cfb1f9629da4494ac0840f3a3cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _hand: {fileID: 0}
   _fingerFeatureStateProvider: {fileID: 2149966933842659051}
   _shapes:
   - {fileID: 11400000, guid: a4f76ee9a4bceba4385d001e7ee27427, type: 2}
@@ -73649,7 +73675,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 5817f7c0-f2a5-45f9-a5ca-64264e0166e8
-  instanceId: 623bab3e-7731-4d03-9851-4950c11ed8dc
+  instanceId: 10431828-adbb-4a34-bc73-05a144e808ca
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -76969,6 +76995,7 @@ GameObject:
   - component: {fileID: 8621506129029750512}
   - component: {fileID: 8194418611709466201}
   - component: {fileID: 7044759651145948421}
+  - component: {fileID: 5951009198592918344}
   m_Layer: 0
   m_Name: Event System Pointable Canvas Module
   m_TagString: Untagged
@@ -77021,6 +77048,37 @@ MonoBehaviour:
   m_SendPointerHoverToParent: 1
   _useInitialPressPositionForDrag: 1
   _exclusiveMode: 1
+--- !u!114 &5951009198592918344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7073818120155653165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.UI.InputSystemUIInputModule
+  m_SendPointerHoverToParent: 1
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
 --- !u!1 &7074532307808123972
 GameObject:
   m_ObjectHideFlags: 0
@@ -77168,6 +77226,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03190b23f0f30f74dacc4ed3992541b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _leftEyeAnchor: {fileID: 0}
+  _rightEyeAnchor: {fileID: 0}
   _centerEyeCamera: {fileID: 6797402455720588834}
   _meshFilter: {fileID: 3846218321284269198}
   _aimingDirection: {x: 0, y: 0, z: 1}
@@ -78266,7 +78326,9 @@ MonoBehaviour:
   _maxIterationsPerFrame: 3
   _data: {fileID: 0}
   _selector: {fileID: 477292677494785270}
+  _grabCenter: {fileID: 0}
   _grabTarget: {fileID: 2493072164949417264}
+  _velocityCalculator: {fileID: 0}
   _distantCandidateComputer:
     _detectionFrustums:
       _selectionFrustum: {fileID: 7868268122720694136}
@@ -81373,6 +81435,7 @@ MonoBehaviour:
   _grabOrigin: {fileID: 223670206697654363}
   _gripPoint: {fileID: 1193303294772615877}
   _pinchPoint: {fileID: 8795954669203869318}
+  _velocityCalculator: {fileID: 0}
   _distantCandidateComputer:
     _detectionFrustums:
       _selectionFrustum: {fileID: 7201390155654616512}
@@ -91458,7 +91521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 8b26b298-7bf4-490e-b245-a039c0184303
-  instanceId: 980c0978-a8d8-4767-a50c-81fac166fdf6
+  instanceId: 2b1e1f30-1f18-43e9-a70a-83e8f77edc1d
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -95208,6 +95271,8 @@ MonoBehaviour:
   _data: {fileID: 0}
   _selector: {fileID: 4130196312092621070}
   _teleportArc: {fileID: 620854467580165356}
+  _equalDistanceThreshold: 0.1
+  _hmd: {fileID: 0}
   _context: {fileID: 0}
 --- !u!114 &620854467580165356
 MonoBehaviour:
@@ -95454,7 +95519,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 8b26b298-7bf4-490e-b245-a039c0184303
-  instanceId: f95725ca-06f1-438c-b116-323d760484f6
+  instanceId: df687cbc-d7c8-420e-ac19-727d8f8474eb
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 
@@ -97293,6 +97358,7 @@ MonoBehaviour:
   _grabOrigin: {fileID: 7393576000856818037}
   _gripPoint: {fileID: 1325206520305432189}
   _pinchPoint: {fileID: 4463561296181488167}
+  _velocityCalculator: {fileID: 0}
   _distantCandidateComputer:
     _detectionFrustums:
       _selectionFrustum: {fileID: 6307329686534703787}
@@ -97793,6 +97859,7 @@ MonoBehaviour:
   _gripCollider: {fileID: 3932518720811672287}
   _pinchPoint: {fileID: 7498606235638155200}
   _pinchCollider: {fileID: 5826422947262278309}
+  _velocityCalculator: {fileID: 0}
 --- !u!114 &27585966716613394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101748,7 +101815,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9087176255014856928, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 524170432571902482}
   m_SourcePrefab: {fileID: 100100000, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
 --- !u!1 &409409142210674622 stripped
 GameObject:
@@ -101765,6 +101835,30 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6171013921714642214, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
   m_PrefabInstance: {fileID: 5514148536555590262}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3646246951099611798 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9087176255014856928, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
+  m_PrefabInstance: {fileID: 5514148536555590262}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &524170432571902482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3646246951099611798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afe3cda3e244f60419474164d6ba3b0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.UI.TrackedDeviceRaycaster
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_MaxDistance: 1000
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!224 &6559325272859107835 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1693731098365834125, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}

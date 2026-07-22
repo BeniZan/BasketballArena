@@ -50,7 +50,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
 
     void StartXR() {
         StopAllCoroutines();
-       // StartCoroutine(StartXRCoroutine());
+        StartCoroutine(StartXRCoroutine());
     }
 
     IEnumerator StartXRCoroutine() {
