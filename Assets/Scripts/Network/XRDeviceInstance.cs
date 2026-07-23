@@ -29,9 +29,8 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         _depthManager.enabled = !ENABLE_MRUK;
         _logger = new CustomLogger(this, Color.green);
         if(_mruk)
-            _mruk.gameObject.SetActive(ENABLE_MRUK);
-        if(_efMesh)
-            _efMesh.gameObject.SetActive(ENABLE_MRUK);
+            _mruk.gameObject.SetActive(ENABLE_MRUK); 
+        _efMesh.gameObject.SetActive(ENABLE_MRUK);
         if (!ENABLE_MRUK) {
             _mruk.ClearScene();
             _mruk.gameObject.SafeDestroy();

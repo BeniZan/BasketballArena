@@ -124,8 +124,10 @@ public class WebRTCVideoSender : MonoBehaviour
 
     private void OnDisable() {
         CloseConnection();
-        var netMnger = NetBoot.Instance.NetMnger;
-        netMnger.OnConnectionEvent -= Singleton_OnConnectionEvent;  
+        if (NetBoot.HasInstance) {
+            var netMnger = NetBoot.Instance.NetMnger;
+            netMnger.OnConnectionEvent -= Singleton_OnConnectionEvent;
+        }
     }
 
     void CloseConnection() {
