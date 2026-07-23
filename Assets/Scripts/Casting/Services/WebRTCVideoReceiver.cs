@@ -4,7 +4,6 @@ using Unity.WebRTC;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using WebSocketSharp;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using System;
