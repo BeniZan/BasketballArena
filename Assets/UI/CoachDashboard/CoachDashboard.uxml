@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/FigmaImport/CoachDashboard/CoachDashboard.uss?fileID=7433441132597879392&amp;guid=b8050dce562aa5f4985b2d592fc275f5&amp;type=3#CoachDashboard"/>
+    <Style src="project://database/Assets/UI/CoachDashboard/CoachDashboard.uss?fileID=7433441132597879392&amp;guid=b8050dce562aa5f4985b2d592fc275f5&amp;type=3#CoachDashboard"/>
     <ui:VisualElement class="dashboard-root">
         <ui:VisualElement class="left-sidebar">
             <ui:VisualElement class="logo-area">
@@ -51,6 +51,15 @@
                         </ui:Button>
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <ui:VisualElement name="coachViewCard" class="coach-view-card">
+                    <ui:VisualElement class="coach-view-left">
+                        <ui:Image name="coachViewEyeIcon" class="coach-view-icon"/>
+                        <ui:Label text="COACH VIEW" class="coach-view-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="coach-view-toggle active">
+                        <ui:VisualElement class="toggle-knob"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="separator"/>
             <ui:VisualElement class="bottom-info">
@@ -73,6 +82,10 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="castingView" class="stream-viewport">
+                <ui:VisualElement name="liveTag" class="live-session-tag">
+                    <ui:VisualElement class="live-session-dot"/>
+                    <ui:Label text="LIVE SESSION" class="live-session-text"/>
+                </ui:VisualElement>
                 <ui:VisualElement class="viewport-placeholder">
                     <ui:Image name="streamEyeIcon" class="viewport-icon"/>
                     <ui:Label text="Awaiting Player Stream" class="viewport-header"/>
@@ -124,6 +137,7 @@
                         <ui:Button name="pickAndRollHeader" class="exercise-foldout-header">
                             <ui:VisualElement class="exercise-left-group">
                                 <ui:Image name="pickAndRollChevron" class="exercise-chevron"/>
+                                <ui:Image name="pickAndRollIcon" class="exercise-icon"/>
                                 <ui:Label text="PICK &amp; ROLL" class="exercise-text"/>
                             </ui:VisualElement>
                             <ui:VisualElement class="exercise-badge">
@@ -136,6 +150,7 @@
                         <ui:Button name="shootingHeader" class="exercise-foldout-header">
                             <ui:VisualElement class="exercise-left-group">
                                 <ui:Image name="shootingChevron" class="exercise-chevron"/>
+                                <ui:Image name="shootingIcon" class="exercise-icon"/>
                                 <ui:Label text="SHOOTING" class="exercise-text"/>
                             </ui:VisualElement>
                             <ui:VisualElement class="exercise-badge">
@@ -148,6 +163,7 @@
                         <ui:Button name="postPlaysHeader" class="exercise-foldout-header">
                             <ui:VisualElement class="exercise-left-group">
                                 <ui:Image name="postPlaysChevron" class="exercise-chevron"/>
+                                <ui:Image name="postPlaysIcon" class="exercise-icon"/>
                                 <ui:Label text="POST PLAYS" class="exercise-text"/>
                             </ui:VisualElement>
                             <ui:VisualElement class="exercise-badge">

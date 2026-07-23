@@ -331,13 +331,19 @@
 .playback-btn {
     height: 42px;
     border-radius: 8px;
-    border-width: 0;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0);
     margin-left: 8px;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     padding-left: 12px;
     padding-right: 12px;
+    transition: border-color 0.15s ease-out, background-color 0.15s ease-out, scale 0.15s ease-out;
+}
+
+.playback-btn:hover {
+    scale: 1.04 1.04;
 }
 
 .playback-icon {
@@ -353,7 +359,13 @@
 
 .playback-btn.start {
     background-color: rgba(255, 107, 0, 0.1);
+    border-color: rgba(255, 107, 0, 0.55);
     width: 77px;
+}
+
+.playback-btn.start:hover {
+    background-color: rgba(255, 107, 0, 0.28);
+    border-color: rgb(255, 107, 0);
 }
 
 .playback-btn.start .playback-text {
@@ -362,7 +374,17 @@
 
 .playback-btn.next {
     background-color: rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.55);
     width: 73px;
+}
+
+.playback-btn.next:hover {
+    background-color: rgba(0, 212, 255, 0.28);
+    border-color: rgb(0, 212, 255);
+}
+
+.playback-btn.next:hover .playback-text {
+    color: rgb(255, 255, 255);
 }
 
 .playback-btn.next .playback-text {
@@ -374,13 +396,28 @@
     width: 67px;
 }
 
+.playback-btn.pause:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.55);
+}
+
+.playback-btn.pause:hover .playback-text {
+    color: rgb(255, 255, 255);
+}
+
 .playback-btn.pause .playback-text {
     color: rgb(100, 116, 139);
 }
 
 .playback-btn.stop {
     background-color: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.55);
     width: 62px;
+}
+
+.playback-btn.stop:hover {
+    background-color: rgba(239, 68, 68, 0.3);
+    border-color: rgb(239, 68, 68);
 }
 
 .playback-btn.stop .playback-text {
@@ -390,6 +427,15 @@
 .playback-btn.force {
     background-color: rgba(255, 255, 255, 0.03);
     width: 60px;
+}
+
+.playback-btn.force:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.55);
+}
+
+.playback-btn.force:hover .playback-text {
+    color: rgb(255, 255, 255);
 }
 
 .playback-btn.force .playback-text {
@@ -631,6 +677,50 @@
 
 .drill-item-close:hover {
     color: rgb(239, 68, 68);
+}
+
+/* Bug fix: remove Unity's default ListView white-hover / selection highlight on drill
+   rows. Selection is also disabled in C# (SelectionType.None). The custom orange
+   .drill-item-active highlight is unaffected. */
+.drill-list-view .unity-collection-view__item:hover,
+.drill-list-view .unity-collection-view__item--selected,
+.drill-list-view .unity-collection-view__item:focus,
+.drill-list-view .unity-list-view__item:hover,
+.drill-list-view .unity-list-view__item--selected {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+/* LIVE SESSION tag overlaid top-left on the stream viewport. Shown/hidden inline by
+   the controller (StartTimer/StopTimer); green matches the "RUNNING" status color. */
+.live-session-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 6px;
+    background-color: rgba(16, 185, 129, 0.18);
+    border-width: 1px;
+    border-color: rgb(16, 185, 129);
+}
+
+.live-session-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: rgb(16, 185, 129);
+    margin-right: 6px;
+}
+
+.live-session-text {
+    color: rgb(16, 185, 129);
+    font-size: 11px;
+    -unity-text-align: middle-left;
 }
 
 .random-drill-btn {

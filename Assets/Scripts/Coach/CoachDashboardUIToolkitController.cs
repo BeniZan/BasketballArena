@@ -63,12 +63,21 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private VisualElement _buildSessionPlaceholder;
     private ListView _drillListView;
 
+<<<<<<< Updated upstream
     private VisualElement _castingView;
     private VisualElement _castingPlaceholder;
     private UnityEngine.UIElements.Image _castingImage;
+=======
+    private VisualElement _liveTag;
+    private VisualElement _streamPlaceholder;
+>>>>>>> Stashed changes
 
     // State variables
     private readonly TrainingSession _session = new TrainingSession();
+
+    // True from START until STOP. PAUSE is a sub-state that keeps the session active
+    // (so the coach can resume / advance / stop). Drives control interactability and the LIVE tag.
+    private bool _isSessionActive = false;
 
     private void Awake()
     {
@@ -143,7 +152,12 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _drillsCountText = _root.Q<Label>("drillsCountText");
         _buildSessionPlaceholder = _root.Q<VisualElement>("buildSessionPlaceholder");
 
+<<<<<<< Updated upstream
         SetupCastingView();
+=======
+        _liveTag = _root.Q<VisualElement>("liveTag");
+        _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
+>>>>>>> Stashed changes
 
         // Robustly acquire the Training Flow ListView. The runtime UI Toolkit importer in
         // this project does not reliably instantiate a <ui:ListView> from UXML (it can fall
@@ -195,6 +209,11 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         UpdateTimerDisplay();
         UpdateRepDisplay();
         UpdateDrillsDisplay();
+
+        // Session starts inactive: hide the LIVE tag and evaluate initial button interactability
+        // (START disabled until a drill exists; NEXT/PAUSE/STOP/FORCE disabled until a session is active).
+        if (_liveTag != null) _liveTag.style.display = DisplayStyle.None;
+        UpdateControlInteractability();
 
         // Wire event handlers and run play-mode specific visual initializations
         if (Application.isPlaying)
@@ -303,16 +322,42 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         NetCoachDashboardState.Instance?.Server_SetStreamMode(realistic);
     }
 
+    /// <summary>
+    /// Central rule for button interactability:
+    /// - START is usable only when NO session is active AND the Training Flow has at least one drill.
+    /// - NEXT / PAUSE / STOP / FORCE are usable only WHILE a session is active.
+    /// </summary>
+    private void UpdateControlInteractability()
+    {
+        bool hasDrills = _session.Drills.Count > 0;
+        if (_startBtn != null) _startBtn.SetEnabled(!_isSessionActive && hasDrills);
+        if (_nextBtn != null) _nextBtn.SetEnabled(_isSessionActive);
+        if (_pauseBtn != null) _pauseBtn.SetEnabled(_isSessionActive);
+        if (_stopBtn != null) _stopBtn.SetEnabled(_isSessionActive);
+        if (_forceBtn != null) _forceBtn.SetEnabled(_isSessionActive);
+    }
+
     private void StartTimer()
     {
+        // Guard: START must only work when a drill exists (mirrors the disabled-button rule).
+        if (_session.Drills.Count == 0) return;
+
         _statusText.text = "RUNNING";
         _statusText.style.color = new StyleColor(new Color(16f/255f, 185f/255f, 129f/255f, 1f)); // Green
+
+        // Enter the active session state: trigger the live stream visual and show the LIVE SESSION tag.
+        _isSessionActive = true;
+        if (_liveTag != null) _liveTag.style.display = DisplayStyle.Flex;
+        if (_streamPlaceholder != null) _streamPlaceholder.style.display = DisplayStyle.None;
+
         // Activate the first drill if the session hasn't started yet.
         // HandleActiveDrillChanged propagates the drill to NetDrillsActivator by name.
         if (_session.ActiveIndex < 0)
             _session.Start();
 
         DrillPlayer.Instance.IsPlaying = true;
+
+        UpdateControlInteractability();
     }
 
     private void PauseTimer()
@@ -333,6 +378,13 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         DrillPlayer.Instance.RestartAndPause(); // resets the animation/timer to 0 and pauses
         //NetCoachDashboardState.Instance?.Server_SetTimerRunning(false); 
+
+        // Exit the active session state: hide the LIVE SESSION tag, restore the placeholder,
+        // and re-lock NEXT/PAUSE/STOP/FORCE (START re-enables if drills remain).
+        _isSessionActive = false;
+        if (_liveTag != null) _liveTag.style.display = DisplayStyle.None;
+        if (_streamPlaceholder != null) _streamPlaceholder.style.display = DisplayStyle.Flex;
+        UpdateControlInteractability();
     }
 
     private void NextRep()
@@ -457,7 +509,10 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         _drillListView.itemsSource = _session.Drills;
         _drillListView.fixedItemHeight = 36;
-        _drillListView.selectionType = SelectionType.Single;
+        // Selection disabled: removes the built-in cyan click-highlight (and the "stuck" selected
+        // state). Drag-reorder still works. The orange .drill-item-active highlight is driven
+        // separately by the session's ActiveIndex, not by ListView selection.
+        _drillListView.selectionType = SelectionType.None;
         _drillListView.reorderable = true;
         _drillListView.reorderMode = ListViewReorderMode.Animated;
         _drillListView.makeItem = MakeDrillItem;
@@ -516,6 +571,9 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     {
         if (_drillListView != null) _drillListView.RefreshItems();
         UpdateDrillsDisplay();
+
+        // Adding/removing a drill may enable/disable START (needs >= 1 drill in the flow).
+        UpdateControlInteractability();
 
         NetCoachDashboardState.Instance?.Server_SetDrills(_session.Drills);
     }
