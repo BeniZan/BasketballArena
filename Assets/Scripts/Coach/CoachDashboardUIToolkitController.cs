@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
  
 public class CoachDashboardUIToolkitController : MonoBehaviour
 {
@@ -14,7 +15,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     [Header("Sprites")]
     [SerializeField] private Sprite _logoSprite;
-    [SerializeField] private Sprite _coachViewEyeSprite;
     [SerializeField] private Sprite _streamEyeSprite;
     [SerializeField] private Sprite _iconRealistic;
     [SerializeField] private Sprite _iconHologram;
@@ -52,25 +52,23 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private Button _realisticBtn;
     private Button _hologramBtn;
 
-    private Button _h1OffenseBtn;
-    private Button _h1DefenseBtn;
-    private Button _h2OffenseBtn;
-    private Button _h2DefenseBtn;
-
     private Button _randomDrillBtn;
+
+    // Header XR headset indicator (green pill next to the stream-mode toggles)
+    private VisualElement _xrStatus;
+    private Label _xrStatusText;
+    private bool _xrConnected;
+    private float _xrPollTimer;
 
     private Label _drillsCountText;
     private VisualElement _buildSessionPlaceholder;
     private ListView _drillListView;
 
-<<<<<<< Updated upstream
     private VisualElement _castingView;
     private VisualElement _castingPlaceholder;
     private UnityEngine.UIElements.Image _castingImage;
-=======
     private VisualElement _liveTag;
     private VisualElement _streamPlaceholder;
->>>>>>> Stashed changes
 
     // State variables
     private readonly TrainingSession _session = new TrainingSession();
@@ -142,22 +140,18 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _realisticBtn = _root.Q<Button>("realisticBtn");
         _hologramBtn = _root.Q<Button>("hologramBtn");
 
-        _h1OffenseBtn = _root.Q<Button>("h1OffenseBtn");
-        _h1DefenseBtn = _root.Q<Button>("h1DefenseBtn");
-        _h2OffenseBtn = _root.Q<Button>("h2OffenseBtn");
-        _h2DefenseBtn = _root.Q<Button>("h2DefenseBtn");
-
         _randomDrillBtn = _root.Q<Button>("randomDrillBtn");
+
+        _xrStatus = _root.Q<VisualElement>("xrStatus");
+        _xrStatusText = _root.Q<Label>("xrStatusText");
+        UpdateXrStatus(true);
 
         _drillsCountText = _root.Q<Label>("drillsCountText");
         _buildSessionPlaceholder = _root.Q<VisualElement>("buildSessionPlaceholder");
 
-<<<<<<< Updated upstream
-        SetupCastingView();
-=======
-        _liveTag = _root.Q<VisualElement>("liveTag");
-        _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
->>>>>>> Stashed changes
+SetupCastingView();
+_liveTag = _root.Q<VisualElement>("liveTag");
+_streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
 
         // Robustly acquire the Training Flow ListView. The runtime UI Toolkit importer in
         // this project does not reliably instantiate a <ui:ListView> from UXML (it can fall
@@ -234,33 +228,71 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
             if (_realisticBtn != null) _realisticBtn.clicked += () => SetStreamMode(true);
             if (_hologramBtn != null) _hologramBtn.clicked += () => SetStreamMode(false);
 
-            if (_h1OffenseBtn != null) _h1OffenseBtn.clicked += () => ToggleOffDef(true, true);
-            if (_h1DefenseBtn != null) _h1DefenseBtn.clicked += () => ToggleOffDef(true, false);
-            if (_h2OffenseBtn != null) _h2OffenseBtn.clicked += () => ToggleOffDef(false, true);
-            if (_h2DefenseBtn != null) _h2DefenseBtn.clicked += () => ToggleOffDef(false, false);
-
             if (_randomDrillBtn != null) _randomDrillBtn.clicked += AddRandomDrill;
 
             SetStreamMode(true);
-            ToggleOffDef(true, true);
-            ToggleOffDef(false, true);
         }
         else
         {
             // In editor mode, let's also visually apply some sensible defaults to the layout (like active tabs) so it looks right in scene view
             SetStreamMode(true);
-            ToggleOffDef(true, true);
-            ToggleOffDef(false, true);
         }
     }
 
     private void Update()
     {
-        UpdateTimerDisplay(); 
+        UpdateTimerDisplay();
 
         // The WebRTC texture is updated outside UI Toolkit, so force a repaint while streaming.
         if (_castingImage != null && _castingImage.image != null)
             _castingImage.MarkDirtyRepaint();
+
+        // Cheap 2 Hz poll instead of NetworkManager events: NetBoot shuts the manager down and
+        // restarts it whenever the player type changes, which would drop event subscriptions.
+        _xrPollTimer -= Time.unscaledDeltaTime;
+        if (_xrPollTimer <= 0f)
+        {
+            _xrPollTimer = 0.5f;
+            UpdateXrStatus();
+        }
+    }
+
+    // ---- XR headset indicator --------------------------------------------------
+
+    private void UpdateXrStatus(bool force = false)
+    {
+        if (_xrStatus == null) return;
+
+        bool connected = HasConnectedXrDevice();
+        if (!force && connected == _xrConnected) return;
+
+        _xrConnected = connected;
+        _xrStatus.EnableInClassList("connected", connected);
+        if (_xrStatusText != null) _xrStatusText.text = connected ? "HEADSET ACTIVE" : "NO HEADSET";
+    }
+
+    /// <summary>
+    /// True while an XR device is connected. The coach runs the Netcode server and every non-server
+    /// peer is an XR player (same assumption as <see cref="NetVisibility"/>), so any remote client
+    /// counts. The local client only counts in the SetupAsXRCoachDebug host case, where the coach
+    /// dashboard itself runs on the headset.
+    /// </summary>
+    private static bool HasConnectedXrDevice()
+    {
+        if (!Application.isPlaying) return false;
+
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsListening) return false;
+        if (!nm.IsServer) return nm.IsConnectedClient;
+
+        // HasInstance instead of Instance: the getter logs an error when no NetBoot exists
+        // (e.g. previewing the dashboard scene standalone).
+        bool localIsXr = NetBoot.HasInstance && NetBoot.Instance.IsXR;
+        foreach (var id in nm.ConnectedClientsIds)
+        {
+            if (id != nm.LocalClientId || localIsXr) return true;
+        }
+        return false;
     }
 
     // ---- Casting view (player stream) -------------------------------------------
@@ -415,38 +447,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _repText.text = active == null
             ? "REP 0/0"
             : string.Format("{0} · REP {1}/{2}", active, _session.ActiveIndex + 1, _session.Drills.Count);
-    }
-
-    private void ToggleOffDef(bool isH1, bool isOffense)
-    {
-        if (isH1)
-        {
-            if (isOffense)
-            {
-                _h1OffenseBtn.AddToClassList("active");
-                _h1DefenseBtn.RemoveFromClassList("active");
-            }
-            else
-            {
-                _h1OffenseBtn.RemoveFromClassList("active");
-                _h1DefenseBtn.AddToClassList("active");
-            }
-        }
-        else
-        {
-            if (isOffense)
-            {
-                _h2OffenseBtn.AddToClassList("active");
-                _h2DefenseBtn.RemoveFromClassList("active");
-            }
-            else
-            {
-                _h2OffenseBtn.RemoveFromClassList("active");
-                _h2DefenseBtn.AddToClassList("active");
-            }
-        }
-
-        NetCoachDashboardState.Instance?.Server_SetOffense(isH1, isOffense);
     }
 
     private void SetupExerciseFoldout(string baseName, string[] drills)
@@ -630,7 +630,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private void ApplySprites()
     {
         SetImageSprite("logoImage", _logoSprite);
-        SetImageSprite("coachViewEyeIcon", _coachViewEyeSprite);
         SetImageSprite("streamEyeIcon", _streamEyeSprite);
         SetImageSprite("realisticIcon", _iconRealistic);
         SetImageSprite("hologramIcon", _iconHologram);
@@ -645,6 +644,11 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         SetImageSprite("marginIcon", _iconMargin);
         SetImageSprite("randomDrillIcon", _iconRandomDrill);
         SetImageSprite("analyticsIcon", _iconAnalytics);
+
+        // The ARena logo is much wider than it is tall; Image defaults to ScaleAndCrop, which would
+        // crop it inside the header slot (USS -unity-background-scale-mode doesn't affect Image.sprite).
+        var logo = _root.Q<UnityEngine.UIElements.Image>("logoImage");
+        if (logo != null) logo.scaleMode = ScaleMode.ScaleToFit;
     }
 
     private void SetImageSprite(string name, Sprite sprite)
@@ -666,16 +670,11 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         _root.Query<Label>().ForEach(lbl =>
         {
-            if (lbl.ClassListContains("label-badge-text"))
-            {
-                SetFontToLabel(lbl, _barlow900);
-            }
-            else if (lbl.ClassListContains("off-def-btn-text") || lbl.ClassListContains("coach-view-text") || 
-                     lbl.ClassListContains("stream-title") || lbl.ClassListContains("stream-toggle-text") || 
-                     lbl.ClassListContains("status-lbl") || lbl.ClassListContains("playback-text") || 
-                     lbl.ClassListContains("section-title") || lbl.ClassListContains("exercise-text") || 
-                     lbl.ClassListContains("random-drill-text") || lbl.ClassListContains("analytics-text") || 
-                     lbl.ClassListContains("pro-badge-text"))
+            if (lbl.ClassListContains("stream-toggle-text") ||
+                lbl.ClassListContains("status-lbl") || lbl.ClassListContains("playback-text") ||
+                lbl.ClassListContains("section-title") || lbl.ClassListContains("exercise-text") ||
+                lbl.ClassListContains("random-drill-text") || lbl.ClassListContains("analytics-text") ||
+                lbl.ClassListContains("pro-badge-text"))
             {
                 SetFontToLabel(lbl, _barlow700);
             }
@@ -683,7 +682,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
             {
                 SetFontToLabel(lbl, _barlow600);
             }
-            else if (lbl.ClassListContains("bottom-info-text") || lbl.ClassListContains("status-timer") || 
+            else if (lbl.ClassListContains("xr-status-text") || lbl.ClassListContains("status-timer") ||
                      lbl.ClassListContains("exercise-badge-text") || lbl.ClassListContains("upgrade-btn-text"))
             {
                 SetFontToLabel(lbl, _inter700);
@@ -714,7 +713,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         string spriteDir = "Assets/UI/FigmaImport/CoachDashboard";
         _logoSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Container.png");
-        _coachViewEyeSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Container_1_53.png");
         _streamEyeSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Container_1_87.png");
         _iconRealistic = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon.png");
         _iconHologram = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_80.png");

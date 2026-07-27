@@ -1,84 +1,24 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/CoachDashboard/CoachDashboard.uss?fileID=7433441132597879392&amp;guid=b8050dce562aa5f4985b2d592fc275f5&amp;type=3#CoachDashboard"/>
     <ui:VisualElement class="dashboard-root">
-        <ui:VisualElement class="left-sidebar">
-            <ui:VisualElement class="logo-area">
-                <ui:Image name="logoImage" class="logo-image"/>
-            </ui:VisualElement>
-            <ui:VisualElement class="separator"/>
-            <ui:VisualElement enabled="false" class="cards-section">
-                <ui:VisualElement name="playerViewCard" class="team-card">
-                    <ui:VisualElement class="team-card-row1">
-                        <ui:VisualElement class="label-badge">
-                            <ui:Label text="H1" class="label-badge-text"/>
-                        </ui:VisualElement>
-                        <ui:VisualElement class="status-group">
-                            <ui:VisualElement class="status-dot"/>
-                            <ui:Label text="95%" class="status-percent"/>
-                        </ui:VisualElement>
-                        <ui:VisualElement class="toggle-switch">
-                            <ui:VisualElement class="toggle-knob"/>
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="team-card-row2">
-                        <ui:Button name="h1OffenseBtn" class="off-def-btn active">
-                            <ui:Label text="OFFENSE" class="off-def-btn-text"/>
-                        </ui:Button>
-                        <ui:Button name="h1DefenseBtn" class="off-def-btn">
-                            <ui:Label text="DEFENSE" class="off-def-btn-text"/>
-                        </ui:Button>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement enabled="false" class="team-card">
-                    <ui:VisualElement class="team-card-row1">
-                        <ui:VisualElement class="label-badge">
-                            <ui:Label text="H2" class="label-badge-text"/>
-                        </ui:VisualElement>
-                        <ui:VisualElement class="status-group">
-                            <ui:VisualElement class="status-dot"/>
-                            <ui:Label text="95%" class="status-percent"/>
-                        </ui:VisualElement>
-                        <ui:VisualElement class="toggle-switch">
-                            <ui:VisualElement class="toggle-knob"/>
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="team-card-row2">
-                        <ui:Button name="h2OffenseBtn" class="off-def-btn active">
-                            <ui:Label text="OFFENSE" class="off-def-btn-text"/>
-                        </ui:Button>
-                        <ui:Button name="h2DefenseBtn" class="off-def-btn">
-                            <ui:Label text="DEFENSE" class="off-def-btn-text"/>
-                        </ui:Button>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement name="coachViewCard" class="coach-view-card">
-                    <ui:VisualElement class="coach-view-left">
-                        <ui:Image name="coachViewEyeIcon" class="coach-view-icon"/>
-                        <ui:Label text="COACH VIEW" class="coach-view-text"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="coach-view-toggle active">
-                        <ui:VisualElement class="toggle-knob"/>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement class="separator"/>
-            <ui:VisualElement class="bottom-info">
-                <ui:VisualElement class="bottom-info-dot"/>
-                <ui:Label name="bottomActiveText" text="0 / 3 Active" class="bottom-info-text"/>
-            </ui:VisualElement>
-        </ui:VisualElement>
         <ui:VisualElement name="playerStreaming" class="center-pane">
             <ui:VisualElement class="center-header">
-                <ui:Label text="PLAYER STREAM" class="stream-title"/>
-                <ui:VisualElement name="botsType" class="stream-mode-toggles">
-                    <ui:Button name="realisticBtn" class="stream-toggle-btn active">
-                        <ui:Image name="realisticIcon" class="stream-toggle-icon"/>
-                        <ui:Label text="REALISTIC" class="stream-toggle-text"/>
-                    </ui:Button>
-                    <ui:Button name="hologramBtn" class="stream-toggle-btn">
-                        <ui:Image name="hologramIcon" class="stream-toggle-icon"/>
-                        <ui:Label text="HOLOGRAM" class="stream-toggle-text"/>
-                    </ui:Button>
+                <ui:Image name="logoImage" class="header-logo"/>
+                <ui:VisualElement class="center-header-right">
+                    <ui:VisualElement name="xrStatus" class="xr-status">
+                        <ui:VisualElement class="xr-status-dot"/>
+                        <ui:Label name="xrStatusText" text="NO HEADSET" class="xr-status-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="botsType" class="stream-mode-toggles">
+                        <ui:Button name="realisticBtn" class="stream-toggle-btn active">
+                            <ui:Image name="realisticIcon" class="stream-toggle-icon"/>
+                            <ui:Label text="REALISTIC" class="stream-toggle-text"/>
+                        </ui:Button>
+                        <ui:Button name="hologramBtn" class="stream-toggle-btn">
+                            <ui:Image name="hologramIcon" class="stream-toggle-icon"/>
+                            <ui:Label text="HOLOGRAM" class="stream-toggle-text"/>
+                        </ui:Button>
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="castingView" class="stream-viewport">
