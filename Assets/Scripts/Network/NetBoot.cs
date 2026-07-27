@@ -174,13 +174,12 @@ public class NetBoot : SingletonMono<NetBoot> {
 
     void ConnectedGUI() {
         var lbl = $"Connected as: {(_netMng.IsHost ? "Host" : (_netMng.IsServer ? "Server" : "Client") )}";
-        if (!PlayerTypeReady)
-            lbl += "\nPlayer type not set up";
         if (IsXR)
             lbl += "\nXR Role set";
         if (IsCoach)
             lbl += "\nCoach Role set";
-        else lbl += "\nWarning: Connected but player type not setup";
+        if (!PlayerTypeReady)
+            lbl += "\nWarning: Connected but player type not setup"; 
         GUILayout.Label(lbl);
     }
     
