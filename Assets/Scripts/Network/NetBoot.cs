@@ -1,12 +1,12 @@
-using NUnit.Framework;
 using SingletonBehaviors;
 using Sirenix.OdinInspector;
 using System;
 using System.Threading.Tasks;
 using Unity.Netcode;
-using UnityEditor;
 using UnityEngine;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 [DefaultExecutionOrder(-1000)]
 public class NetBoot : SingletonMono<NetBoot> { 
     [Flags] enum PlayerType { NotSetup = 1 << 0, XRPlayer = 1 << 1, Coach = 1 << 2 }
@@ -97,7 +97,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     Awaitable _awaitingShutdown;
 
     async Awaitable SetupNetwork() {
-        if (_awaitingShutdown != null && !_awaitingShutdown.IsCompleted)
+        while (_awaitingShutdown != null && !_awaitingShutdown.IsCompleted)
             await Awaitable.NextFrameAsync();
         _awaitingShutdown = AwaitSetupNetwork();
     }
@@ -112,12 +112,14 @@ public class NetBoot : SingletonMono<NetBoot> {
                 return;
             }
 
-            bool TrySetup(bool isClient, bool isServer) {
-                if (isClient)
-                    return isServer ? _netMng.StartHost() : _netMng.StartServer();
-                if(isClient)
+            bool TrySetup(bool isXR, bool isCoach) {
+                if (isXR && isCoach)
+                    return _netMng.StartHost();
+                if (isCoach)
+                    return _netMng.StartServer();
+                if (isXR)
                     return _netMng.StartClient();
-                return true;
+                return false;
             }
 
             while (!TrySetup(IsXR, IsCoach)) {
@@ -133,8 +135,8 @@ public class NetBoot : SingletonMono<NetBoot> {
         _netMng.OnConnectionEvent -= NetMng_OnConnectionEvent;
         _netMng.OnServerStarted -= NetMng_OnServerStarted;
         _netMng.OnPreShutdown -= NetMng_OnShutdown;
-        if(!_awaitingShutdown.IsCompleted)
-            _awaitingShutdown?.Cancel();
+        if(_awaitingShutdown != null && !_awaitingShutdown.IsCompleted)
+            _awaitingShutdown.Cancel();
     }
 
 #if UNITY_EDITOR
