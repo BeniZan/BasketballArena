@@ -2,6 +2,7 @@ using NUnit.Framework;
 using SingletonBehaviors;
 using Sirenix.OdinInspector;
 using System;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     [SerializeField, Get] NetworkManager _netMng;
     [SerializeField] NetworkObject  _XRClientPrefab;
     [SerializeField] GameObject LocalXRDeviceToggle, _localCoachHostToggle;
+    public NetworkManager NetMnger => _netMng;
     public bool IsXR => _playerType.HasFlag(PlayerType.XRPlayer);
     public bool IsCoach => _playerType.HasFlag(PlayerType.Coach);
     public bool PlayerTypeReady => IsXR || IsCoach;
@@ -92,30 +94,47 @@ public class NetBoot : SingletonMono<NetBoot> {
         } 
     }
 
-    void SetupNetwork() { 
-        if(_netMng.IsServer || _netMng.IsClient)
-            _netMng.Shutdown();
+    Awaitable _awaitingShutdown;
 
-        if (!PlayerTypeReady) {
-            _logger.Log("Player type not setup, ignoring SetupNetwork call...");
-            return;
-        }
-
-        if (IsCoach) {
-            if (IsXR)
-                _netMng.StartHost();
-            else   
-                _netMng.StartServer(); 
-        }
-        else  
-            _netMng.StartClient(); 
+    async Awaitable SetupNetwork() {
+        if (_awaitingShutdown != null && !_awaitingShutdown.IsCompleted)
+            await Awaitable.NextFrameAsync();
+        _awaitingShutdown = AwaitSetupNetwork();
     }
+
+    async Awaitable AwaitSetupNetwork() {
+        try {
+            if (_netMng.IsServer || _netMng.IsClient)
+                _netMng.Shutdown();
+
+            if (!PlayerTypeReady) {
+                _logger.Log("Player type not setup, ignoring SetupNetwork call...");
+                return;
+            }
+
+            bool TrySetup(bool isClient, bool isServer) {
+                if (isClient)
+                    return isServer ? _netMng.StartHost() : _netMng.StartServer();
+                if(isClient)
+                    return _netMng.StartClient();
+                return true;
+            }
+
+            while (!TrySetup(IsXR, IsCoach)) {
+                await Awaitable.NextFrameAsync();
+            }
+        } catch(Exception ex) { Debug.LogException(ex); }
+    }
+
+ 
 
     protected override void OnDestroy() {
         base.OnDestroy();
         _netMng.OnConnectionEvent -= NetMng_OnConnectionEvent;
         _netMng.OnServerStarted -= NetMng_OnServerStarted;
         _netMng.OnPreShutdown -= NetMng_OnShutdown;
+        if(!_awaitingShutdown.IsCompleted)
+            _awaitingShutdown?.Cancel();
     }
 
 #if UNITY_EDITOR

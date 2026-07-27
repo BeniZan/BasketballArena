@@ -52,6 +52,9 @@ public class Calibration : MonoBehaviour {
     [SerializeField, BoxGroup("Auto Calibrate")] bool _editorAutoCalibrate;
     [SerializeField, BoxGroup("Auto Calibrate")] Camera _centerCam;
     private async Awaitable Start() {
+        if (!_editorAutoCalibrate)
+            return;
+
         await Awaitable.EndOfFrameAsync();
         await Awaitable.NextFrameAsync();
         await Awaitable.EndOfFrameAsync();

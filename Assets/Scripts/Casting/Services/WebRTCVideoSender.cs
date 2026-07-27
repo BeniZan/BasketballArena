@@ -53,12 +53,13 @@ public class WebRTCVideoSender : MonoBehaviour
     private void Instance_OnICECandidateReceived(WebRTCHandshakeManager.IceCandidateData data) {
         AddIceCandidate(new RTCIceCandidateInit 
         { candidate = data.candidate, sdpMid = data.sdpMid, sdpMLineIndex = data.sdpMLineIndex });
-    }
+    } 
 
     private void OnEnable() {
         _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] ");
-        NetworkManager.Singleton.OnConnectionEvent += Singleton_OnConnectionEvent;
-        if (NetworkManager.Singleton.IsConnectedClient && !NetworkManager.Singleton.IsServer)
+        var netMnger = NetBoot.Instance.NetMnger;
+        netMnger.OnConnectionEvent += Singleton_OnConnectionEvent;
+        if (netMnger.IsConnectedClient && !netMnger.IsServer)
             StartConnection();
     }
 
@@ -123,6 +124,10 @@ public class WebRTCVideoSender : MonoBehaviour
 
     private void OnDisable() {
         CloseConnection();
+        if (NetBoot.HasInstance) {
+            var netMnger = NetBoot.Instance.NetMnger;
+            netMnger.OnConnectionEvent -= Singleton_OnConnectionEvent;
+        }
     }
 
     void CloseConnection() {

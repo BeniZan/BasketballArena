@@ -1,4 +1,5 @@
 using SingletonBehaviors;
+using Sirenix.OdinInspector;
 using System;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,7 +8,7 @@ using static UnityEngine.ParticleSystem;
 public class DrillPlayer : NetworkBehaviour {
     static DrillPlayer _instance;
     static public DrillPlayer Instance {
-        get => _instance = _instance != null ? _instance : FindFirstObjectByType<DrillPlayer>();
+        get => _instance = _instance ? _instance : FindFirstObjectByType<DrillPlayer>();
     }
     public DrillData CurrentPlayingDrillData => NetDrillsActivator.Instance.ActiveManeuver;
     [SerializeField] DrillActivator _drillActivator;
@@ -22,7 +23,8 @@ public class DrillPlayer : NetworkBehaviour {
         = new NetworkVariable<AnimationPlaybackState>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     public AnimationPlaybackState PlaybackState { get => SyncState.Value; set => SyncState.Value = value; }
     CustomLogger _logger;
-    public float AnimationTime {
+    [ShowInInspector]
+    public float AnimationTime { 
         get {
             if (PlaybackState.Speed == 0f)
                 return PlaybackState.Time;
@@ -37,6 +39,7 @@ public class DrillPlayer : NetworkBehaviour {
             PlaybackState = state;
         }
     }
+    [ShowInInspector, HideInEditorMode]
     public bool IsPlaying {  // PLAY OR PAUSE
         get => PlaybackState.Speed != 0f; 
         set {

@@ -14,10 +14,10 @@ public class DrillActivator : SingletonMono<DrillActivator> {
     [SerializeField] Transform _courtTf;
     [SerializeField] SurfaceHandler _courtSurface;
     [SerializeField] NetDrillsActivator _manager;
-    [SerializeField, ReadOnly] List<CharComponent> _placedChars = new List<CharComponent>();
+    [SerializeField, ReadOnly] List<CharComponent> _spawnedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
     public event Action OnDrillChange;
-    public IReadOnlyList<CharComponent> PlacedChars => _placedChars;
+    public IReadOnlyList<CharComponent> PlacedChars => _spawnedChars;
     protected override void Awake() {
         base.Awake();
         _manager.ActiveManeuver.Sub(OnTeamManeverChange);
@@ -42,25 +42,24 @@ public class DrillActivator : SingletonMono<DrillActivator> {
 
         int i = 0;
         for (; i < _currentActive.CharsData.Count; i++) {
-            if (_placedChars.Count <= i) {
-                var spawned = Instantiate(_templateChar);
-                spawned.gameObject.SetActive(true);
-                _courtSurface.ParentAndPlace(spawned.transform);
-                _placedChars.Add(spawned);
+            if (_spawnedChars.Count <= i) {
+                var spawned = Instantiate(_templateChar, _courtTf);
+                spawned.gameObject.SetActive(true); 
+                _spawnedChars.Add(spawned);
             }
-            _placedChars[i].SetData(_currentActive.CharsData[i], _currentActive.MirrorLeftRight);
+            _spawnedChars[i].SetData(_currentActive.CharsData[i], _currentActive.MirrorLeftRight);
         }
-        while(i < _placedChars.Count) {
-            if (_placedChars[i])
-                _placedChars[i].gameObject.SafeDestroy();
-            _placedChars.RemoveAt(i);
+        while(i < _spawnedChars.Count) {
+            if (_spawnedChars[i])
+                _spawnedChars[i].gameObject.SafeDestroy();
+            _spawnedChars.RemoveAt(i);
         }
     } 
     public void Deactivate() {
-        foreach (var placedChar in _placedChars)
+        foreach (var placedChar in _spawnedChars)
             if(placedChar)
                 placedChar.gameObject.SafeDestroy();
-        _placedChars.Clear();
+        _spawnedChars.Clear();
         _currentActive = null;
         OnDrillChange?.Invoke();
     }
