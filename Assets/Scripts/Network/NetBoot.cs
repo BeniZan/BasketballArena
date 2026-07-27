@@ -2,23 +2,79 @@ using NUnit.Framework;
 using SingletonBehaviors;
 using Sirenix.OdinInspector;
 using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Unity.Netcode;
-using UnityEditor;
+using UnityEditor; 
 using UnityEngine;
+
+public class NetDiscovery : MonoBehaviour {
+    [SerializeField, Get] NetworkManager _netMng;
+    [SerializeField, Get] NetworkTransport _transport;
+
+    private void Awake() {
+        _netMng.OnClientStarted += RevalidateDiscoveryStatus;
+        _netMng.OnClientStopped += RevalidateDiscoveryStatus;
+
+        _netMng.OnServerStarted += RevalidateDiscoveryStatus;
+        _netMng.OnServerStopped += RevalidateDiscoveryStatus;
+    }
+
+    private void OnDestroy() {
+        _netMng.OnClientStarted -= RevalidateDiscoveryStatus;
+        _netMng.OnClientStopped -= RevalidateDiscoveryStatus;
+        _netMng.OnConnectionEvent += RevalidateDiscoveryStatus;
+
+        _netMng.OnServerStarted -= RevalidateDiscoveryStatus;
+        _netMng.OnServerStopped -= RevalidateDiscoveryStatus;
+    }
+    void RevalidateDiscoveryStatus(NetworkManager m, ConnectionEventData _) => RevalidateDiscoveryStatus();
+    void RevalidateDiscoveryStatus(bool _) => RevalidateDiscoveryStatus();
+    void RevalidateDiscoveryStatus() {
+        if (!_netMng) {
+            enabled = false;
+            return;
+        }
+
+        if (_netMng.IsClient) {
+            enabled = !_netMng.IsConnectedClient;
+            return;
+        } 
+
+        enabled = _netMng.IsServer;
+    }  
+    void StartDiscovery(bool isServer) {
+        StopDiscovery();
+
+        IsServer = isServer;
+        IsClient = !isServer;
+
+        // If we are not a server we use the 0 port (let udp client assign a free port to us)
+        var port = isServer ? m_Port : 0;
+
+        m_Client = new UdpClient(port) { EnableBroadcast = true, MulticastLoopback = false };
+
+        _ = ListenAsync(isServer ? ReceiveBroadcastAsync : new Func<Task>(ReceiveResponseAsync));
+
+        IsRunning = true;
+    }
+
+}
 
 [DefaultExecutionOrder(-1000)]
 public class NetBoot : SingletonMono<NetBoot> { 
     [Flags] enum PlayerType { NotSetup = 1 << 0, XRPlayer = 1 << 1, Coach = 1 << 2 }
-    PlayerType _playerType;
+    [ShowInInspector, HideInEditorMode, ReadOnly] PlayerType _playerType;
     [SerializeField, Get] NetworkManager _netMng;
     [SerializeField] NetworkObject  _XRClientPrefab;
     [SerializeField] GameObject LocalXRDeviceToggle, _localCoachHostToggle;
-    public NetworkManager NetMnger => _netMng;
-    public bool IsXR => _playerType.HasFlag(PlayerType.XRPlayer);
+    public NetworkManager NetMnger => _netMng; 
+    public bool IsXR => _playerType.HasFlag(PlayerType.XRPlayer); 
     public bool IsCoach => _playerType.HasFlag(PlayerType.Coach);
     public bool PlayerTypeReady => IsXR || IsCoach;
+    [ShowInInspector, HideInEditorMode]
     public bool IsConnectionAwaiting => _netMng.IsListening && _netMng.IsClient && !_netMng.IsConnectedClient;
+    [ShowInInspector, HideInEditorMode]
     public bool IsConnected =>  _netMng.IsServer || _netMng.IsConnectedClient;
     CustomLogger _logger;
     public event Action<NetBoot> OnPlayerTypeSetup;
@@ -29,6 +85,15 @@ public class NetBoot : SingletonMono<NetBoot> {
         var deviceModel = SystemInfo.deviceModel.ToLower();
         return deviceModel.Contains("quest") || deviceModel.Contains("oculus");
     }
+
+    protected override void Awake() {
+        if (HasInstance && Instance != this) {
+            gameObject.SafeDestroy();
+            return;
+        }
+        base.Awake();
+    } 
+
     private void Start() {
         _logger = new CustomLogger(this, Color.softBlue);
         _netMng.OnConnectionEvent += NetMng_OnConnectionEvent; 
@@ -72,7 +137,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     }
 
     void OnSetPlayerType() {
-        SetupNetwork();
+        _ = SetupNetwork();
         LocalXRDeviceToggle.SetActive(IsXR);
         _localCoachHostToggle.SetActive(!IsXR && IsCoach);
         OnPlayerTypeSetup?.Invoke(this);
@@ -125,8 +190,6 @@ public class NetBoot : SingletonMono<NetBoot> {
             }
         } catch(Exception ex) { Debug.LogException(ex); }
     }
-
- 
 
     protected override void OnDestroy() {
         base.OnDestroy();
