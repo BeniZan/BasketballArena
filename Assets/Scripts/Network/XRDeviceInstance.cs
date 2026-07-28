@@ -23,6 +23,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     [SerializeField] MRUK _mruk;
     [SerializeField] EffectMesh _efMesh;
     [SerializeField] EnvironmentDepthManager _depthManager;
+    [ShowInInspector, ReadOnly] XRLoader CurrentLoader =>  XRGeneralSettings.Instance?.Manager?.activeLoader;
     CustomLogger _logger;
     protected override void Awake() {
         base.Awake();
@@ -88,8 +89,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
             mnger.StopSubsystems();
              
             mnger.DeinitializeLoader();
-
-            _logger.Log("XR shutdown complete.");
         }
+        _logger.Log("XR shutdown complete.");
     }
 }

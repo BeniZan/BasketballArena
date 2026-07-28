@@ -27,35 +27,34 @@ public class NetBoot : SingletonMono<NetBoot> {
     public event Action<NetBoot> OnPlayerTypeSetup;
 #if UNITY_EDITOR  
     [SerializeField] PlayerType _editorAutoSetupConfig = PlayerType.NotSetup; 
-#endif
-    bool IsOnXRDevice() {
-        var deviceModel = SystemInfo.deviceModel.ToLower();
-        return deviceModel.Contains("quest") || deviceModel.Contains("oculus");
-    }
+#endif 
 
     protected override void Awake() {
+        _logger = new CustomLogger(this, Color.softBlue);
         if (HasInstance && Instance != this) {
             gameObject.SafeDestroy();
+            _logger.Log(this, "Multiple instances of NetBoot detected, destroying self duplicate");
             return;
         }
         base.Awake();
     } 
 
     private void Start() {
-        _logger = new CustomLogger(this, Color.softBlue);
         _netMng.OnConnectionEvent += NetMng_OnConnectionEvent; 
         _netMng.OnServerStarted += NetMng_OnServerStarted;
         _netMng.OnPreShutdown += NetMng_OnShutdown;   
         DontDestroyOnLoad(gameObject);
 #if UNITY_EDITOR 
-        SetupPlayerType(_editorAutoSetupConfig); 
+        SetupPlayerType(_editorAutoSetupConfig);
 #else
-        SetupPlayerType(IsOnXRDevice());
+        var deviceModel = SystemInfo.deviceModel.ToLower();
+        var isOnXRDevice = deviceModel.Contains("quest") || deviceModel.Contains("oculus");
+        SetupPlayerType(isOnXRDevice);
 #endif
     }
 
     private void NetMng_OnServerStarted() {
-        _logger.Log("Server started");
+        _logger.Log("Server started"); 
     }
     private void NetMng_OnShutdown() {
         _logger.Log("Server shutdown"); 
@@ -84,7 +83,6 @@ public class NetBoot : SingletonMono<NetBoot> {
     }
 
     void OnSetPlayerType() {
-        _ = SetupNetwork();
         LocalXRDeviceToggle.SetActive(IsXR);
         _localCoachHostToggle.SetActive(!IsXR && IsCoach);
         OnPlayerTypeSetup?.Invoke(this);
@@ -106,51 +104,15 @@ public class NetBoot : SingletonMono<NetBoot> {
         } 
     }
 
-    Awaitable _awaitingShutdown;
-
-    async Awaitable SetupNetwork() {
-        while (_awaitingShutdown != null && !_awaitingShutdown.IsCompleted)
-            await Awaitable.NextFrameAsync();
-        _awaitingShutdown = AwaitSetupNetwork();
-    }
-
-    async Awaitable AwaitSetupNetwork() {
-        try {
-            if (_netMng.IsServer || _netMng.IsClient)
-                _netMng.Shutdown();
-
-            if (!PlayerTypeReady) {
-                _logger.Log("Player type not setup, ignoring SetupNetwork call...");
-                return;
-            }
-
-            bool TrySetup(bool isXR, bool isCoach) {
-                if (isXR && isCoach)
-                    return _netMng.StartHost();
-                if (isCoach)
-                    return _netMng.StartServer();
-                if (isXR)
-                    return _netMng.StartClient();
-                return false;
-            }
-
-            while (!TrySetup(IsXR, IsCoach)) {
-                await Awaitable.NextFrameAsync();
-            }
-        } catch(Exception ex) { Debug.LogException(ex); }
-    }
 
     protected override void OnDestroy() {
         base.OnDestroy();
         _netMng.OnConnectionEvent -= NetMng_OnConnectionEvent;
         _netMng.OnServerStarted -= NetMng_OnServerStarted;
-        _netMng.OnPreShutdown -= NetMng_OnShutdown;
-        if(_awaitingShutdown != null && !_awaitingShutdown.IsCompleted)
-            _awaitingShutdown.Cancel();
+        _netMng.OnPreShutdown -= NetMng_OnShutdown; 
     }
 
-#if UNITY_EDITOR
-
+#if UNITY_EDITOR 
     private void OnGUI() {
         if (!Application.isEditor)
             return;
@@ -202,8 +164,7 @@ public class NetBoot : SingletonMono<NetBoot> {
         if (GUILayout.Button("Setup As XR Player")) {
             SetupPlayerType(true);
             GUIUtility.keyboardControl = 0;
-        }
-
+        } 
     }
 #endif
 }
