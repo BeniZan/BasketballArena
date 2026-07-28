@@ -19,7 +19,7 @@ public class XRDebugHostUI : MonoBehaviour
         _uiDoc.enabled = false;
         _calib.CalibrationStep.Sub(OnCalibStep);
         var boot = NetBoot.Instance;
-        boot.OnPlayerTypeSetup += ShouldToggle;
+        boot.OnPlayerTypeChange += ShouldToggle;
         ShouldToggle(boot);
     }
     void OnCalibStep(Calibration.Step step) => ShouldToggle(NetBoot.Instance);
@@ -30,7 +30,7 @@ public class XRDebugHostUI : MonoBehaviour
     private void OnDestroy() {
         _calib.CalibrationStep.Unsub(OnCalibStep);
         if (NetBoot.Instance)
-            NetBoot.Instance.OnPlayerTypeSetup -= ShouldToggle;
+            NetBoot.Instance.OnPlayerTypeChange -= ShouldToggle;
     }
      
     void LateUpdate()

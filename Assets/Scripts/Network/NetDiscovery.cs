@@ -52,7 +52,7 @@ public class NetDiscovery : MonoBehaviour {
         _appName = Application.productName;
         _appVersion = Application.version;
 
-        _netBoot.OnPlayerTypeSetup += OnPlayerTypeSetup;
+        _netBoot.OnPlayerTypeChange += OnPlayerTypeSetup;
         _netMng.OnConnectionEvent += OnConnectionEvent;
         RevalidateDiscoveryStatus();
     }
@@ -70,7 +70,7 @@ public class NetDiscovery : MonoBehaviour {
     private void OnDestroy() {
         if(_isRunningDiscovery)
             StopDiscovery();
-        _netBoot.OnPlayerTypeSetup -= OnPlayerTypeSetup;
+        _netBoot.OnPlayerTypeChange -= OnPlayerTypeSetup;
         _netMng.OnConnectionEvent -= OnConnectionEvent;
     }
 

@@ -14,7 +14,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     [ShowInInspector, HideInEditorMode, ReadOnly] PlayerType _playerType;
     [SerializeField, Get] NetworkManager _netMng;
     [SerializeField] NetworkObject  _XRClientPrefab;
-    [SerializeField] GameObject LocalXRDeviceToggle, _localCoachHostToggle;
+    [SerializeField] GameObject LocalXRDevice, LocalCoachDevice; 
     public NetworkManager NetMnger => _netMng; 
     public bool IsXR => _playerType.HasFlag(PlayerType.XRPlayer); 
     public bool IsCoach => _playerType.HasFlag(PlayerType.Coach);
@@ -24,7 +24,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     [ShowInInspector, HideInEditorMode]
     public bool IsConnected =>  _netMng.IsServer || _netMng.IsConnectedClient;
     CustomLogger _logger;
-    public event Action<NetBoot> OnPlayerTypeSetup;
+    public event Action<NetBoot> OnPlayerTypeChange;
 #if UNITY_EDITOR  
     [SerializeField] PlayerType _editorAutoSetupConfig = PlayerType.NotSetup; 
 #endif 
@@ -83,9 +83,9 @@ public class NetBoot : SingletonMono<NetBoot> {
     }
 
     void OnSetPlayerType() {
-        LocalXRDeviceToggle.SetActive(IsXR);
-        _localCoachHostToggle.SetActive(!IsXR && IsCoach);
-        OnPlayerTypeSetup?.Invoke(this);
+        LocalCoachDevice.SetActive(IsCoach);
+        LocalXRDevice.SetActive(IsXR);
+        OnPlayerTypeChange?.Invoke(this);
     }
 
     public void SetupAsXRCoachDebug() => SetupPlayerType(true, true);
@@ -133,7 +133,7 @@ public class NetBoot : SingletonMono<NetBoot> {
             }
             else {
                 PlayerTypeSetupGUI();
-            }
+            } 
         } catch(System.Exception ex) { Debug.LogException(ex); } 
         finally  { EditorGUILayout.EndVertical();  }
     } 
