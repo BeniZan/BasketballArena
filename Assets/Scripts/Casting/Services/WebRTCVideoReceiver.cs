@@ -10,34 +10,26 @@ using System;
 using UnityEngine.UIElements;
 
 public class WebRTCVideoReceiver : MonoBehaviour {   
-    static WebRTCVideoReceiver _instance;
-    public static WebRTCVideoReceiver Instance {
-        get {
-            if (_instance)
-                return _instance;
-            return _instance = FindFirstObjectByType<WebRTCVideoReceiver>();
-        }
-    }
-    /// <summary>Latest texture received from the remote video track, or null when no stream is active.</summary>
-    public Texture VideoTexture { get; private set; }
-    /// <summary>Raised with the new texture when a stream starts, and with null when it ends.</summary>
-    public event Action<Texture> OnVideoTextureChanged;
-
     private RTCPeerConnection peerConnection;
     Queue<RTCIceCandidateInit> _pendingCandidates = new Queue<RTCIceCandidateInit>();
     bool _setupRemoteDescription;
-    CustomLogger _logger; 
-    private void OnEnable() {
-        _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] ");
-        NetworkManager.Singleton.OnServerStarted += OnServerStarted;
-        NetworkManager.Singleton.OnServerStopped += OnServerStopped;
-        if (NetworkManager.Singleton.IsServer) 
-            StartConnection(); 
+    CustomLogger _logger;
+    [ShowInInspector, HideInEditorMode, ReadOnly] bool _isConnectionActive;
+    [ShowInInspector, HideInEditorMode, ReadOnly] Texture _recievedVideo;
+    private void Awake() {
+        _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] "); 
+    } 
+    private void LateUpdate() {
+        var shouldConnect = NetworkManager.Singleton && NetworkManager.Singleton.IsServer;
+        if (_isConnectionActive != shouldConnect) {
+            if (shouldConnect)
+                StartConnection();
+            else CloseConnection();
+        }
     }
-    void OnServerStarted() => StartConnection();
-    void OnServerStopped(bool _) => CloseConnection();
     public void StartConnection()
-    { 
+    {
+        _isConnectionActive = true;
         _logger = new CustomLogger(this, Color.cyan, "[WebRTC-Receiver] ");
         _logger.Log("Starting WebRTC connection..."); 
 
@@ -68,8 +60,10 @@ public class WebRTCVideoReceiver : MonoBehaviour {
     }
 
     private void InitializeTexture(Texture tex) {
-        VideoTexture = tex;
-        OnVideoTextureChanged?.Invoke(tex);
+        _recievedVideo = tex;
+        if (TryGetComponent(out RawImage raw))
+            raw.texture = _recievedVideo; // for testing
+        //todo
     }
 
     private void Instance_OnOfferReceived(WebRTCHandshakeManager.Handshake handshake) {
@@ -112,15 +106,12 @@ public class WebRTCVideoReceiver : MonoBehaviour {
         else _pendingCandidates.Enqueue(candInit);
     }
 
-    void CloseConnection() {  
-        if (VideoTexture != null) {
-            VideoTexture = null;
-            OnVideoTextureChanged?.Invoke(null);
-        }
+    void CloseConnection() {
+        _isConnectionActive = false;
         peerConnection?.Dispose(); 
         StopAllCoroutines();
     }
-    private void OnDisable() {
+    private void OnDisable() { 
         CloseConnection();
     } 
 }

@@ -15,12 +15,12 @@ public class WebRTCVideoSender : MonoBehaviour
     public Camera vrCamera; 
     
     private RTCPeerConnection peerConnection;
-    private VideoStreamTrack videoTrack;  
+    private VideoStreamTrack videoTrack;
+    [ShowInInspector, HideInEditorMode] private RenderTexture _copiedCameraRT;
+
     CustomLogger _logger;
     Queue<RTCIceCandidateInit> _pendingCandidates = new Queue<RTCIceCandidateInit>();
     bool _setupRemoteDescription;
-    [ShowInInspector]
-    public bool IsSendingVideo { get; private set; }
 
     private void Awake() {
         WebRTCHandshakeManager.Instance.OnServerHandshakeResponse += Handshake_OnServerHandshakeResponse;
@@ -99,13 +99,29 @@ public class WebRTCVideoSender : MonoBehaviour
                 WebRTCHandshakeManager.Instance.SendICEData(c, NetworkManager.ServerClientId);
             }
         };
-        
-        videoTrack = vrCamera.CaptureStreamTrack(1920, 1080);
-        peerConnection.AddTrack(videoTrack);
+
+        CreateAndAddVideoTrack(); 
 
         _logger.Log("Waiting for socket to be ready...");
 
         yield return CreateAndSendOffer();
+    }
+
+    void CreateAndAddVideoTrack() {
+        if(_copiedCameraRT && _copiedCameraRT.IsCreated())
+            _copiedCameraRT.Release();
+
+        int width = 1920, height = 1080;
+        int depthValue = (int)RenderTextureDepth.Depth24;
+        var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+        _copiedCameraRT = new RenderTexture(width, height, depthValue, format);
+        _copiedCameraRT.Create(); 
+        videoTrack = new VideoStreamTrack(_copiedCameraRT, Graphics.Blit);
+        peerConnection.AddTrack(videoTrack);
+    }
+    private void LateUpdate() {
+        if(_copiedCameraRT && _copiedCameraRT.IsCreated())
+            ScreenCapture.CaptureScreenshotIntoRenderTexture(_copiedCameraRT);
     }
 
     IEnumerator CreateAndSendOffer() { 

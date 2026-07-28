@@ -3,7 +3,7 @@ using UnityEngine;
 public class CoachOnlyGo : MonoBehaviour
 {
     void Awake() {
-        NetBoot.Instance.OnPlayerTypeSetup += Instance_OnPlayerTypeSetup; 
+        NetBoot.Instance.OnPlayerTypeChange += Instance_OnPlayerTypeSetup; 
     }
 
     private void Instance_OnPlayerTypeSetup(NetBoot obj) {

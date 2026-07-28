@@ -44,7 +44,7 @@ public class WebRTCHandshakeManager : NetworkBehaviour {
     public event Action<IceCandidateData> OnICECandidateReceived;
 
     private void OnEnable() {
-        WebRTC.ConfigureNativeLogging(true, NativeLoggingSeverity.Info);
+        WebRTC.ConfigureNativeLogging(true, NativeLoggingSeverity.Warning);
         StartCoroutine(WebRTC.Update()); 
     }
 
