@@ -224,9 +224,10 @@ public class NetDiscovery : MonoBehaviour {
             _logger.Log($"Broadcast received from {result.RemoteEndPoint} — App: {broadcast.AppName}, Version: {broadcast.Version}");
 
             if (!ProcessBroadcast(broadcast, out DiscoveryResponseData response)) {
-                _logger.LogWarning($"Broadcast rejected: app/version mismatch (expected {_appName} {_appVersion})");
+                _logger.LogWarning($"Broadcast warning: app/version mismatch from client (expected {_appName} {_appVersion}; " +
+                                    $"recieved {broadcast.AppName} {broadcast.Version})");
                 OnVersionMismatch?.Invoke((broadcast.AppName.ToString(), broadcast.Version.ToString())); 
-                return;
+                //return; for now let the mismatched client connect
             }
 
             byte[] data;
