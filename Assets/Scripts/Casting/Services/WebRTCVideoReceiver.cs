@@ -16,6 +16,8 @@ public class WebRTCVideoReceiver : MonoBehaviour {
     CustomLogger _logger;
     [ShowInInspector, HideInEditorMode, ReadOnly] bool _isConnectionActive;
     [ShowInInspector, HideInEditorMode, ReadOnly] Texture _recievedVideo;
+    public Texture VideoTexture { get; private set; }
+    public event Action<Texture> OnVideoTextureChanged;
     private void Awake() {
         _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] "); 
     } 
@@ -64,10 +66,7 @@ public class WebRTCVideoReceiver : MonoBehaviour {
         OnVideoTextureChanged?.Invoke(tex); 
         _recievedVideo = tex;
         if (TryGetComponent(out RawImage raw))
-            raw.texture = _recievedVideo; // for testing  
-        _recievedVideo = tex;
-        if (TryGetComponent(out RawImage raw))
-            raw.texture = _recievedVideo; // for testing 
+            raw.texture = _recievedVideo; // for testing   
     }
 
     private void Instance_OnOfferReceived(WebRTCHandshakeManager.Handshake handshake) {
