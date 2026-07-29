@@ -23,13 +23,19 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     [SerializeField] MRUK _mruk;
     [SerializeField] EffectMesh _efMesh;
     [SerializeField] EnvironmentDepthManager _depthManager;
+    [ShowInInspector, ReadOnly] XRLoader CurrentLoader =>  XRGeneralSettings.Instance?.Manager?.activeLoader;
     CustomLogger _logger;
-    protected override void Awake() {
-        base.Awake();
+
+    bool _wasInit;
+
+    Task<MRUK.LoadDeviceResult> _awaitingRoom;
+
+    void Init() {
+        _wasInit = true;
         _depthManager.enabled = !ENABLE_MRUK;
         _logger = new CustomLogger(this, Color.green);
-        if(_mruk)
-            _mruk.gameObject.SetActive(ENABLE_MRUK); 
+        if (_mruk)
+            _mruk.gameObject.SetActive(ENABLE_MRUK);
         _efMesh.gameObject.SetActive(ENABLE_MRUK);
         if (!ENABLE_MRUK) {
             _mruk.ClearScene();
@@ -38,9 +44,10 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         }
     }
 
-
-    Task<MRUK.LoadDeviceResult> _awaitingRoom;
     void OnEnable() {
+        if (!_wasInit)
+            Init();
+
         StartXR();
         if (_mruk) {
             _mruk.ClearScene();
@@ -88,8 +95,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
             mnger.StopSubsystems();
              
             mnger.DeinitializeLoader();
-
-            _logger.Log("XR shutdown complete.");
         }
+        _logger.Log("XR shutdown complete.");
     }
 }
