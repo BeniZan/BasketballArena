@@ -70,6 +70,14 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private VisualElement _liveTag;
     private VisualElement _streamPlaceholder;
 
+    // WebRTCVideoReceiver exposes no public API (no singleton, event, or property), so the
+    // casting view polls its private "_recievedVideo" field via cached reflection each frame.
+    private WebRTCVideoReceiver _videoReceiver;
+    private Texture _lastCastingTexture;
+    private static readonly System.Reflection.FieldInfo s_receivedVideoField =
+        typeof(WebRTCVideoReceiver).GetField("_recievedVideo",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
     // State variables
     private readonly TrainingSession _session = new TrainingSession();
 
@@ -107,8 +115,6 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _session.OnDrillsChanged -= HandleDrillsChanged;
         _session.OnActiveDrillChanged -= HandleActiveDrillChanged;
         if (_drillListView != null) _drillListView.itemIndexChanged -= OnDrillReordered;
-        if (WebRTCVideoReceiver.Instance != null)
-            WebRTCVideoReceiver.Instance.OnVideoTextureChanged -= HandleCastingTextureChanged;
     }
 
     private void InitializeUI(bool logIfNotReady = false)
@@ -243,6 +249,8 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
     {
         UpdateTimerDisplay();
 
+        PollCastingTexture();
+
         // The WebRTC texture is updated outside UI Toolkit, so force a repaint while streaming.
         if (_castingImage != null && _castingImage.image != null)
             _castingImage.MarkDirtyRepaint();
@@ -254,7 +262,35 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
         {
             _xrPollTimer = 0.5f;
             UpdateXrStatus();
+
+            // Piggyback on the 2 Hz timer to (re)locate the receiver if it isn't known yet
+            // (it may be spawned/destroyed at runtime and is not a singleton).
+            if (_videoReceiver == null)
+                _videoReceiver = FindObjectOfType<WebRTCVideoReceiver>();
         }
+    }
+
+    /// <summary>
+    /// Per-frame poll of the receiver's current video texture. The receiver has no public
+    /// API, so the texture is read from its private field via cached reflection; when the
+    /// receiver is missing or has no texture, the placeholder is restored.
+    /// </summary>
+    private void PollCastingTexture()
+    {
+        if (!Application.isPlaying || _castingImage == null) return;
+
+        Texture tex = GetReceiverTexture();
+        if (tex != _lastCastingTexture)
+        {
+            _lastCastingTexture = tex;
+            HandleCastingTextureChanged(tex);
+        }
+    }
+
+    private Texture GetReceiverTexture()
+    {
+        if (_videoReceiver == null || s_receivedVideoField == null) return null;
+        return s_receivedVideoField.GetValue(_videoReceiver) as Texture;
     }
 
     // ---- XR headset indicator --------------------------------------------------
@@ -317,14 +353,12 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
         if (_castingImage.parent != _castingView)
             _castingView.Insert(0, _castingImage);
 
-        if (Application.isPlaying && WebRTCVideoReceiver.Instance != null)
-        {
-            WebRTCVideoReceiver.Instance.OnVideoTextureChanged -= HandleCastingTextureChanged;
-            WebRTCVideoReceiver.Instance.OnVideoTextureChanged += HandleCastingTextureChanged;
-        }
-
-        // Reflect the current stream state (covers re-initialization while already streaming).
-        HandleCastingTextureChanged(Application.isPlaying ? WebRTCVideoReceiver.Instance?.VideoTexture : null);
+        // Locate the receiver now (Update keeps retrying if it appears later) and reflect the
+        // current stream state (covers re-initialization while already streaming).
+        if (Application.isPlaying && _videoReceiver == null)
+            _videoReceiver = FindObjectOfType<WebRTCVideoReceiver>();
+        _lastCastingTexture = Application.isPlaying ? GetReceiverTexture() : null;
+        HandleCastingTextureChanged(_lastCastingTexture);
     }
 
     private void HandleCastingTextureChanged(Texture tex)

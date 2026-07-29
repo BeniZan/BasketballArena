@@ -10,19 +10,6 @@ using System;
 using UnityEngine.UIElements;
 
 public class WebRTCVideoReceiver : MonoBehaviour {   
-    static WebRTCVideoReceiver _instance;
-    public static WebRTCVideoReceiver Instance {
-        get {
-            if (_instance)
-                return _instance;
-            return _instance = FindFirstObjectByType<WebRTCVideoReceiver>();
-        }
-    }
-    /// <summary>Latest texture received from the remote video track, or null when no stream is active.</summary>
-    public Texture VideoTexture { get; private set; }
-    /// <summary>Raised with the new texture when a stream starts, and with null when it ends.</summary>
-    public event Action<Texture> OnVideoTextureChanged;
-
     private RTCPeerConnection peerConnection;
     Queue<RTCIceCandidateInit> _pendingCandidates = new Queue<RTCIceCandidateInit>();
     bool _setupRemoteDescription;
@@ -71,10 +58,13 @@ public class WebRTCVideoReceiver : MonoBehaviour {
         WebRTCHandshakeManager.Instance.OnClientHandshakeReceived += Instance_OnOfferReceived; 
         WebRTCHandshakeManager.Instance.OnICECandidateReceived += OnReceivedICE;
     }
-
+ 
     private void InitializeTexture(Texture tex) { 
         VideoTexture = tex;
         OnVideoTextureChanged?.Invoke(tex); 
+        _recievedVideo = tex;
+        if (TryGetComponent(out RawImage raw))
+            raw.texture = _recievedVideo; // for testing  
         _recievedVideo = tex;
         if (TryGetComponent(out RawImage raw))
             raw.texture = _recievedVideo; // for testing 
@@ -118,14 +108,14 @@ public class WebRTCVideoReceiver : MonoBehaviour {
             peerConnection.AddIceCandidate(new RTCIceCandidate(candInit));
         }
         else _pendingCandidates.Enqueue(candInit);
-    }
+    } 
  
     void CloseConnection() {  
         if (VideoTexture != null) {
             VideoTexture = null;
             OnVideoTextureChanged?.Invoke(null);
         } 
-        _isConnectionActive = false; 
+        _isConnectionActive = false;  
         peerConnection?.Dispose(); 
         StopAllCoroutines();
     }
