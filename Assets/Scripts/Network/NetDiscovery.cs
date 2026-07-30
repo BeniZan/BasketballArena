@@ -65,10 +65,10 @@ public class NetDiscovery : MonoBehaviour {
     Awaitable _sendBroadcastAwait;
     Awaitable _setupNetworkAwait;
     DiscoveryResponseData? _recievedResponse;
-    bool _isRunningDiscovery;
+    public bool IsRunningDiscovery { get; private set; }
 
     private void OnDestroy() {
-        if(_isRunningDiscovery)
+        if(IsRunningDiscovery)
             StopDiscovery();
         _netBoot.OnPlayerTypeChange -= OnPlayerTypeSetup;
         _netMng.OnConnectionEvent -= OnConnectionEvent;
@@ -89,7 +89,7 @@ public class NetDiscovery : MonoBehaviour {
         if (_netMng.IsConnectedClient)
             shouldDiscover = false;
 
-        if(shouldDiscover == _isRunningDiscovery)
+        if(shouldDiscover == IsRunningDiscovery)
             return; 
 
         _logger.Log($"Revalidating discovery — enabled: {shouldDiscover}");
@@ -102,11 +102,11 @@ public class NetDiscovery : MonoBehaviour {
     // ── Discovery start / stop ────────────────────────────────────────────────
 
     public void StartDiscovery() {
-        if(_isRunningDiscovery)
+        if(IsRunningDiscovery)
             StopDiscovery();
         _logger.Log("Discovery starting...");
         _recievedResponse = null;
-        _isRunningDiscovery = true;
+        IsRunningDiscovery = true;
         _isDiscoveryServer = _netBoot.IsCoach;
 
         // Server binds to _port; client lets the OS pick a free port
@@ -123,7 +123,7 @@ public class NetDiscovery : MonoBehaviour {
     }
 
     void StopDiscovery() {
-        _isRunningDiscovery = false;
+        IsRunningDiscovery = false;
         _logger.Log("Discovery stopping...");
         _recieveBroadcastAwait?.Cancel();
         _sendBroadcastAwait?.Cancel();
@@ -137,7 +137,7 @@ public class NetDiscovery : MonoBehaviour {
     // ── Shared async infrastructure ───────────────────────────────────────────
 
     async Awaitable ListenLoopAsync(Func<Awaitable> onReceiveTask) {
-        while (_isRunningDiscovery) {
+        while (IsRunningDiscovery) {
             try {
                 await onReceiveTask();
             } catch (ObjectDisposedException) {

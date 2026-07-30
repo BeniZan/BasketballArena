@@ -23,6 +23,8 @@ public class NetBoot : SingletonMono<NetBoot> {
     public bool IsConnectionAwaiting => _netMng.IsListening && _netMng.IsClient && !_netMng.IsConnectedClient;
     [ShowInInspector, HideInEditorMode]
     public bool IsConnected =>  _netMng.IsServer || _netMng.IsConnectedClient;
+    [field: SerializeField, Get] public NetDiscovery NetDiscovery { get; private set; }
+
     CustomLogger _logger;
     public event Action<NetBoot> OnPlayerTypeChange;
 #if UNITY_EDITOR  
