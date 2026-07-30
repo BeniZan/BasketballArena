@@ -308,10 +308,7 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
     }
 
     /// <summary>
-    /// True while an XR device is connected. The coach runs the Netcode server and every non-server
-    /// peer is an XR player (same assumption as <see cref="NetVisibility"/>), so any remote client
-    /// counts. The local client only counts in the SetupAsXRCoachDebug host case, where the coach
-    /// dashboard itself runs on the headset.
+    /// True while a player client is connected to the coach host.
     /// </summary>
     private static bool HasConnectedXrDevice()
     {
@@ -321,14 +318,7 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
         if (nm == null || !nm.IsListening) return false;
         if (!nm.IsServer) return nm.IsConnectedClient;
 
-        // HasInstance instead of Instance: the getter logs an error when no NetBoot exists
-        // (e.g. previewing the dashboard scene standalone).
-        bool localIsXr = NetBoot.HasInstance && NetBoot.Instance.IsXR;
-        foreach (var id in nm.ConnectedClientsIds)
-        {
-            if (id != nm.LocalClientId || localIsXr) return true;
-        }
-        return false;
+        return nm.ConnectedClients.Count > (nm.IsHost ? 1 : 0);
     }
 
     // ---- Casting view (player stream) -------------------------------------------
