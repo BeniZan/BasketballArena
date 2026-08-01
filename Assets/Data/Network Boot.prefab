@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8870628452414119526}
   - component: {fileID: 2441147724392871323}
+  - component: {fileID: 1304400454408651257}
   - component: {fileID: -8752387944499000450}
   - component: {fileID: 4683310461084245847}
   m_Layer: 0
@@ -46,10 +47,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a41ff853a5bc057468d5f86acaa38ccd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkBoot
-  IsCoach:
-    _value: 0
-  PlayerTypeSetup: 0
   _netMng: {fileID: -8752387944499000450}
+  _XRClientPrefab: {fileID: 0}
+  LocalXRDevice: {fileID: 0}
+  LocalCoachDevice: {fileID: 0}
+  _editorAutoSetupConfig: 1
+--- !u!114 &1304400454408651257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6293998837902806738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51be6e4513be96b44bf37bb2de8ed431, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetDiscovery
+  _netMng: {fileID: -8752387944499000450}
+  _transport: {fileID: 4683310461084245847}
+  _netBoot: {fileID: 2441147724392871323}
+  _discoveryPort: 47775
 --- !u!114 &-8752387944499000450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,6 +106,7 @@ MonoBehaviour:
     NetworkTopology: 0
     UseCMBService: 0
     AutoSpawnPlayerPrefabClientSide: 1
+    NetworkMessageMetrics: 1
     NetworkProfilingMetrics: 1
     OldPrefabList: []
   RunInBackground: 1

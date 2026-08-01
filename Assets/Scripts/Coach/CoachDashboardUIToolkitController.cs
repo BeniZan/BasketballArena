@@ -3,7 +3,8 @@ using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
- 
+using UnityEditor;
+
 public class CoachDashboardUIToolkitController : MonoBehaviour
 {
     [Header("Fonts")]
@@ -56,9 +57,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     // Header XR headset indicator (green pill next to the stream-mode toggles)
     private VisualElement _xrStatus;
-    private Label _xrStatusText;
-    private bool _xrConnected;
-    private float _xrPollTimer;
+    private Label _xrStatusText; 
 
     private Label _drillsCountText;
     private VisualElement _buildSessionPlaceholder;
@@ -72,11 +71,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     // WebRTCVideoReceiver exposes no public API (no singleton, event, or property), so the
     // casting view polls its private "_recievedVideo" field via cached reflection each frame.
-    private WebRTCVideoReceiver _videoReceiver;
-    private Texture _lastCastingTexture;
-    private static readonly System.Reflection.FieldInfo s_receivedVideoField =
-        typeof(WebRTCVideoReceiver).GetField("_recievedVideo",
-            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+    [SerializeField] WebRTCVideoReceiver _videoReceiver;
 
     // State variables
     private readonly TrainingSession _session = new TrainingSession();
@@ -149,15 +144,15 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _randomDrillBtn = _root.Q<Button>("randomDrillBtn");
 
         _xrStatus = _root.Q<VisualElement>("xrStatus");
-        _xrStatusText = _root.Q<Label>("xrStatusText");
-        UpdateXrStatus(true);
+        _xrStatusText = _root.Q<Label>("xrStatusText"); 
 
         _drillsCountText = _root.Q<Label>("drillsCountText");
         _buildSessionPlaceholder = _root.Q<VisualElement>("buildSessionPlaceholder");
 
-SetupCastingView();
-_liveTag = _root.Q<VisualElement>("liveTag");
-_streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
+        _liveTag = _root.Q<VisualElement>("liveTag");
+        _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
+        SetupCastingView();
+        NetBoot.Instance.NetMnger.OnConnectionEvent += NetMnger_OnConnectionEvent;
 
         // Robustly acquire the Training Flow ListView. The runtime UI Toolkit importer in
         // this project does not reliably instantiate a <ui:ListView> from UXML (it can fall
@@ -243,66 +238,31 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
             // In editor mode, let's also visually apply some sensible defaults to the layout (like active tabs) so it looks right in scene view
             SetStreamMode(true);
         }
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+            EditorUtility.SetDirty(_uiDocument.visualTreeAsset);
+#endif
+
+    }
+
+    private void NetMnger_OnConnectionEvent(NetworkManager arg1, ConnectionEventData arg2) {
+        UpdateConnectedStatus();
     }
 
     private void Update()
     {
-        UpdateTimerDisplay();
-
-        PollCastingTexture();
-
-        // The WebRTC texture is updated outside UI Toolkit, so force a repaint while streaming.
-        if (_castingImage != null && _castingImage.image != null)
-            _castingImage.MarkDirtyRepaint();
-
-        // Cheap 2 Hz poll instead of NetworkManager events: NetBoot shuts the manager down and
-        // restarts it whenever the player type changes, which would drop event subscriptions.
-        _xrPollTimer -= Time.unscaledDeltaTime;
-        if (_xrPollTimer <= 0f)
-        {
-            _xrPollTimer = 0.5f;
-            UpdateXrStatus();
-
-            // Piggyback on the 2 Hz timer to (re)locate the receiver if it isn't known yet
-            // (it may be spawned/destroyed at runtime and is not a singleton).
-            if (_videoReceiver == null)
-                _videoReceiver = FindObjectOfType<WebRTCVideoReceiver>();
-        }
-    }
-
-    /// <summary>
-    /// Per-frame poll of the receiver's current video texture. The receiver has no public
-    /// API, so the texture is read from its private field via cached reflection; when the
-    /// receiver is missing or has no texture, the placeholder is restored.
-    /// </summary>
-    private void PollCastingTexture()
-    {
-        if (!Application.isPlaying || _castingImage == null) return;
-
-        Texture tex = GetReceiverTexture();
-        if (tex != _lastCastingTexture)
-        {
-            _lastCastingTexture = tex;
-            HandleCastingTextureChanged(tex);
-        }
-    }
-
-    private Texture GetReceiverTexture()
-    {
-        if (_videoReceiver == null || s_receivedVideoField == null) return null;
-        return s_receivedVideoField.GetValue(_videoReceiver) as Texture;
-    }
+        UpdateTimerDisplay();  
+    }  
 
     // ---- XR headset indicator --------------------------------------------------
 
-    private void UpdateXrStatus(bool force = false)
+    private void UpdateConnectedStatus()
     {
         if (_xrStatus == null) return;
 
-        bool connected = HasConnectedXrDevice();
-        if (!force && connected == _xrConnected) return;
-
-        _xrConnected = connected;
+        bool connected = HasConnectedClients(); 
+         
         _xrStatus.EnableInClassList("connected", connected);
         if (_xrStatusText != null) _xrStatusText.text = connected ? "HEADSET ACTIVE" : "NO HEADSET";
     }
@@ -310,7 +270,7 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
     /// <summary>
     /// True while a player client is connected to the coach host.
     /// </summary>
-    private static bool HasConnectedXrDevice()
+    private static bool HasConnectedClients()
     {
         if (!Application.isPlaying) return false;
 
@@ -318,7 +278,7 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
         if (nm == null || !nm.IsListening) return false;
         if (!nm.IsServer) return nm.IsConnectedClient;
 
-        return nm.ConnectedClients.Count > (nm.IsHost ? 1 : 0);
+        return nm.ConnectedClients.Count > 0;
     }
 
     // ---- Casting view (player stream) -------------------------------------------
@@ -346,21 +306,16 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
         // Locate the receiver now (Update keeps retrying if it appears later) and reflect the
         // current stream state (covers re-initialization while already streaming).
         if (Application.isPlaying && _videoReceiver == null)
-            _videoReceiver = FindObjectOfType<WebRTCVideoReceiver>();
-        _lastCastingTexture = Application.isPlaying ? GetReceiverTexture() : null;
-        HandleCastingTextureChanged(_lastCastingTexture);
+            _videoReceiver = FindObjectOfType<WebRTCVideoReceiver>(); 
+
+        _videoReceiver.OnVideoTextureChanged -= VideoReceiver_OnVideoTextureChanged; 
+        _videoReceiver.OnVideoTextureChanged += VideoReceiver_OnVideoTextureChanged;
     }
 
-    private void HandleCastingTextureChanged(Texture tex)
-    {
-        if (_castingImage == null) return;
-
-        _castingImage.image = tex;
-        bool streaming = tex != null;
-        _castingImage.style.display = streaming ? DisplayStyle.Flex : DisplayStyle.None;
-        if (_castingPlaceholder != null)
-            _castingPlaceholder.style.display = streaming ? DisplayStyle.None : DisplayStyle.Flex;
-    }
+    private void VideoReceiver_OnVideoTextureChanged(Texture texture) {
+        _castingImage.image = texture;
+        _castingImage.style.display = texture ? DisplayStyle.Flex : DisplayStyle.None;
+    } 
 
     private void SetStreamMode(bool realistic)
     {
@@ -724,6 +679,13 @@ _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
         {
             lbl.style.unityFontDefinition = new StyleFontDefinition(font);
         }
+    }
+
+    private void OnDestroy() {
+        if(NetBoot.Instance && NetBoot.Instance.NetMnger)
+            NetBoot.Instance.NetMnger.OnConnectionEvent -= NetMnger_OnConnectionEvent;
+        if (_videoReceiver)
+            _videoReceiver.OnVideoTextureChanged -= VideoReceiver_OnVideoTextureChanged;
     }
 
 #if UNITY_EDITOR
