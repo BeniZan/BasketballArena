@@ -34,12 +34,5 @@ public class CalibrationUI : MonoBehaviour {
     [Button, HorizontalGroup]
     void OnNext() => _calibration.OnConfirmedCalibrationStep();
     [Button, HorizontalGroup]
-    void OnPrevious() => _calibration.Backtrack();  
-    private void Update() {
-        var dirToCam = -transform.DirectionTo(_cam.transform);
-        transform.rotation = Quaternion.LookRotation(dirToCam, _cam.transform.up);
-        transform.localPosition = dirToCam * 0.1f;
-        _canvas.enabled = _hand.IsTracked;
-    }
-
+    void OnPrevious() => _calibration.Backtrack();   
 }

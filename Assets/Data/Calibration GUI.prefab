@@ -1572,6 +1572,7 @@ GameObject:
   - component: {fileID: 8018852037639535061}
   - component: {fileID: 7691371766822833985}
   - component: {fileID: 9025398183060776681}
+  - component: {fileID: 3329242289094563335}
   m_Layer: 3
   m_Name: Calibration GUI
   m_TagString: Untagged
@@ -1694,3 +1695,18 @@ MonoBehaviour:
   _cam: {fileID: 0}
   _hand: {fileID: 0}
   _canvas: {fileID: 1832417360604335958}
+--- !u!114 &3329242289094563335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9087176255014856928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1098f30a8bf9bb742b8d5d3919970353, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::XRHandCanvas
+  _cam: {fileID: 0}
+  _canvas: {fileID: 1832417360604335958}
+  _hand: {fileID: 0}
