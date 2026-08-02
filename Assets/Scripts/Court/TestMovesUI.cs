@@ -4,15 +4,17 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic; 
 using Sirenix.OdinInspector;
-using Oculus.Interaction.PoseDetection;
+using Unity.XR;
+using UnityEngine.InputSystem.XR;
+using UnityEngine.XR.Hands.Gestures;
 
 public class TestMovesUI : MonoBehaviour {
     [SerializeField] Canvas _mainCanvas;
-    [SerializeField] OVRHand _leftHand;
+    [SerializeField, Get] XRDeviceInstance _xrDevice;
     [SerializeField] GameObject _debugCanvas;
     [SerializeField] Image _loadingImg;
     [SerializeField] TMPro.TMP_Dropdown _dropdown;
-    [SerializeField] ShapeRecognizerActiveState _handShape;
+    [SerializeField] XRHandPose _handShape;
     [SerializeField] Calibration _calib;
     [SerializeField] Button _play, _pause, _restart;
     [SerializeField] RealTimer _timeHandShapeActive = new(3f);
@@ -63,8 +65,8 @@ public class TestMovesUI : MonoBehaviour {
 
 
     private void LateUpdate() {
-        _mainCanvas.enabled = _leftHand.IsTracked;
-
+        _mainCanvas.enabled = _xrDevice.IsLeftTracked;
+        /*
         if (_handShape.Active && _wasToggled) {
             return;
         }
@@ -89,6 +91,7 @@ public class TestMovesUI : MonoBehaviour {
         const float headStart = 0.15f;
         _loadingImg.gameObject.SetActive(_handShape.Active && _timeHandShapeActive.TimeRunning > headStart);
         _loadingImg.fillAmount = _timeHandShapeActive.NormalizedTime;
+        */
     } 
 
     [Button, HideInEditorMode]

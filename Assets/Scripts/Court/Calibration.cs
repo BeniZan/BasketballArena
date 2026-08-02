@@ -1,11 +1,12 @@
-using Meta.XR; 
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI; 
+using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 public class Calibration : MonoBehaviour {
     public enum Step { NotCalibrated = -1, 
@@ -17,7 +18,6 @@ public class Calibration : MonoBehaviour {
     [SerializeField] PlaceWithPinch[] _placers;
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
     [SerializeField] LineRenderer _pinchLine;
-    [SerializeField] EnvironmentRaycastManager _raycastManager;
     [SerializeField] SurfaceHandler _courtSurface, _courtSurfacePreview;
     [SerializeField] LineRenderer _inBetweenPlacersLine;
     public float MinPinchForLine = 0.2f, PinchThreshold = 0.85f;

@@ -1,7 +1,6 @@
-using Oculus.Interaction.HandGrab;
-using Oculus.Interaction.PoseDetection;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.Gestures;
 
 public class XRDebugHostUI : MonoBehaviour
@@ -9,7 +8,7 @@ public class XRDebugHostUI : MonoBehaviour
     [SerializeField] Transform _lookAt;
     [SerializeField] UIDocument _uiDoc;
     [SerializeField] UnityEngine.UI.Image _loadingImg;
-    [SerializeField] ShapeRecognizerActiveState _handShape;
+    [SerializeField] XRHandPose _handShape;
     [SerializeField] RealTimer _timeHandShapeActive = new(3f);
     [SerializeField] Calibration _calib;
     bool _isActive;
@@ -36,8 +35,9 @@ public class XRDebugHostUI : MonoBehaviour
     void LateUpdate()
     {
         transform.LookAt( - transform.DirectionTo(_lookAt), _lookAt.up);
-
-        if(_handShape.Active && _wasToggled) {
+        //todo
+        /*
+        if (_handShape.Active && _wasToggled) {
             return;
         }
 
@@ -60,6 +60,6 @@ public class XRDebugHostUI : MonoBehaviour
 
         const float headStart = 0.15f; 
         _loadingImg.gameObject.SetActive(_timeHandShapeActive.TimeRunning > headStart);
-        _loadingImg.fillAmount = _timeHandShapeActive.NormalizedTime;
+        _loadingImg.fillAmount = _timeHandShapeActive.NormalizedTime;*/
     }
 }

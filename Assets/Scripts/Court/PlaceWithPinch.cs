@@ -1,20 +1,20 @@
-using Meta.XR;
-using Meta.XR.MRUtilityKit;
-using Meta.XR.MRUtilityKit.BuildingBlocks;
 using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
+using Unity.XR;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using UnityEngine.XR.Interaction.Toolkit.AR;
 
 public class PlaceWithPinch : MonoBehaviour {
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
     [SerializeField] LineRenderer _lineRend;
-    [SerializeField] EnvironmentRaycastManager _raycastManager;
     [SerializeField] Transform _preview;
     [SerializeField] Transform _placeObj;
     public string Description;
     public float PinchThreshold = 0.7f;
     public event Action OnPlaced;   
-    [NonSerialized, ShowInInspector] public bool WasPlaced; 
+    [NonSerialized, ShowInInspector] public bool WasPlaced;
+    XRRayInteractor _raycaster => _xrPlayer.RightRay;
     public Transform PreviewObj => _preview;
     public Transform PlacedObj => _placeObj; 
     public Vector3 PreviewOrPlacedPosition => WasPlaced ? _placeObj.position : _preview.position;
@@ -37,12 +37,14 @@ public class PlaceWithPinch : MonoBehaviour {
 
 
     private void Update() { 
-        var pinchValue = _xrPlayer.LocalRightHand.GetFingerPinchStrength(0);  
+        var pinchValue = _xrPlayer.RighPinchValue;  
         var isPinching = pinchValue >= PinchThreshold; 
-        var ray = _xrPlayer.RightRay.Ray; 
 
-        var rayHit = Raycast(ray, out var hitPoint);
-        UpdateRay(ray, isPinching, rayHit, hitPoint);
+        var rayHit = _raycaster.TryGetCurrentARRaycastHit(out var arHit);
+        _raycaster.GetLineOriginAndDirection(out var origin, out var direction);
+
+        var hitPoint = rayHit ? arHit.pose.position : origin + direction * 100f;
+        UpdateRay(origin, direction, isPinching, rayHit, hitPoint);
 
         _preview.gameObject.SetActive(rayHit); 
         _preview.position = hitPoint;
@@ -52,38 +54,12 @@ public class PlaceWithPinch : MonoBehaviour {
             WasPlaced = true;
             OnPlaced?.Invoke();
         } 
-    }
-
-    bool Raycast(Ray ray, out Vector3 hit) {
-        if (XRDeviceInstance.ENABLE_MRUK) {
-            if (!MRUK.Instance) {
-                Debug.LogWarning("MRUK enabled but no instance found");
-                hit = default;
-                return false;
-            }
-            try {
-                var room = MRUK.Instance.GetCurrentRoom();
-                if (room) {
-                    var isRayHit = room.Raycast(ray, 100f, out var rhit);
-                    hit = rhit.point;
-                    return isRayHit;
-                }
-            } catch (Exception ex) { Debug.LogException(ex);   }
-            hit = default;
-            return false;
-
-        } 
-
-        var isHit = _raycastManager.Raycast(ray, out var envHit);
-        hit = envHit.point;
-        return isHit; 
-    }
+    } 
 
 
-    void UpdateRay(Ray ray, bool isPinch, bool rayHit, Vector3 hitPoint) { 
-        var origin = ray.origin;
+    void UpdateRay(Vector3 origin, Vector3 dir, bool isPinch, bool rayHit, Vector3 hitPoint) { 
         _lineRend.SetPosition(0, origin);
-        var dest = rayHit ? hitPoint : ray.origin + ray.direction * 100f;
+        var dest = rayHit ? hitPoint : origin + dir * 100f;
         _lineRend.SetPosition(1, dest);
         var color = rayHit ?
             (isPinch ? Color.green : Color.blue) :

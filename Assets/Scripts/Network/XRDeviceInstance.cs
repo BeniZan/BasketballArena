@@ -1,60 +1,52 @@
-using Meta.XR;
-using Meta.XR.BuildingBlocks;
-using Meta.XR.EnvironmentDepth;
-using Meta.XR.MRUtilityKit;
-using Oculus.Interaction;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.XR.Hands;
+using UnityEngine.XR.Hands.OpenXR;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Management;
 
 public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstance> {
     const float RetryConnectXRDelay = 5f;
     private static WaitForSeconds _waitForRetryConnectXR = new WaitForSeconds(RetryConnectXRDelay);
-    static public bool ENABLE_MRUK => Application.isEditor;
-	[field: SerializeField] public OVRHand LocalRightHand { get; private set; }
-	[field: SerializeField] public OVRHand LocalLeftHand { get; private set; }
-	[field: SerializeField] public RayInteractor RightRay { get; private set; }
-	[field: SerializeField] public RayInteractor LeftRay { get; private set; }
+    static public bool ENABLE_SIMULATED_ROOM => Application.isEditor;
+	[field: SerializeField] public XRHandDevice TrackedRightHand { get; private set; }
+	[field: SerializeField] public XRHandDevice TrackedLeftHand { get; private set; }
+	[field: SerializeField] public XRRayInteractor RightRay { get; private set; }
+	[field: SerializeField] public XRRayInteractor LeftRay { get; private set; }
     [field: SerializeField] public Transform CenterEyes { get; private set; }
-    [SerializeField] MRUK _mruk;
-    [SerializeField] EffectMesh _efMesh;
-    [SerializeField] EnvironmentDepthManager _depthManager;
+    [field: SerializeField] public XRHandTrackingEvents LeftTracking { get; private set; }
+    [field: SerializeField] public XRHandTrackingEvents RightTracking { get; private set; }
     [ShowInInspector, ReadOnly] XRLoader CurrentLoader =>  XRGeneralSettings.Instance?.Manager?.activeLoader;
+    public float RighPinchValue => TrackedRightHand != null ? TrackedRightHand.pinchValue.ReadValue() : 0f;
+    public bool IsLeftTracked => LeftTracking.bindableHandIsTracked.Value;
+
     CustomLogger _logger;
-
     bool _wasInit;
-
-    Task<MRUK.LoadDeviceResult> _awaitingRoom;
-
+     
     void Init() {
         _wasInit = true;
-        _depthManager.enabled = !ENABLE_MRUK;
-        _logger = new CustomLogger(this, Color.green);
-        if (_mruk)
-            _mruk.gameObject.SetActive(ENABLE_MRUK);
-        _efMesh.gameObject.SetActive(ENABLE_MRUK);
-        if (!ENABLE_MRUK) {
-            _mruk.ClearScene();
-            _mruk.gameObject.SafeDestroy();
-            _efMesh.gameObject.SafeDestroy();
-        }
+        _logger = new CustomLogger(this, Color.green); 
     }
 
     void OnEnable() {
         if (!_wasInit)
             Init();
+      
+        LeftTracking.trackingChanged.AddListener(_ =>OnTrackingChanged());
+        RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
 
-        StartXR();
-        if (_mruk) {
-            _mruk.ClearScene();
-            if(_awaitingRoom == null || _awaitingRoom.IsCompleted)
-                _awaitingRoom = _mruk.LoadSceneFromPrefab(_mruk.SceneSettings.RoomPrefabs[0], true);
-        }
-    }
+        StartXR(); 
+    } 
+
+    void OnTrackingChanged() { 
+        TrackedLeftHand = InputSystem.GetDevice<XRHandDevice>(CommonUsages.LeftHand);
+        TrackedRightHand = InputSystem.GetDevice<XRHandDevice>(CommonUsages.RightHand);
+    } 
 
     void StartXR() {
         StopAllCoroutines();

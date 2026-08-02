@@ -2,13 +2,14 @@ using Sirenix.OdinInspector;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.Hands;
 
 public class CalibrationUI : MonoBehaviour {
     [SerializeField] Calibration _calibration; 
     [SerializeField] GameObject[] _tabs;
     [SerializeField] Button _next, _previous;
     [SerializeField] Camera _cam;
-    [SerializeField] OVRHand _hand;
+    [SerializeField] XRHandDevice _hand;
     [SerializeField, Get] Canvas _canvas;
     private void Start() {
         _next.onClick.AddListener(OnNext);
