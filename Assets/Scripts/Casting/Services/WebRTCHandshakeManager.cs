@@ -54,7 +54,7 @@ public class WebRTCHandshakeManager : NetworkBehaviour {
         ReceiveHandshakeRPC(handShake);
     }
 
-    [Rpc(SendTo.Server)]
+    [Rpc(SendTo.Server, Delivery = RpcDelivery.Reliable)]
     void ReceiveHandshakeRPC(Handshake handshake) => OnClientHandshakeReceived?.Invoke(handshake); 
 
     public void Server_SendAnswer(string sdp, ulong destinationClient) {
@@ -62,14 +62,14 @@ public class WebRTCHandshakeManager : NetworkBehaviour {
         Client_ReceiveAnswerRPC(sdp, target);
     }
 
-    [Rpc(SendTo.SpecifiedInParams)]
+    [Rpc(SendTo.SpecifiedInParams, Delivery = RpcDelivery.Reliable)]
     public void Client_ReceiveAnswerRPC(string sdp, RpcParams param = default) {
         OnServerHandshakeResponse?.Invoke(sdp);
     }
     public void SendICEData(IceCandidateData data, ulong destination) {
         ReceiveICEDataRPC(data, RpcTarget.Single(destination, RpcTargetUse.Temp));
     }
-    [Rpc(SendTo.SpecifiedInParams)]
+    [Rpc(SendTo.SpecifiedInParams, Delivery = RpcDelivery.Reliable)]
     void ReceiveICEDataRPC(IceCandidateData data, RpcParams p = default) {
         OnICECandidateReceived?.Invoke(data);
     }

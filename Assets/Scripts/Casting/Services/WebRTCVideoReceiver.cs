@@ -73,13 +73,19 @@ public class WebRTCVideoReceiver : MonoBehaviour {
         StartCoroutine(RecieveOffer(handshake));
     }
 
-    IEnumerator RecieveOffer(WebRTCHandshakeManager.Handshake handshake) { 
+    IEnumerator RecieveOffer(WebRTCHandshakeManager.Handshake handshake) {
         var desc = new RTCSessionDescription {
             type = RTCSdpType.Offer,
             sdp = handshake.SDP
         };
 
-        yield return peerConnection.SetRemoteDescription(ref desc);
+        var remoteDesc = peerConnection.SetRemoteDescription(ref desc);
+        yield return remoteDesc;
+        if (remoteDesc.IsError) {
+            _logger.LogError($"Failed to set remote description: {remoteDesc.Error.message}");
+            yield break;
+        }
+
         _setupRemoteDescription = true;
         while (_pendingCandidates.TryDequeue(out var candidate)) {
             peerConnection.AddIceCandidate(new RTCIceCandidate(candidate));

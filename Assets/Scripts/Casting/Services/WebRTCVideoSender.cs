@@ -1,11 +1,12 @@
-using UnityEngine;
-using Unity.WebRTC;
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-using Sirenix.OdinInspector;
-using System.Collections.Generic;
+using Unity.WebRTC;
+using UnityEngine;
 
 public enum WebRTCState { Disconnected, Connecting, Connected } 
 public class WebRTCVideoSender : MonoBehaviour
@@ -36,7 +37,11 @@ public class WebRTCVideoSender : MonoBehaviour
             sdp = sdp
         };
         _logger.Log("Received answer..."); 
-        yield return peerConnection.SetRemoteDescription(ref desc);
+        var remoteDesc = peerConnection.SetRemoteDescription(ref desc);
+        yield return remoteDesc;
+        if (remoteDesc.IsError) {
+            _logger.LogError($"Failed to set remote description: {remoteDesc.Error.message}");
+        }
         _setupRemoteDescription = true;
         while (_pendingCandidates.TryDequeue(out var candidate)){
             peerConnection.AddIceCandidate(new RTCIceCandidate(candidate));
@@ -84,8 +89,8 @@ public class WebRTCVideoSender : MonoBehaviour
         {
             iceServers = new RTCIceServer[0],
             iceTransportPolicy = RTCIceTransportPolicy.All
-        };
-
+        }; 
+         
         peerConnection = new RTCPeerConnection(ref config) {
             OnConnectionStateChange = state => _logger.Log($"Connection state: {state}"),
             OnIceConnectionChange = state => _logger.Log($"ICE state: {state}"),
@@ -108,20 +113,48 @@ public class WebRTCVideoSender : MonoBehaviour
     }
 
     void CreateAndAddVideoTrack() {
-        if(_copiedCameraRT && _copiedCameraRT.IsCreated())
+        //SetupCodecs();
+        var codecs = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs;
+
+        if(codecs.Length == 0)
+            _logger.LogError("No video codecs available. Cannot create video track.");
+
+        // Log available codecs for debugging
+        foreach (var c in codecs)
+            _logger.Log($"Available codec: {c.mimeType}");
+
+        if (_copiedCameraRT && _copiedCameraRT.IsCreated())
             _copiedCameraRT.Release();
 
-        int width = 1920, height = 1080;
+        int width = 1280, height = 720;
         int depthValue = (int)RenderTextureDepth.Depth24;
         var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
         _copiedCameraRT = new RenderTexture(width, height, depthValue, format);
-        _copiedCameraRT.Create(); 
+        _copiedCameraRT.Create();
         videoTrack = new VideoStreamTrack(_copiedCameraRT, Graphics.Blit);
         peerConnection.AddTrack(videoTrack);
     }
     private void LateUpdate() {
         if(_copiedCameraRT && _copiedCameraRT.IsCreated())
             ScreenCapture.CaptureScreenshotIntoRenderTexture(_copiedCameraRT);
+    }
+
+    void SetupCodecs() {
+        var codecs = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs;
+
+        // Log available codecs for debugging
+        foreach (var c in codecs)
+            _logger.Log($"Available codec: {c.mimeType}");
+
+        var preferredCodecs = codecs.Where(c => c.mimeType == "video/H264").ToList();
+
+        if (preferredCodecs.Count == 0) {
+            _logger.Log("H264 not available, falling back to VP8");
+            preferredCodecs = codecs.Where(c => c.mimeType == "video/VP8").ToList();
+        }
+
+        RTCRtpTransceiver transceiver = peerConnection.AddTransceiver(TrackKind.Video);
+        transceiver.SetCodecPreferences(preferredCodecs.ToArray());
     }
 
     IEnumerator CreateAndSendOffer() { 
