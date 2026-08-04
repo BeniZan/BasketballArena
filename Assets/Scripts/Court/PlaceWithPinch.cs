@@ -40,12 +40,11 @@ public class PlaceWithPinch : MonoBehaviour {
         var pinchValue = _xrPlayer.RighPinchValue;  
         var isPinching = pinchValue >= PinchThreshold; 
 
-        var rayHit = _raycaster.TryGetCurrentARRaycastHit(out var arHit);
+        var rayHit = _raycaster.TryGetCurrent3DRaycastHit(out var arHit);
         _raycaster.GetLineOriginAndDirection(out var origin, out var direction);
 
-        var hitPoint = rayHit ? arHit.pose.position : origin + direction * 100f;
+        var hitPoint = rayHit ? arHit.point : origin + direction * 100f;
         UpdateRay(origin, direction, isPinching, rayHit, hitPoint);
-
         _preview.gameObject.SetActive(rayHit); 
         _preview.position = hitPoint;
         if (isPinching && rayHit) {
@@ -57,7 +56,7 @@ public class PlaceWithPinch : MonoBehaviour {
     } 
 
 
-    void UpdateRay(Vector3 origin, Vector3 dir, bool isPinch, bool rayHit, Vector3 hitPoint) { 
+    void UpdateRay(Vector3 origin, Vector3 dir, bool isPinch, bool rayHit, Vector3 hitPoint) {
         _lineRend.SetPosition(0, origin);
         var dest = rayHit ? hitPoint : origin + dir * 100f;
         _lineRend.SetPosition(1, dest);

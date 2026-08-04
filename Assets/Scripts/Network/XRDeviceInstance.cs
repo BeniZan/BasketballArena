@@ -14,6 +14,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     const float RetryConnectXRDelay = 5f;
     private static WaitForSeconds _waitForRetryConnectXR = new WaitForSeconds(RetryConnectXRDelay);
     static public bool ENABLE_SIMULATED_ROOM => Application.isEditor;
+    [SerializeField] GameObject _simulatedEnviorment;
 	[field: SerializeField] public XRHandDevice TrackedRightHand { get; private set; }
 	[field: SerializeField] public XRHandDevice TrackedLeftHand { get; private set; }
 	[field: SerializeField] public XRRayInteractor RightRay { get; private set; }
@@ -22,8 +23,8 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     [field: SerializeField] public XRHandTrackingEvents LeftTracking { get; private set; }
     [field: SerializeField] public XRHandTrackingEvents RightTracking { get; private set; }
     [ShowInInspector, ReadOnly] XRLoader CurrentLoader =>  XRGeneralSettings.Instance?.Manager?.activeLoader;
-    public float RighPinchValue => TrackedRightHand != null ? TrackedRightHand.pinchValue.ReadValue() : 0f;
-    public bool IsLeftTracked => LeftTracking.bindableHandIsTracked.Value;
+    public float RighPinchValue => (TrackedRightHand != null && TrackedRightHand.added) ? TrackedRightHand.pinchValue.ReadValue() : 0f;
+    public bool IsLeftTracked => LeftTracking.handIsTracked;
 
     CustomLogger _logger;
     bool _wasInit;
@@ -36,7 +37,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     void OnEnable() {
         if (!_wasInit)
             Init();
-      
+        _simulatedEnviorment.SetActive(Application.isEditor);
         LeftTracking.trackingChanged.AddListener(_ =>OnTrackingChanged());
         RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
 

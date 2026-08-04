@@ -28,16 +28,18 @@ public class NetDrillsActivator : NetworkBehaviour
         _allTeamManeuvers.RemoveDestroyed();
     }
 #endif
-    void Awake() {
+
+    private void Awake() {
         if (Instance) {
             Debug.LogError("Two " + nameof(NetDrillsActivator) + " exists");
             Destroy(this);
             return;
         }
         Instance = this;
+        _syncActiveManeuver.OnValueChanged -= OnSyncManeuverChange;
         _syncActiveManeuver.OnValueChanged += OnSyncManeuverChange;
         OnSyncManeuverChange(new FixedString512Bytes(), _syncActiveManeuver.Value);
-    }
+    } 
 
     void OnSyncManeuverChange(FixedString512Bytes _, FixedString512Bytes cur) {
         var name = cur.ToString();

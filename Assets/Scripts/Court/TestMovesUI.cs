@@ -10,7 +10,7 @@ using UnityEngine.XR.Hands.Gestures;
 
 public class TestMovesUI : MonoBehaviour {
     [SerializeField] Canvas _mainCanvas;
-    [SerializeField, Get] XRDeviceInstance _xrDevice;
+    [SerializeField, GetParent] XRDeviceInstance _xrDevice;
     [SerializeField] GameObject _debugCanvas;
     [SerializeField] Image _loadingImg;
     [SerializeField] TMPro.TMP_Dropdown _dropdown;

@@ -51,6 +51,7 @@ MonoBehaviour:
   _XRClientPrefab: {fileID: 0}
   LocalXRDevice: {fileID: 0}
   LocalCoachDevice: {fileID: 0}
+  <NetDiscovery>k__BackingField: {fileID: 1304400454408651257}
   _editorAutoSetupConfig: 1
 --- !u!114 &1304400454408651257
 MonoBehaviour:

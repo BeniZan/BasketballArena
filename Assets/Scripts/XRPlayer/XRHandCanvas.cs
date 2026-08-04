@@ -1,17 +1,22 @@
+using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.XR.Hands;
 
 public class XRHandCanvas : MonoBehaviour {
     [SerializeField] Canvas _canvas;
     [SerializeField] CanvasGroup _group;
     [SerializeField] Camera _cam;
-    [SerializeField] XRHandDevice _hand;
+    [SerializeField, GetParent] XRDeviceInstance _xrDevice;
     [SerializeField] float _smoothAlphaSpeed = 0.2f;
     [SerializeField] float _lookAtThreshold = 0.7f;
-    private void LateUpdate() {  
+    [SerializeField] bool _rightHand = false;
+    [SerializeField] Pose _pose;
+    XRHandTrackingEvents Track => _rightHand ? _xrDevice.RightTracking : _xrDevice.LeftTracking; 
+    private void LateUpdate() { 
+
         var lookAtDot = Vector3.Dot(_cam.transform.forward, transform.forward);
-        var enableCanvas = _hand.isTracked.isPressed && lookAtDot > _lookAtThreshold;
-        
+        var enableCanvas = Track.handIsTracked && lookAtDot > _lookAtThreshold;
 
         var deltaAlphaTime = Time.deltaTime / _smoothAlphaSpeed;
         if (!enableCanvas)

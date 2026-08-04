@@ -73,13 +73,13 @@ public class NetBoot : SingletonMono<NetBoot> {
     void SetupPlayerType(PlayerType player) => SetupPlayerType(player.HasFlag(PlayerType.XRPlayer), player.HasFlag(PlayerType.Coach));
     public void SetupPlayerType(bool isXR) => SetupPlayerType(isXR, !isXR);
     public void SetupPlayerType(bool isXR, bool isCoach) {
-        PlayerType type = 0;
+        PlayerType type = PlayerType.NotSetup;
         if (isXR)
             type |= PlayerType.XRPlayer;
         if (isCoach)
             type |= PlayerType.Coach;
          
-        _logger.Log($"setting up player type as: [{type}]");
+        _logger.Log($"setting up player type as: [{type.ToString()}]");
         _playerType = type;
         OnSetPlayerType(); 
     }
