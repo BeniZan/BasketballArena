@@ -1,13 +1,10 @@
-using Sirenix.OdinInspector;
-using System;
-using System.Collections;
-using System.Threading.Tasks;
-using Unity.Netcode;
+using Sirenix.OdinInspector; 
+using System.Collections; 
+using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR.Hands;
-using UnityEngine.XR.Hands.OpenXR;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.Hands; 
 using UnityEngine.XR.Management;
 
 public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstance> {
@@ -15,16 +12,38 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     private static WaitForSeconds _waitForRetryConnectXR = new WaitForSeconds(RetryConnectXRDelay);
     static public bool ENABLE_SIMULATED_ROOM => Application.isEditor;
     [SerializeField] GameObject _simulatedEnviorment;
-	[field: SerializeField] public XRHandDevice TrackedRightHand { get; private set; }
+    [field: SerializeField] public XROrigin Origin { get; private set; }
+    [field: SerializeField] public ARRaycastManager Raycaster { get; private set; }
+    [field: SerializeField] public XRHandDevice TrackedRightHand { get; private set; }
 	[field: SerializeField] public XRHandDevice TrackedLeftHand { get; private set; }
-	[field: SerializeField] public XRRayInteractor RightRay { get; private set; }
-	[field: SerializeField] public XRRayInteractor LeftRay { get; private set; }
     [field: SerializeField] public Transform CenterEyes { get; private set; }
     [field: SerializeField] public XRHandTrackingEvents LeftTracking { get; private set; }
     [field: SerializeField] public XRHandTrackingEvents RightTracking { get; private set; }
-    [ShowInInspector, ReadOnly] XRLoader CurrentLoader =>  XRGeneralSettings.Instance?.Manager?.activeLoader;
-    public float RighPinchValue => (TrackedRightHand != null && TrackedRightHand.added) ? TrackedRightHand.pinchValue.ReadValue() : 0f;
-    public bool IsLeftTracked => LeftTracking.handIsTracked;
+    [ShowInInspector] XRLoader CurrentLoader =>  XRGeneralSettings.Instance?.Manager?.activeLoader;
+    public bool IsLeftTracked => LeftTracking.handIsTracked; 
+    public bool TryGetRightPinchValues(out Vector3 pinchWorldPos, out Quaternion pinchWorldRot, out float pinchValue) {
+        pinchWorldPos = default;
+        pinchWorldRot = default;
+        pinchValue = default;
+
+        if (!Origin) {
+            Debug.LogError("No XR origin");
+            return false;
+        }
+
+        if (TrackedRightHand == null || !TrackedRightHand.added)
+            return false; 
+         
+        pinchValue = TrackedRightHand.pinchValue.ReadValue();
+        pinchWorldPos = TrackedRightHand.pinchPosition.ReadValue();
+        pinchWorldRot = TrackedRightHand.pinchRotation.ReadValue(); 
+         
+        pinchWorldPos = Origin.transform.TransformPoint(pinchWorldPos);
+        pinchWorldRot = Origin.transform.rotation * pinchWorldRot;
+
+        return true;
+    }
+
 
     CustomLogger _logger;
     bool _wasInit;
@@ -76,8 +95,8 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         _logger.Log("XR initialized successfully. Starting subsystems..."); 
         mnger.StartSubsystems(); 
     }
-    void OnDisable() {
-        StopXR();
+    void OnDisable() { 
+        StopXR(); 
     }
     void StopXR() {
         StopAllCoroutines();

@@ -27,6 +27,8 @@ public class NetBoot : SingletonMono<NetBoot> {
 
     CustomLogger _logger;
     public event Action<NetBoot> OnPlayerTypeChange;
+    const string NET_PLAY_SCENE = "PlayNetworkedScene";
+
 #if UNITY_EDITOR  
     [SerializeField] PlayerType _editorAutoSetupConfig = PlayerType.NotSetup; 
 #endif 
@@ -38,9 +40,9 @@ public class NetBoot : SingletonMono<NetBoot> {
             _logger.Log(this, "Multiple instances of NetBoot detected, destroying self duplicate");
             return;
         }
-        base.Awake();
-    } 
-
+        base.Awake(); 
+    }
+     
     private void Start() {
         _netMng.OnConnectionEvent += NetMng_OnConnectionEvent; 
         _netMng.OnServerStarted += NetMng_OnServerStarted;
@@ -56,11 +58,12 @@ public class NetBoot : SingletonMono<NetBoot> {
     }
 
     private void NetMng_OnServerStarted() {
-        _logger.Log("Server started"); 
+        _logger.Log("Server started");
     }
     private void NetMng_OnShutdown() {
-        _logger.Log("Server shutdown"); 
+        _logger.Log("Server shutdown");
     }
+
 #if UNITY_EDITOR
     void UnsetPlayerType() {
         _logger.Log("Unset player type");

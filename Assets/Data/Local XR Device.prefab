@@ -62,6 +62,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4497123764194379931}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &159148254854592792
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5295608837971072400}
+  m_Layer: 0
+  m_Name: Pinch Ray
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5295608837971072400
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159148254854592792}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 627944735504407175}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &269643636970056614
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,6 +757,7 @@ GameObject:
   - component: {fileID: 2965570115009785906}
   - component: {fileID: 2198651731365301681}
   - component: {fileID: 4079364108574925282}
+  - component: {fileID: 8874524310002811957}
   m_Layer: 0
   m_Name: Left Hand
   m_TagString: Untagged
@@ -762,13 +794,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 508963182090479398}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4a50d88b55b45648927679791f472de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_GroupName: 
-  m_InteractionManager: {fileID: 0}
+  m_InteractionManager: {fileID: 118851635660374947}
   m_StartingGroupMembers:
   - {fileID: 697214378888688337}
   - {fileID: 1532344195182985286}
@@ -1011,6 +1043,35 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &8874524310002811957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508963182090479398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5b9cf54c47f40ee9c3eb30ea8eb89b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Hands::UnityEngine.XR.Hands.XRHandTrackingEvents
+  m_Handedness: 1
+  m_UpdateType: 1
+  m_PoseUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JointsUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingAcquired:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingLost:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &566709013148602941
 GameObject:
   m_ObjectHideFlags: 0
@@ -3459,7 +3520,8 @@ GameObject:
   - component: {fileID: 6345435547691427319}
   - component: {fileID: 8467049473058267003}
   - component: {fileID: 118851635660374947}
-  - component: {fileID: 1694700840951836870}
+  - component: {fileID: 4252292954905669467}
+  - component: {fileID: 2239373057041117329}
   m_Layer: 0
   m_Name: Local XR Device
   m_TagString: Untagged
@@ -3498,8 +3560,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::XRDevice
   _simulatedEnviorment: {fileID: 7233190935812968499}
-  <RightRay>k__BackingField: {fileID: 0}
-  <LeftRay>k__BackingField: {fileID: 0}
+  <Origin>k__BackingField: {fileID: 0}
+  <Raycaster>k__BackingField: {fileID: 2239373057041117329}
   <CenterEyes>k__BackingField: {fileID: 6214328651488995076}
   <LeftTracking>k__BackingField: {fileID: 8467049473058267003}
   <RightTracking>k__BackingField: {fileID: 6345435547691427319}
@@ -3575,7 +3637,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.XRInteractionManager
   m_StartingHoverFilters: []
   m_StartingSelectFilters: []
---- !u!114 &1694700840951836870
+--- !u!114 &4252292954905669467
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3584,12 +3646,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 2122369787266574141}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3859a92a05d4f5d418cb6ca605290e74, type: 3}
+  m_Script: {fileID: 11500000, guid: e0cb9aa70a22847b5925ee5f067c10a9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.XR.ARFoundation::UnityEngine.XR.ARFoundation.ARSession
-  m_AttemptUpdate: 1
-  m_MatchFrameRate: 1
-  m_TrackingMode: 2
+  m_EditorClassIdentifier: Unity.XR.CoreUtils::Unity.XR.CoreUtils.XROrigin
+  m_Camera: {fileID: 0}
+  m_OriginBaseGameObject: {fileID: 2122369787266574141}
+  m_CameraFloorOffsetObject: {fileID: 0}
+  m_RequestedTrackingOriginMode: 0
+  m_CameraYOffset: 1.1176
+--- !u!114 &2239373057041117329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122369787266574141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa17d122634046b4a8e23048891fafc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.ARFoundation::UnityEngine.XR.ARFoundation.ARRaycastManager
+  <trackablesChanged>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
+  m_RaycastPrefab: {fileID: 0}
 --- !u!1 &2126215136783021448
 GameObject:
   m_ObjectHideFlags: 0
@@ -6893,7 +6973,7 @@ MonoBehaviour:
   m_UICanvas: {fileID: 0}
   m_UIMirrorComponent: {fileID: 0}
   m_LayerOutline: {fileID: 7728179409598570653}
-  m_Order: -1
+  m_Order: 4
   m_LayerData:
     rid: 8683212824386470146
   m_PlatformLayerDataKeys: []
@@ -6975,7 +7055,7 @@ MonoBehaviour:
   m_Camera: {fileID: 6214328651488995073}
   m_OriginBaseGameObject: {fileID: 4749851103948242523}
   m_CameraFloorOffsetObject: {fileID: 6214328651278187300}
-  m_RequestedTrackingOriginMode: 1
+  m_RequestedTrackingOriginMode: 2
   m_CameraYOffset: 0.9
 --- !u!114 &882987582761345529
 MonoBehaviour:
@@ -7911,6 +7991,7 @@ GameObject:
   - component: {fileID: 3016006082011511345}
   - component: {fileID: 5431001455094251022}
   - component: {fileID: 7288653222807703765}
+  - component: {fileID: 8631497803974118359}
   m_Layer: 0
   m_Name: Right Hand
   m_TagString: Untagged
@@ -7935,6 +8016,7 @@ Transform:
   - {fileID: 1850932148704055772}
   - {fileID: 3469294672739801174}
   - {fileID: 8792327138894060549}
+  - {fileID: 5295608837971072400}
   - {fileID: 2075680940206096282}
   - {fileID: 9020001549706268645}
   - {fileID: 4985991116072458272}
@@ -8196,6 +8278,35 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &8631497803974118359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5178583887082115051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5b9cf54c47f40ee9c3eb30ea8eb89b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Hands::UnityEngine.XR.Hands.XRHandTrackingEvents
+  m_Handedness: 2
+  m_UpdateType: 1
+  m_PoseUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JointsUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingAcquired:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingLost:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5213717415269228600
 GameObject:
   m_ObjectHideFlags: 0
@@ -9674,7 +9785,7 @@ GameObject:
   - component: {fileID: 3864109346412272705}
   - component: {fileID: 273961169544190373}
   m_Layer: 0
-  m_Name: Main Camera
+  m_Name: XR Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10017,37 +10128,6 @@ MonoBehaviour:
   m_RightControllerTransform: {fileID: 0}
   m_LeftHandMovementDirection: 0
   m_RightHandMovementDirection: 0
---- !u!1 &6314564990022524923
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8874746278594787794}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8874746278594787794
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6314564990022524923}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8792327138894060549}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6418035405017169578
 GameObject:
   m_ObjectHideFlags: 0
@@ -10206,7 +10286,7 @@ MonoBehaviour:
   MinPinchForLine: 0.2
   PinchThreshold: 0.7
   _editorAutoCalibrate: 0
-  _centerCam: {fileID: 0}
+  _centerCam: {fileID: 6214328651488995073}
 --- !u!1 &6578085585197428543
 GameObject:
   m_ObjectHideFlags: 0
@@ -10401,7 +10481,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2075680940206096282
 Transform:
   m_ObjectHideFlags: 0
@@ -13127,8 +13207,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8874746278594787794}
+  m_Children: []
   m_Father: {fileID: 627944735504407175}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8615281032983936524
@@ -14489,7 +14568,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8484883169960310511
 Transform:
   m_ObjectHideFlags: 0
@@ -14764,6 +14843,14 @@ PrefabInstance:
     - target: {fileID: 7576867131100388943, guid: 795d83f737bcb35438738e78042f4cfe, type: 3}
       propertyPath: m_Name
       value: Simulation Environment
+      objectReference: {fileID: 0}
+    - target: {fileID: 7618165371811446966, guid: 795d83f737bcb35438738e78042f4cfe, type: 3}
+      propertyPath: m_CameraStartingPose.position.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7618165371811446966, guid: 795d83f737bcb35438738e78042f4cfe, type: 3}
+      propertyPath: m_CameraStartingPose.position.y
+      value: 0.57
       objectReference: {fileID: 0}
     - target: {fileID: 7618165371811446966, guid: 795d83f737bcb35438738e78042f4cfe, type: 3}
       propertyPath: m_CameraMovementBounds.m_Extent.x
@@ -15326,8 +15413,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8041348912376204090, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000022888184
+      value: -0.000020980835
       objectReference: {fileID: 0}
+    - target: {fileID: 9206592606451533056, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
+      propertyPath: _cam
+      value: 
+      objectReference: {fileID: 6214328651488995073}
     - target: {fileID: 9206592606451533056, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
       propertyPath: _calibration
       value: 
@@ -15337,6 +15428,7 @@ PrefabInstance:
     - {fileID: 1293907039222887384, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
     - {fileID: 5673581526701694334, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
     - {fileID: 5107365304412505880, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
+    - {fileID: 5279571427016047501, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1754919447669467695, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
     m_AddedGameObjects: []
@@ -15344,34 +15436,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1628025321785915348, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8468386552103439210}
-    - targetCorrespondingSourceObject: {fileID: 384493648784790649, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6782581851518590196}
   m_SourcePrefab: {fileID: 100100000, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
---- !u!1 &5428819872074687974 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 384493648784790649, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}
-  m_PrefabInstance: {fileID: 5621323594247303583}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6782581851518590196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5428819872074687974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7951c64acb0fa62458bf30a60089fe2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.UI.TrackedDeviceGraphicRaycaster
-  m_IgnoreReversedGraphics: 0
-  m_CheckFor2DOcclusion: 0
-  m_CheckFor3DOcclusion: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 3221225535
-  m_RaycastTriggerInteraction: 1
 --- !u!1 &6383039250555864651 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1628025321785915348, guid: e9c96ba27c34ba342be527989c2dc106, type: 3}

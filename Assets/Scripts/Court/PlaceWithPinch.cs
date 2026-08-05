@@ -4,6 +4,8 @@ using UnityEngine;
 using Unity.XR;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.AR;
+using System.Collections.Generic;
+using UnityEngine.XR.ARFoundation;
 
 public class PlaceWithPinch : MonoBehaviour {
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
@@ -13,17 +15,20 @@ public class PlaceWithPinch : MonoBehaviour {
     public string Description;
     public float PinchThreshold = 0.7f;
     public event Action OnPlaced;   
-    [NonSerialized, ShowInInspector] public bool WasPlaced;
-    XRRayInteractor _raycaster => _xrPlayer.RightRay;
+    [NonSerialized, ShowInInspector] public bool WasPlaced; 
     public Transform PreviewObj => _preview;
     public Transform PlacedObj => _placeObj; 
     public Vector3 PreviewOrPlacedPosition => WasPlaced ? _placeObj.position : _preview.position;
+    CustomLogger _logger;
     public bool IsPlacing {
         get => isActiveAndEnabled;
         set {
             enabled = value;
             OnIsPlacing(value);
         }
+    }
+    private void Awake() {
+        _logger = new(this, Color.blueViolet);
     }
 
     private void OnEnable()  => OnIsPlacing(true); 
@@ -34,35 +39,64 @@ public class PlaceWithPinch : MonoBehaviour {
         _lineRend.enabled = enable;
         _preview.gameObject.SetActive(enable);
     }
+    List<ARRaycastHit> _hits = new List<ARRaycastHit>();
+    void TryRaycast(out Ray? ray, out ARRaycastHit? hit, out bool isPinching) {
+        hit = null;
+        ray = default;
+        var pinchReady =
+            _xrPlayer.TryGetRightPinchValues(out var pinchWorldPos, out var pinchWorldRot, out var pinchValue);
+        isPinching = pinchValue >= PinchThreshold;
+        if (!pinchReady) {
+            _logger.Log($"Pinch not ready ({pinchValue})"); 
+            return;
+        }
 
+        ray = new Ray(pinchWorldPos, pinchWorldRot * Vector3.forward);
+        _hits.Clear();
+        var rayHit = _xrPlayer.Raycaster.Raycast(ray.Value, _hits, UnityEngine.XR.ARSubsystems.TrackableType.AllTypes);
 
-    private void Update() { 
-        var pinchValue = _xrPlayer.RighPinchValue;  
-        var isPinching = pinchValue >= PinchThreshold; 
+        if(_hits.Count == 0) {
+            _logger.Log("Raycast hit nothing");
+        } 
 
-        var rayHit = _raycaster.TryGetCurrent3DRaycastHit(out var arHit);
-        _raycaster.GetLineOriginAndDirection(out var origin, out var direction);
+        foreach (var h in _hits) {
+            _logger.Log($"Raycast hit: {h.trackableId} at {h.pose.position}");
+        }
 
-        var hitPoint = rayHit ? arHit.point : origin + direction * 100f;
-        UpdateRay(origin, direction, isPinching, rayHit, hitPoint);
-        _preview.gameObject.SetActive(rayHit); 
-        _preview.position = hitPoint;
+        if (rayHit && _hits.ValidIndex(0))
+            hit = _hits[0];
+
+        return;
+    }
+
+    private void Update() {  
+        TryRaycast(out var ray, out var arHit, out var isPinching);
+        var rayHit = ray.HasValue && arHit.HasValue;
+        UpdateRay(ray, isPinching, arHit);
+        _preview.gameObject.SetActive(rayHit);
+        if (rayHit)
+            _preview.position = arHit.Value.pose.position;
         if (isPinching && rayHit) {
             _placeObj.gameObject.SetActive(true); 
-            _placeObj.transform.position = hitPoint;
+            _placeObj.transform.position = _preview.position;
             WasPlaced = true;
             OnPlaced?.Invoke();
         } 
     } 
 
 
-    void UpdateRay(Vector3 origin, Vector3 dir, bool isPinch, bool rayHit, Vector3 hitPoint) {
+    void UpdateRay(Ray? ray, bool isPinch, ARRaycastHit? hit) {
+        _lineRend.enabled = ray.HasValue;
+        if (!ray.HasValue) {
+            return;
+        }
+        var hitPoint = hit.HasValue ? hit.Value.pose.position : ray.Value.GetPoint(100f);   
+        var origin = ray.Value.origin;
         _lineRend.SetPosition(0, origin);
-        var dest = rayHit ? hitPoint : origin + dir * 100f;
-        _lineRend.SetPosition(1, dest);
-        var color = rayHit ?
+        _lineRend.SetPosition(1, hitPoint);
+        var color = hit.HasValue ?
             (isPinch ? Color.green : Color.blue) :
-            Color.red;
+            (isPinch ? Color.orange : Color.red);
         _lineRend.startColor = color;
         _lineRend.endColor = color;
     }
