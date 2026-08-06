@@ -10,12 +10,11 @@ using UnityEngine;
 using UnityEngine.UIElements;
  
 public class DrillActivator : SingletonMono<DrillActivator> { 
-    [SerializeField] CharComponent _templateChar; 
-    [SerializeField] Transform _courtTf;
-    [SerializeField] SurfaceHandler _courtSurface;
+    [SerializeField] CharComponent _templateChar;  
     [SerializeField] NetDrillsActivator _manager;
     [SerializeField, ReadOnly] List<CharComponent> _spawnedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
+    Transform _courtTf;
     public event Action OnDrillChange;
     public IReadOnlyList<CharComponent> PlacedChars => _spawnedChars;
     protected override void Awake() {
@@ -35,9 +34,17 @@ public class DrillActivator : SingletonMono<DrillActivator> {
         if (!_currentActive)
             return;
 
+        var calib = Calibration.Instance;
+        if (!calib)
+            Debug.LogError("Calibration instance is null. Make sure Calibration script is present in the scene.");
+
         var pos = _currentActive.OriginPoint;
         var rot = Quaternion.Euler(0f, _currentActive.OriginYRotation, 0f);
-        _courtSurface.ParentAndPlace(_courtTf);
+
+        if (!_courtTf) 
+            _courtTf = new GameObject("CourtSurface").transform;
+
+        calib.CourtSurface.ParentAndPlace(_courtTf);
         _courtTf.SetLocalPositionAndRotation(pos, rot);
 
         int i = 0;

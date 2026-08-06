@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
-public class Calibration : MonoBehaviour {
+public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
     public enum Step { NotCalibrated = -1, 
         CalibratingCenter, CalibratingCenterCorner, CalibratingBasketCorner,
         Calibrated 
@@ -20,6 +20,7 @@ public class Calibration : MonoBehaviour {
     [SerializeField] LineRenderer _pinchLine;
     [SerializeField] SurfaceHandler _courtSurface, _courtSurfacePreview;
     [SerializeField] LineRenderer _inBetweenPlacersLine;
+    public SurfaceHandler CourtSurface => _courtSurface;
     public float MinPinchForLine = 0.2f, PinchThreshold = 0.85f;
     Awaitable _calibrationAwait;
     CustomLogger _logger; 
@@ -44,10 +45,12 @@ public class Calibration : MonoBehaviour {
             return null;
         }
     }
-    private async Awaitable Awake() {  
+    protected override void Awake() {
+        base.Awake();
         _logger = new CustomLogger(this, Color.green);  
-        await (_calibrationAwait = BeginCalibration());
-    }
+        _calibrationAwait = BeginCalibration();
+    } 
+
 #if UNITY_EDITOR
     [SerializeField, BoxGroup("Auto Calibrate")] bool _editorAutoCalibrate;
     [SerializeField, BoxGroup("Auto Calibrate")] Camera _centerCam;
@@ -58,12 +61,18 @@ public class Calibration : MonoBehaviour {
         await Awaitable.EndOfFrameAsync();
         await Awaitable.NextFrameAsync();
         await Awaitable.EndOfFrameAsync();
+        AutoCalibration();
+    }
+
+    [Button("Auto Calibrate"), HideInEditorMode]
+    void AutoCalibration() {
 
         var playerPos = _centerCam.transform.position - (Vector3.up * 1.2f);
-        var surface = CreateSurface(playerPos, playerPos + Vector3.forward * 2, playerPos + Vector3.right * 2);
+        var surface = CreateSurface(playerPos, playerPos + Vector3.forward * 10, playerPos + Vector3.right * 7);
         _courtSurface.SetSurface(surface);
         SetState(Step.Calibrated);
     }
+
 #endif
 
     void SetState(Step step) {
@@ -129,7 +138,7 @@ public class Calibration : MonoBehaviour {
             var surface = 
                 CreateSurface(_tempLine[0], _tempLine[1], _tempLine[2]);
             var topCorner =
-                surface.Center + (surface.Rotation * surface.Size.XZToXYZ() / 2f);
+                surface.Center + (surface.Rotation * surface.SizeXZ.XZToXYZ() / 2f);
             _tempLine[2] = topCorner;
         }
 
@@ -178,7 +187,7 @@ public class Calibration : MonoBehaviour {
 
         return new SurfaceData {
             Center = center,
-            Size = new Vector2(width, length),
+            SizeXZ = new Vector2(width, length),
             Forward = forward,
             Rotation = Quaternion.LookRotation(forward, Vector3.up)
         };

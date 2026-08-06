@@ -27,7 +27,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         pinchValue = default;
 
         if (!Origin) {
-            Debug.LogError("No XR origin");
+            Debug.LogError("No XR origin" ,this);
             return false;
         }
 
@@ -103,9 +103,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         var mnger = XRGeneralSettings.Instance.Manager;
         if (mnger && mnger.isInitializationComplete) {
             _logger.Log("Stopping XR Subsystems...");
-             
-            mnger.StopSubsystems();
-             
+
             mnger.DeinitializeLoader();
         }
         _logger.Log("XR shutdown complete.");
