@@ -1253,7 +1253,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1693731098365834125}
   - component: {fileID: 1832417360604335958}
-  - component: {fileID: 8018852037639535061}
   - component: {fileID: 9025398183060776681}
   - component: {fileID: 8653468846999397743}
   - component: {fileID: 6769826982903844600}
@@ -1312,23 +1311,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &8018852037639535061
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9087176255014856928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 2147483711
 --- !u!114 &9025398183060776681
 MonoBehaviour:
   m_ObjectHideFlags: 0

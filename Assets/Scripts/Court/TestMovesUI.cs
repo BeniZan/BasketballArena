@@ -1,12 +1,14 @@
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.Collections.Generic; 
 using Sirenix.OdinInspector;
+using System.Collections.Generic; 
+using System.Linq;
+using TMPro;
 using Unity.XR;
+using UnityEngine;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.UI;
+using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.Gestures;
+using UnityEngine.XR.Hands.Samples.GestureSample;
 
 public class TestMovesUI : MonoBehaviour {
     [SerializeField] Canvas _mainCanvas;
@@ -18,10 +20,9 @@ public class TestMovesUI : MonoBehaviour {
     [SerializeField] Calibration _calib;
     [SerializeField] Button _play, _pause, _restart;
     [SerializeField] RealTimer _timeHandShapeActive = new(3f);
-    [SerializeField] Camera _centerEye;
+    bool _poseDetected;
+    bool _poseDetectionApplied;
     CustomLogger _logger;
-    bool _wasToggled;
-    bool _wasShapeActive; 
     void Start() {
         _logger = new CustomLogger(this, Color.green);
         if (Debug.isDebugBuild) {
@@ -46,6 +47,26 @@ public class TestMovesUI : MonoBehaviour {
 
     private void OnEnable() {
         SetDropdownValue();
+        _poseDetected = false;
+        _xrDevice.LeftTracking.jointsUpdated.AddListener(OnJointsUpdated);
+    }
+
+    private void OnDisable() {
+        _poseDetected = false;
+        _xrDevice.LeftTracking.jointsUpdated.RemoveListener(OnJointsUpdated);
+    }
+
+    void OnJointsUpdated(XRHandJointsUpdatedEventArgs update) {
+        var detected = _handShape.CheckConditions(update);
+        if (detected != _poseDetected)
+            OnPoseDetection(detected);
+    }
+
+    void OnPoseDetection(bool detected) {
+        _poseDetected = detected;
+        if (detected)
+            _timeHandShapeActive.Restart();
+
     }
 
     void OnDropdown(int i) {
@@ -66,37 +87,34 @@ public class TestMovesUI : MonoBehaviour {
 
     private void LateUpdate() {
         _mainCanvas.enabled = _xrDevice.IsLeftTracked;
-        /*
-        if (_handShape.Active && _wasToggled) {
+        UpdatePoseDetectionAppliance();
+    } 
+
+    void UpdatePoseDetectionAppliance() {
+        if (_poseDetectionApplied) {
+            _loadingImg.gameObject.SetActive(false);
             return;
         }
 
-        if (!_handShape.Active)
-            _wasToggled = false;
-
-        if (_wasShapeActive != _handShape.Active) {
-            _wasShapeActive = _handShape.Active;
-            _timeHandShapeActive.Restart();
-        }
-
-        if (_handShape.Active && _timeHandShapeActive.TimerOver) {
+        if (_poseDetected && _timeHandShapeActive.TimerOver) {
             ToggleCoachHostState();
-            return;
         }
 
-        if (_handShape.Active) {
+        if (_poseDetected) {
             _logger.Log("Thumbs up for: " + _timeHandShapeActive.TimeRunning.ToString2Digits());
         }
 
         const float headStart = 0.15f;
-        _loadingImg.gameObject.SetActive(_handShape.Active && _timeHandShapeActive.TimeRunning > headStart);
-        _loadingImg.fillAmount = _timeHandShapeActive.NormalizedTime;
-        */
-    } 
+        var enableLoading = _poseDetected &&
+                                 _timeHandShapeActive.TimeRunning > headStart;
+        _loadingImg.gameObject.SetActive(enableLoading);
+        if (enableLoading)
+            _loadingImg.fillAmount = _timeHandShapeActive.NormalizedTime;
+    }
 
     [Button, HideInEditorMode]
     void ToggleCoachHostState() {
-        _wasToggled = true;
+        _poseDetectionApplied = true;
         _loadingImg.gameObject.SetActive(false);
         _timeHandShapeActive.Restart();
         NetBoot.Instance.SetupPlayerType(true, !NetBoot.Instance.IsCoach);

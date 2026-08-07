@@ -290,6 +290,9 @@ public class NetDiscovery : MonoBehaviour {
         }
 
         bool TrySetup(bool isXR, bool isCoach) {
+            if (_netMng.ShutdownInProgress)
+                return false;
+
             if (isXR && isCoach)
                 return _netMng.StartHost();
             if (isCoach)

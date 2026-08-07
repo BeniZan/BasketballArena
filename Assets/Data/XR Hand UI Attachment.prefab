@@ -10,10 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7838668198413127444}
   - component: {fileID: 7072852251955753935}
-  - component: {fileID: 1441560033654179148}
   - component: {fileID: 913315353673441599}
   - component: {fileID: 2513119706470532917}
-  - component: {fileID: 7750729576243986067}
+  - component: {fileID: 2571961210263051116}
   m_Layer: 3
   m_Name: Test Moves GUI
   m_TagString: Untagged
@@ -65,23 +64,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &1441560033654179148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 384493648784790649}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 2147483711
 --- !u!114 &913315353673441599
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,7 +89,6 @@ MonoBehaviour:
   _timeHandShapeActive:
     UseInconsistentFrameTime: 1
     MaxTime: 3
-  _centerEye: {fileID: 0}
 --- !u!222 &2513119706470532917
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -116,7 +97,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 384493648784790649}
   m_CullTransparentMesh: 1
---- !u!114 &7750729576243986067
+--- !u!114 &2571961210263051116
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,20 +106,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 384493648784790649}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Script: {fileID: 11500000, guid: 7951c64acb0fa62458bf30a60089fe2d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
-  m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
-  m_PhysicalUnit: 3
-  m_FallbackScreenDPI: 96
-  m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.UI.TrackedDeviceGraphicRaycaster
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 3221225791
+  m_RaycastTriggerInteraction: 1
 --- !u!1 &517121537173771030
 GameObject:
   m_ObjectHideFlags: 0
@@ -2589,7 +2566,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0010166168}
+  m_AnchoredPosition: {x: 0, y: 0.000024795532}
   m_SizeDelta: {x: 0, y: 28}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &6867813808747083106
