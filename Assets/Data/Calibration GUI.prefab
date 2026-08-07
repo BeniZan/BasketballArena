@@ -1255,7 +1255,9 @@ GameObject:
   - component: {fileID: 1832417360604335958}
   - component: {fileID: 8018852037639535061}
   - component: {fileID: 9025398183060776681}
-  - component: {fileID: 3329242289094563335}
+  - component: {fileID: 8653468846999397743}
+  - component: {fileID: 6769826982903844600}
+  - component: {fileID: 9103270273585550862}
   m_Layer: 3
   m_Name: Calibration GUI
   m_TagString: Untagged
@@ -1270,7 +1272,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9087176255014856928}
-  m_LocalRotation: {x: -0, y: -0.262947, z: -0, w: 0.9648103}
+  m_LocalRotation: {x: 0, y: -0.262947, z: 0, w: 0.9648103}
   m_LocalPosition: {x: 0, y: 0, z: 0.49999973}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1347,9 +1349,16 @@ MonoBehaviour:
   _next: {fileID: 7763726514128740344}
   _previous: {fileID: 7332312701643905771}
   _cam: {fileID: 0}
-  _hand: {fileID: 0}
   _canvas: {fileID: 1832417360604335958}
---- !u!114 &3329242289094563335
+--- !u!222 &8653468846999397743
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9087176255014856928}
+  m_CullTransparentMesh: 1
+--- !u!114 &6769826982903844600
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1358,12 +1367,43 @@ MonoBehaviour:
   m_GameObject: {fileID: 9087176255014856928}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1098f30a8bf9bb742b8d5d3919970353, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::XRHandCanvas
-  _canvas: {fileID: 1832417360604335958}
-  _group: {fileID: 0}
-  _cam: {fileID: 0}
-  _hand: {fileID: 0}
-  _smoothAlphaSpeed: 0.2
-  _lookAtThreshold: 0.7
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &9103270273585550862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9087176255014856928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7951c64acb0fa62458bf30a60089fe2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.UI.TrackedDeviceGraphicRaycaster
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 3221225791
+  m_RaycastTriggerInteraction: 1

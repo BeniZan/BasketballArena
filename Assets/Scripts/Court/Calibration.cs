@@ -53,7 +53,6 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
 
 #if UNITY_EDITOR
     [SerializeField, BoxGroup("Auto Calibrate")] bool _editorAutoCalibrate;
-    [SerializeField, BoxGroup("Auto Calibrate")] Camera _centerCam;
     private async Awaitable Start() {
         if (!_editorAutoCalibrate)
             return;
@@ -66,8 +65,7 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
 
     [Button("Auto Calibrate"), HideInEditorMode]
     void AutoCalibration() {
-
-        var playerPos = _centerCam.transform.position - (Vector3.up * 1.2f);
+        var playerPos = _xrPlayer.HeadCam.transform.position - (Vector3.up * 1.2f);
         var surface = CreateSurface(playerPos, playerPos + Vector3.forward * 10, playerPos + Vector3.right * 7);
         _courtSurface.SetSurface(surface);
         SetState(Step.Calibrated);

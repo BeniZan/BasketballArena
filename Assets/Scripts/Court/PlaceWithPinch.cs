@@ -1,11 +1,12 @@
 using Sirenix.OdinInspector;
 using System;
-using UnityEngine;
-using Unity.XR;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
-using UnityEngine.XR.Interaction.Toolkit.AR;
 using System.Collections.Generic;
+using Unity.XR;
+using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.Interaction.Toolkit.AR;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using static UnityEngine.XR.OpenXR.Features.Interactions.PalmPoseInteraction;
 
 public class PlaceWithPinch : MonoBehaviour {
     [SerializeField, GetParent] XRDeviceInstance _xrPlayer;
@@ -40,27 +41,36 @@ public class PlaceWithPinch : MonoBehaviour {
         _preview.gameObject.SetActive(enable);
     }
     List<ARRaycastHit> _hits = new List<ARRaycastHit>();
+    [SerializeField] Transform _aimPose;
+    bool _logRayHits;
+    bool _logPinch = false;
     void TryRaycast(out Ray? ray, out ARRaycastHit? hit, out bool isPinching) {
         hit = null;
         ray = default;
         var pinchReady =
-            _xrPlayer.TryGetRightPinchValues(out var pinchWorldPos, out var pinchWorldRot, out var pinchValue);
+            _xrPlayer.TryGetRightPinchValues(out var pinchValue);
         isPinching = pinchValue >= PinchThreshold;
         if (!pinchReady) {
-            _logger.Log($"Pinch not ready ({pinchValue})"); 
+            if(_logPinch)
+                _logger.Log($"Pinch not ready ({pinchValue})"); 
             return;
         }
+        if (_logPinch)
+            _logger.Log($"Pinching ({pinchValue})");
 
-        ray = new Ray(pinchWorldPos, pinchWorldRot * Vector3.forward);
+        //ray = new Ray(pinchWorldPos, pinchWorldRot * Vector3.forward); 
+        ray = new Ray(_aimPose.position, _aimPose.forward);
         _hits.Clear();
         var rayHit = _xrPlayer.Raycaster.Raycast(ray.Value, _hits, UnityEngine.XR.ARSubsystems.TrackableType.AllTypes);
 
-        if(_hits.Count == 0) {
-            _logger.Log("Raycast hit nothing");
-        } 
+        if (_logRayHits) {
+            if (_hits.Count == 0) {
+                _logger.Log("Raycast hit nothing");
+            }
 
-        foreach (var h in _hits) {
-            _logger.Log($"Raycast hit: {h.trackableId} at {h.pose.position}");
+            foreach (var h in _hits) {
+                _logger.Log($"Raycast hit: {h.trackableId} at {h.pose.position}");
+            }
         }
 
         if (rayHit && _hits.ValidIndex(0))

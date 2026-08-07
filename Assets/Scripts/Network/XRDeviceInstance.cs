@@ -1,10 +1,13 @@
 using Sirenix.OdinInspector; 
-using System.Collections; 
+using System.Collections;
+using System.Collections.Generic;
 using Unity.XR.CoreUtils;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.Hands; 
+using UnityEngine.XR.Hands;
+using UnityEngine.XR.Hands.Gestures;
 using UnityEngine.XR.Management;
 
 public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstance> {
@@ -13,6 +16,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     static public bool ENABLE_SIMULATED_ROOM => Application.isEditor;
     [SerializeField] GameObject _simulatedEnviorment;
     [field: SerializeField] public XROrigin Origin { get; private set; }
+    [field: SerializeField] public Camera HeadCam { get; private set; }
     [field: SerializeField] public ARRaycastManager Raycaster { get; private set; }
     [field: SerializeField] public XRHandDevice TrackedRightHand { get; private set; }
 	[field: SerializeField] public XRHandDevice TrackedLeftHand { get; private set; }
@@ -20,47 +24,48 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     [field: SerializeField] public XRHandTrackingEvents LeftTracking { get; private set; }
     [field: SerializeField] public XRHandTrackingEvents RightTracking { get; private set; }
     [ShowInInspector] XRLoader CurrentLoader =>  XRGeneralSettings.Instance?.Manager?.activeLoader;
-    public bool IsLeftTracked => LeftTracking.handIsTracked; 
-    public bool TryGetRightPinchValues(out Vector3 pinchWorldPos, out Quaternion pinchWorldRot, out float pinchValue) {
-        pinchWorldPos = default;
-        pinchWorldRot = default;
-        pinchValue = default;
+    public bool IsLeftTracked => LeftTracking.handIsTracked;
 
-        if (!Origin) {
-            Debug.LogError("No XR origin" ,this);
+    readonly List<XRHandSubsystem> _reuseSubsystems = new();
+
+    bool TryGetHandSubsystem(out XRHandSubsystem xrHandSubSys) {
+        if (_reuseSubsystems.Count > 0) {
+            xrHandSubSys = _reuseSubsystems[0];
+            return true;
+        } 
+        SubsystemManager.GetSubsystems(_reuseSubsystems);
+        xrHandSubSys = _reuseSubsystems.Count > 0 ? _reuseSubsystems[0] : null;
+        return xrHandSubSys != null;
+    }
+
+    public bool TryGetRightPinchValues(out float pinchValue) { 
+        pinchValue = default;
+        if (!TryGetHandSubsystem(out var xrHandSubSys)) {
+            _logger.LogError("No XR hand subsystem found. Ensure XR is properly configured in Project Settings.");
             return false;
         }
-
-        if (TrackedRightHand == null || !TrackedRightHand.added)
-            return false; 
+        if (!Origin) {
+            _logger.LogError("No XR origin");
+            return false;
+        }
          
-        pinchValue = TrackedRightHand.pinchValue.ReadValue();
-        pinchWorldPos = TrackedRightHand.pinchPosition.ReadValue();
-        pinchWorldRot = TrackedRightHand.pinchRotation.ReadValue(); 
-         
-        pinchWorldPos = Origin.transform.TransformPoint(pinchWorldPos);
-        pinchWorldRot = Origin.transform.rotation * pinchWorldRot;
-
+        var idx = 
+            xrHandSubSys.rightHand.CalculateFingerShape(XRHandFingerID.Index,  XRFingerShapeTypes.Pinch);
+        idx.TryGetPinch(out pinchValue);
         return true;
     }
 
 
     CustomLogger _logger;
-    bool _wasInit;
-     
-    void Init() {
-        _wasInit = true;
-        _logger = new CustomLogger(this, Color.green); 
-    }
-
-    void OnEnable() {
-        if (!_wasInit)
-            Init();
-        _simulatedEnviorment.SetActive(Application.isEditor);
-        LeftTracking.trackingChanged.AddListener(_ =>OnTrackingChanged());
-        RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
-
-        StartXR(); 
+    protected override void Awake() {
+        base.Awake();
+        if (IsInstance) {
+            _logger = new CustomLogger(this, Color.green);
+            StartXR();
+            _simulatedEnviorment.SetActive(Application.isEditor);
+            LeftTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
+            RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
+        }
     } 
 
     void OnTrackingChanged() { 
@@ -76,7 +81,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     IEnumerator StartXRCoroutine() {
         _logger.Log("Initializing XR...");
 
-        var mnger = XRGeneralSettings.Instance.Manager;
+        var mnger = XRGeneralSettings.Instance.Manager; 
         if (!mnger) {
             _logger.LogError("XR Manager not found. Ensure XR is properly configured in Project Settings.");
             yield break;
@@ -94,18 +99,5 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         }
         _logger.Log("XR initialized successfully. Starting subsystems..."); 
         mnger.StartSubsystems(); 
-    }
-    void OnDisable() { 
-        StopXR(); 
-    }
-    void StopXR() {
-        StopAllCoroutines();
-        var mnger = XRGeneralSettings.Instance.Manager;
-        if (mnger && mnger.isInitializationComplete) {
-            _logger.Log("Stopping XR Subsystems...");
-
-            mnger.DeinitializeLoader();
-        }
-        _logger.Log("XR shutdown complete.");
-    }
+    } 
 }

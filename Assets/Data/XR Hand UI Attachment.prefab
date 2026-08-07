@@ -712,6 +712,7 @@ GameObject:
   - component: {fileID: 73226996946649784}
   - component: {fileID: 3137150957648639299}
   - component: {fileID: 1546138583373873229}
+  - component: {fileID: 4289455122095012597}
   m_Layer: 0
   m_Name: XR Hand UI Attachment
   m_TagString: Untagged
@@ -798,6 +799,25 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &4289455122095012597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628025321785915348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7951c64acb0fa62458bf30a60089fe2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.UI.TrackedDeviceGraphicRaycaster
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 3221225791
+  m_RaycastTriggerInteraction: 1
 --- !u!1 &1853537525664788191
 GameObject:
   m_ObjectHideFlags: 0
@@ -2094,7 +2114,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6530029935371414749}
   m_HandleRect: {fileID: 6793065581542760270}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3323,10 +3343,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3217159187278354248, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3217159187278354248, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
@@ -3354,80 +3370,17 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 9025398183060776681, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-      propertyPath: _tabs.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 9025398183060776681, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-      propertyPath: '_tabs.Array.data[0]'
-      value: 
-      objectReference: {fileID: 5127421470368012933}
-    - target: {fileID: 9025398183060776681, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-      propertyPath: '_tabs.Array.data[1]'
-      value: 
-      objectReference: {fileID: 6280019615448415951}
-    - target: {fileID: 9025398183060776681, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-      propertyPath: '_tabs.Array.data[2]'
-      value: 
-      objectReference: {fileID: 5452864592090910241}
     - target: {fileID: 9087176255014856928, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
       propertyPath: m_Name
       value: Calibration GUI
       objectReference: {fileID: 0}
-    - target: {fileID: 9087176255014856928, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 3329242289094563335, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 9087176255014856928, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5279571427016047501}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
 --- !u!224 &1514779111760040036 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1693731098365834125, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
   m_PrefabInstance: {fileID: 181486378641728489}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &5127421470368012933 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5020535360090552684, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-  m_PrefabInstance: {fileID: 181486378641728489}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5452864592090910241 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5271660807265021384, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-  m_PrefabInstance: {fileID: 181486378641728489}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &6280019615448415951 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6171013921714642214, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-  m_PrefabInstance: {fileID: 181486378641728489}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &8978179080533134089 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9087176255014856928, guid: 2d0da6f6979f84544893609dfea6875e, type: 3}
-  m_PrefabInstance: {fileID: 181486378641728489}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5279571427016047501
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8978179080533134089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afe3cda3e244f60419474164d6ba3b0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.UI.TrackedDeviceRaycaster
-  m_IgnoreReversedGraphics: 0
-  m_CheckFor2DOcclusion: 0
-  m_CheckFor3DOcclusion: 0
-  m_MaxDistance: 1000
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 0

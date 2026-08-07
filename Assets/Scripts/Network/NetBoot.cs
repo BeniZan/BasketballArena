@@ -88,7 +88,7 @@ public class NetBoot : SingletonMono<NetBoot> {
     }
 
     void OnSetPlayerType() {
-        LocalCoachDevice.SetActive(IsCoach);
+        LocalCoachDevice.SetActive(IsCoach && !IsXR);
         LocalXRDevice.SetActive(IsXR);
         OnPlayerTypeChange?.Invoke(this);
     }
