@@ -63,8 +63,8 @@ public class WebRTCVideoReceiver : MonoBehaviour {
  
     private void InitializeTexture(Texture tex) { 
         VideoTexture = tex;
-        OnVideoTextureChanged?.Invoke(tex); 
         _recievedVideo = tex;
+        OnVideoTextureChanged?.Invoke(tex); 
         if (TryGetComponent(out RawImage raw))
             raw.texture = _recievedVideo; // for testing   
     }
