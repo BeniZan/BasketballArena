@@ -14,7 +14,6 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     const float RetryConnectXRDelay = 5f;
     private static WaitForSeconds _waitForRetryConnectXR = new WaitForSeconds(RetryConnectXRDelay);
     static public bool ENABLE_SIMULATED_ROOM => Application.isEditor;
-    [SerializeField] GameObject _simulatedEnviorment;
     [field: SerializeField] public XROrigin Origin { get; private set; }
     [field: SerializeField] public Camera HeadCam { get; private set; }
     [field: SerializeField] public ARRaycastManager Raycaster { get; private set; }
@@ -62,7 +61,6 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         if (IsInstance) {
             _logger = new CustomLogger(this, Color.green);
             StartXR();
-            _simulatedEnviorment.SetActive(Application.isEditor);
             LeftTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
             RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
         }
