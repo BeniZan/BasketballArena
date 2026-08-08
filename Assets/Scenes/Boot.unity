@@ -362,7 +362,7 @@ GameObject:
   - component: {fileID: 775255782}
   - component: {fileID: 775255783}
   m_Layer: 0
-  m_Name: XR Drills Manager
+  m_Name: '[Net] XR Drills Manager'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -423,11 +423,11 @@ Transform:
   m_GameObject: {fileID: 775255778}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.25385, y: 0, z: -25.98671}
+  m_LocalPosition: {x: -3.15483, y: 0, z: -7.2370605}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1338306080}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &775255782
 MonoBehaviour:
@@ -855,88 +855,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8870628452414119526, guid: 7a36ac6ee15590d4c97170af3e1bcdb0, type: 3}
   m_PrefabInstance: {fileID: 4155387273900902609}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1338306078
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1338306080}
-  - component: {fileID: 1338306079}
-  - component: {fileID: 1338306081}
-  m_Layer: 0
-  m_Name: Networked Objects
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1338306079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1338306078}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3841171214
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  <InScenePlaced>k__BackingField: 0
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 0
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
---- !u!4 &1338306080
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1338306078}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.09902, y: -0, z: 18.74965}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 775255781}
-  - {fileID: 1859018662}
-  - {fileID: 1372235280}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1338306081
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1338306078}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5925c833cb62af4ea1c08904b4cece8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetSpawnToggle
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1001 &1372235279
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1338306080}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 672668589995307931, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -952,7 +877,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3369630857505244353, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
       propertyPath: m_Name
-      value: Networked Coach Server
+      value: '[Net] Networked Coach Server'
       objectReference: {fileID: 0}
     - target: {fileID: 3369630857505244353, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
       propertyPath: m_IsActive
@@ -960,7 +885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6908519312933878016, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -334.02255
+      value: -333.92352
       objectReference: {fileID: 0}
     - target: {fileID: 6908519312933878016, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
       propertyPath: m_LocalPosition.y
@@ -968,7 +893,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6908519312933878016, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1100.5294
+      value: 1119.279
       objectReference: {fileID: 0}
     - target: {fileID: 6908519312933878016, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1003,11 +928,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
---- !u!4 &1372235280 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6908519312933878016, guid: a932fac15fc06c64c9b4a3c4afd95ef1, type: 3}
-  m_PrefabInstance: {fileID: 1372235279}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1859018661
 GameObject:
   m_ObjectHideFlags: 0
@@ -1020,7 +940,7 @@ GameObject:
   - component: {fileID: 1859018663}
   - component: {fileID: 1859018664}
   m_Layer: 0
-  m_Name: WebRTC Handshake
+  m_Name: '[Net] WebRTC Handshake'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1035,12 +955,12 @@ Transform:
   m_GameObject: {fileID: 1859018661}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.86774, y: 1.72126, z: -23.645409}
+  m_LocalPosition: {x: 1.96676, y: 1.72126, z: -4.8957596}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 715611592}
-  m_Father: {fileID: 1338306080}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1859018663
 MonoBehaviour:
@@ -1348,4 +1268,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 4155387273900902609}
   - {fileID: 660501022}
-  - {fileID: 1338306080}
+  - {fileID: 775255781}
+  - {fileID: 1859018662}
+  - {fileID: 1372235279}
