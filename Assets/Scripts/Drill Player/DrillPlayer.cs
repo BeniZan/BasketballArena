@@ -11,8 +11,6 @@ public class DrillPlayer : NetworkBehaviour {
         get => _instance = _instance ? _instance : FindFirstObjectByType<DrillPlayer>();
     }
     public DrillData CurrentPlayingDrillData => NetDrillsActivator.Instance.ActiveManeuver;
-    [SerializeField] DrillActivator _drillActivator;
-
     public struct AnimationPlaybackState : INetworkSerializeByMemcpy {
         public float Time;          // animation time at SyncTime
         public float Speed;         // 0 = paused
@@ -23,6 +21,7 @@ public class DrillPlayer : NetworkBehaviour {
         = new NetworkVariable<AnimationPlaybackState>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     public AnimationPlaybackState PlaybackState { get => SyncState.Value; set => SyncState.Value = value; }
     CustomLogger _logger;
+    [SerializeField, Get] NetDrillsActivator _netDrillActivator;
     [ShowInInspector]
     public float AnimationTime { 
         get {
@@ -62,10 +61,10 @@ public class DrillPlayer : NetworkBehaviour {
     private void Awake() {
         _logger = new CustomLogger(this, Color.magenta);
         _instance = this;
-        _drillActivator.OnDrillChange += DrillActivator_OnDrillChange;
-    }
-
-    private void DrillActivator_OnDrillChange() { 
+        _netDrillActivator.ActiveManeuver.Sub(DrillActivator_OnDrillChange);
+    } 
+    private void DrillActivator_OnDrillChange(DrillData _) => DrillActivator_OnDrillChange(); 
+    private void DrillActivator_OnDrillChange() {
         AnimationTime = 0;
         IsPlaying = true;
     }
@@ -73,11 +72,6 @@ public class DrillPlayer : NetworkBehaviour {
     public void RestartAndPause() {
         AnimationTime = 0;
         IsPlaying = false;
-    }
-
-    private void Update() {
-        foreach (var c in _drillActivator.PlacedChars)
-            c.SetAnimationTime(AnimationTime); 
     }
 
     public override void OnDestroy() {

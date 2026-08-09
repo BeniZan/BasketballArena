@@ -359,7 +359,6 @@ GameObject:
   - component: {fileID: 775255781}
   - component: {fileID: 775255779}
   - component: {fileID: 775255780}
-  - component: {fileID: 775255782}
   - component: {fileID: 775255783}
   m_Layer: 0
   m_Name: '[Net] XR Drills Manager'
@@ -429,21 +428,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &775255782
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 775255778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b787d1c81d19ff84f98dc69c2a709575, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TeamManeuverPlacer
-  _templateChar: {fileID: 2499888353544917440, guid: 7daf483a6f4418b4cb16a2ed329ee9b1, type: 3}
-  _manager: {fileID: 775255780}
-  _spawnedChars: []
 --- !u!114 &775255783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -457,7 +441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DrillPlayer
   ShowTopMostFoldoutHeaderGroup: 1
-  _drillActivator: {fileID: 775255782}
+  _netDrillActivator: {fileID: 775255780}
 --- !u!1 &817122003 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1499804163833366913, guid: 2a43d959ec042c342b896dd10b2a8075, type: 3}
@@ -619,7 +603,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1948228263676355834, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: _editorAutoCalibrate
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2122369787266574141, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: m_Name
@@ -777,6 +761,10 @@ PrefabInstance:
       propertyPath: _aimPose
       value: 
       objectReference: {fileID: 2062895729}
+    - target: {fileID: 6577352677013559756, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 775255780}
     - target: {fileID: 6927545427034015038, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -813,7 +801,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5816307049958330872, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1137399575}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2122369787266574141, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2052934929}
   m_SourcePrefab: {fileID: 100100000, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
 --- !u!4 &1009212373 stripped
 Transform:
@@ -1029,6 +1020,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83e4e6cca11330d4088d729ab4fc9d9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.XRInteractionManager
+--- !u!114 &2052934929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2052934926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f62c7b7418ee024aa16285921e63d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit.Samples.StarterAssets::UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets.PermissionsManager
+  m_ProcessPermissionsOnAwake: 1
+  m_PermissionGroups:
+  - platformType: 0
+    permissions:
+    - permissionId: com.oculus.permission.USE_SCENE
+      enabled: 1
+      requested: 0
+      responseReceived: 0
+      granted: 0
+      onPermissionGranted:
+        m_PersistentCalls:
+          m_Calls: []
+      onPermissionDenied:
+        m_PersistentCalls:
+          m_Calls: []
 --- !u!4 &2062895729 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2674274509519676099, guid: a1c7be68311b64743a4152b5d2199304, type: 3}

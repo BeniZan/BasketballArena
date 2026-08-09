@@ -7,6 +7,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.WebRTC;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public enum WebRTCState { Disconnected, Connecting, Connected } 
 public class WebRTCVideoSender : MonoBehaviour
@@ -135,8 +136,31 @@ public class WebRTCVideoSender : MonoBehaviour
         peerConnection.AddTrack(videoTrack);
     }
     private void LateUpdate() {
+        // copy via camera to avoid issues with XR rendering
+        return;
         if(_copiedCameraRT && _copiedCameraRT.IsCreated())
             ScreenCapture.CaptureScreenshotIntoRenderTexture(_copiedCameraRT);
+    }
+
+    //todo: consider using a CommandBuffer to copy the camera's render target to the RenderTexture
+    private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
+        // Filter out other cameras (like scene view or overlay cameras)
+        if (camera != vrCamera) return;
+
+        if (!_copiedCameraRT || !_copiedCameraRT.IsCreated()) { 
+            return;
+        }
+
+        // Get a temporary CommandBuffer allocated from the pool
+        CommandBuffer cmd = CommandBufferPool.Get("CopyCameraTexture");
+
+        // Use Blit to copy the camera's current target buffer to your custom RenderTexture
+        // BuiltinRenderTextureType.CameraTarget points directly to the active camera buffer
+        cmd.Blit(BuiltinRenderTextureType.CameraTarget, _copiedCameraRT);
+
+        // Execute and immediately clean up the buffer
+        context.ExecuteCommandBuffer(cmd);
+        CommandBufferPool.Release(cmd);
     }
 
     void SetupCodecs() {

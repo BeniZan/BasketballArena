@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa7f63e253653e34893818f789375768, type: 3}
   m_Name: PNR_Switch_a_converted_move_1
   m_EditorClassIdentifier: Assembly-CSharp::TeamManeuver
+  DrillCategory: 0
   OriginPoint: {x: 0, y: 0, z: 0}
   OriginYRotation: 0
+  MirrorLeftRight: 0
   CharsData:
   - FieldStandardPosition: {x: 4.409336, y: -0.05796528}
     yRotation: 178.58893
-    Animation: {fileID: 0}
+    Animation: {fileID: 7400000, guid: b29e9dbf7d217084682b4b83a0be86cb, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
   - FieldStandardPosition: {x: 1.7294283, y: -0.03886652}

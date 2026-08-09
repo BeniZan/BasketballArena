@@ -11,46 +11,53 @@ using UnityEngine.UIElements;
  
 public class DrillActivator : SingletonMono<DrillActivator> { 
     [SerializeField] CharComponent _templateChar;  
-    [SerializeField] NetDrillsActivator _manager;
+    
     [SerializeField, ReadOnly] List<CharComponent> _spawnedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
-    Transform _courtTf;
-    public event Action OnDrillChange;
+    [ShowInInspector, HideInEditorMode, ReadOnly] Transform _courtCenter, _drillOrigin;
     public IReadOnlyList<CharComponent> PlacedChars => _spawnedChars;
     protected override void Awake() {
-        base.Awake();
-        _manager.ActiveManeuver.Sub(OnTeamManeverChange);
-    }
-    void OnTeamManeverChange(DrillData data)  => Activate(data); 
+        base.Awake(); 
+    } 
     public void Activate(DrillData move) {
         if (_currentActive)
             Deactivate();
         if (move) 
             _currentActive = move;
         UpdateChars();
-        OnDrillChange?.Invoke();
     }
     public void UpdateChars() {
         if (!_currentActive)
             return;
 
         var calib = Calibration.Instance;
-        if (!calib)
+        if (!calib) {
             Debug.LogError("Calibration instance is null. Make sure Calibration script is present in the scene.");
+            return;
+        }
 
         var pos = _currentActive.OriginPoint;
         var rot = Quaternion.Euler(0f, _currentActive.OriginYRotation, 0f);
 
-        if (!_courtTf) 
-            _courtTf = new GameObject("CourtSurface").transform;
+        if (!_courtCenter) {
+            _courtCenter = new GameObject("CourtCenter").transform;
+            _courtCenter.parent = transform;
+        }
 
-        calib.CourtSurface.ParentAndPlace(_courtTf);
-        _courtTf.SetLocalPositionAndRotation(pos, rot);
+        if (!_drillOrigin) {
+            _drillOrigin = new GameObject("Drill Origin").transform;
+            _drillOrigin.parent = _courtCenter;
+        }
+
+        var courtCenter =
+            calib.CourtSurface.TransformPose(new Pose(Calibration.LENGTH_AXIS_V3 * -0.5f, Quaternion.identity));
+        _courtCenter.SetPositionAndRotation(courtCenter.position, courtCenter.rotation); 
+        _drillOrigin.SetLocalPositionAndRotation(pos, rot);
 
         int i = 0;
         for (; i < _currentActive.CharsData.Count; i++) {
             if (_spawnedChars.Count <= i) {
-                var spawned = Instantiate(_templateChar, _courtTf);
+                var spawned = Instantiate(_templateChar, _drillOrigin);
                 spawned.gameObject.SetActive(true); 
                 _spawnedChars.Add(spawned);
             }
@@ -61,14 +68,34 @@ public class DrillActivator : SingletonMono<DrillActivator> {
                 _spawnedChars[i].gameObject.SafeDestroy();
             _spawnedChars.RemoveAt(i);
         }
-    } 
+    }
+
+    private void Update() {
+        var drillPlayer = DrillPlayer.Instance;
+        if (!drillPlayer) {
+            Debug.LogError("DrillPlayer instance is null. Make sure DrillPlayer script is present in the scene.");
+            return;
+        }
+
+        var netDrillActivator = NetDrillsActivator.Instance;
+        if(!netDrillActivator) {
+            Debug.LogError("NetDrillsActivator instance is null. Make sure NetDrillsActivator script is present in the scene.");
+            return;
+        }
+
+        if(netDrillActivator.ActiveManeuver.Value != _currentActive) {
+            Activate(netDrillActivator.ActiveManeuver.Value);
+        }
+
+        foreach (var c in PlacedChars)
+            c.SetAnimationTime(drillPlayer.AnimationTime);
+    }
     public void Deactivate() {
         foreach (var placedChar in _spawnedChars)
             if(placedChar)
                 placedChar.gameObject.SafeDestroy();
         _spawnedChars.Clear();
         _currentActive = null;
-        OnDrillChange?.Invoke();
     }
     private void OnEnable() {
         Activate(_currentActive);

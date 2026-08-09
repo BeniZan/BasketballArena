@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa7f63e253653e34893818f789375768, type: 3}
   m_Name: Scene_10_c_converted_move_3
   m_EditorClassIdentifier: Assembly-CSharp::TeamManeuver
+  DrillCategory: 0
   OriginPoint: {x: 0, y: 0, z: 0}
-  OriginYRotation: 0
+  OriginYRotation: 89
+  MirrorLeftRight: 0
   CharsData:
   - FieldStandardPosition: {x: 0.7636051, y: 1.9520125}
-    yRotation: 144.34203
+    yRotation: 0
     Animation: {fileID: 7400000, guid: 4f88c6f3cc34e444790621c15ef445b7, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
@@ -26,7 +28,7 @@ MonoBehaviour:
     AnimationTimeOffset: 0
     IsFriendly: 0
   - FieldStandardPosition: {x: -4.214033, y: 6.1531262}
-    yRotation: 148.05943
+    yRotation: 167
     Animation: {fileID: 7400000, guid: 6c4a8e5875941564cbe478e83003c07e, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0

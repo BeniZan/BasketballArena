@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa7f63e253653e34893818f789375768, type: 3}
   m_Name: Scene_12_b_converted_move_5
   m_EditorClassIdentifier: Assembly-CSharp::TeamManeuver
+  DrillCategory: 0
   OriginPoint: {x: 0, y: 0, z: 0}
   OriginYRotation: 0
+  MirrorLeftRight: 0
   CharsData:
   - FieldStandardPosition: {x: 1.18, y: -1.01}
     yRotation: 118.64487

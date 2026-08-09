@@ -49,10 +49,17 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
         base.Awake();
         _logger = new CustomLogger(this, Color.green);  
         _calibrationAwait = BeginCalibration();
-    } 
+    }
 
+    public const int LENGTH_AXIS = 0;
+    public const int UNUSED_AXIS = 1;
+    public const int WIDTH_AXIS = 2;
+    static public Vector3 WIDTH_AXIS_V3 => new Vector3 { [WIDTH_AXIS] = 1f };
+    static public Vector3 LENGTH_AXIS_V3 => new Vector3 { [LENGTH_AXIS] = 1f };
 #if UNITY_EDITOR
     [SerializeField, BoxGroup("Auto Calibrate")] bool _editorAutoCalibrate;
+    [SerializeField, BoxGroup("Auto Calibrate")] float _editorCalibrateWidth = 15f;
+    [SerializeField, BoxGroup("Auto Calibrate")] float _editorCalibrateLength = 28f;
     private async Awaitable Start() {
         if (!_editorAutoCalibrate)
             return;
@@ -65,8 +72,11 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
 
     [Button("Auto Calibrate"), HideInEditorMode]
     void AutoCalibration() {
-        var playerPos = _xrPlayer.HeadCam.transform.position - (Vector3.up * 1.2f);
-        var surface = CreateSurface(playerPos, playerPos + Vector3.forward * 10, playerPos + Vector3.right * 7);
+        var playerPos = _xrPlayer.HeadCam.transform.position - (Vector3.up * 1.2f); 
+
+        var bottomCenter = playerPos + (WIDTH_AXIS_V3 * _editorCalibrateWidth /2f);
+        var userPoint = bottomCenter + (LENGTH_AXIS_V3 * _editorCalibrateLength /2f);
+        var surface = CreateSurface(playerPos, bottomCenter, userPoint);
         _courtSurface.SetSurface(surface);
         SetState(Step.Calibrated);
     }
@@ -136,7 +146,7 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
             var surface = 
                 CreateSurface(_tempLine[0], _tempLine[1], _tempLine[2]);
             var topCorner =
-                surface.Center + (surface.Rotation * surface.SizeXZ.XZToXYZ() / 2f);
+                surface.Center + (surface.Rotation * surface.Size / 2f);
             _tempLine[2] = topCorner;
         }
 
@@ -154,11 +164,11 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
         Vector3 centerBottom,
         Vector3 bottomCorner,
         Vector3 userPoint) {
-        // Width axis
+        // Length axis
         Vector3 right = (bottomCorner - centerBottom).normalized;
-
-        // Width
-        float width = Vector3.Distance(centerBottom, bottomCorner) * 2f;
+        
+        // Length
+        float length = Vector3.Distance(centerBottom, bottomCorner) * 2f;
 
         // Perpendicular axis on floor
         Vector3 forward = Vector3.Cross(Vector3.up, right).normalized;
@@ -174,21 +184,23 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
         if (Vector3.Dot(projected, forward) < 0f)
             forward = -forward;
 
-        // Length is distance along forward axis only
-        float length =
+        // Width is distance along forward axis only
+        float width =
             Mathf.Abs(Vector3.Dot(toUser, forward));
 
         // Center of rectangle
         Vector3 center =
             centerBottom +
-            forward * (length * 0.5f);
+            forward * (width * 0.5f);
+
 
         return new SurfaceData {
             Center = center,
-            SizeXZ = new Vector2(width, length),
+            Size = new Vector3 { [LENGTH_AXIS] = length, [WIDTH_AXIS] = width, [UNUSED_AXIS] = 1f },
             Forward = forward,
             Rotation = Quaternion.LookRotation(forward, Vector3.up)
         };
+
     } 
 
     public void OnConfirmedCalibrationStep() {
