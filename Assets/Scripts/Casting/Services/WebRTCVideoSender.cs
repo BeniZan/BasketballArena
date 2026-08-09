@@ -62,6 +62,7 @@ public class WebRTCVideoSender : MonoBehaviour
     } 
 
     private void OnEnable() {
+        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
         _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] ");
         var netMnger = NetBoot.Instance.NetMnger;
         netMnger.OnConnectionEvent += Singleton_OnConnectionEvent;
@@ -196,6 +197,7 @@ public class WebRTCVideoSender : MonoBehaviour
     } 
 
     private void OnDisable() {
+        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
         CloseConnection();
         if (NetBoot.HasInstance) {
             var netMnger = NetBoot.Instance.NetMnger;
