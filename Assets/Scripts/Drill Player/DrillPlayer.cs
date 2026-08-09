@@ -33,15 +33,16 @@ public class DrillPlayer : NetworkBehaviour {
     public float AnimationTime { 
         get {
             if (PlaybackState.Speed == 0f)
-                return PlaybackState.Time;
+                return PlaybackState.Time; 
 
-            double elapsed = NetworkManager.Singleton.ServerTime.Time - PlaybackState.SyncTime;
+            double elapsed = NetworkManager.Singleton ? 
+                NetworkManager.Singleton.ServerTime.Time - PlaybackState.SyncTime : 0;
             return PlaybackState.Time + (float)(elapsed * PlaybackState.Speed);
         }
         set {
             var state = PlaybackState;
             state.Time = value;
-            state.SyncTime = NetworkManager.Singleton.ServerTime.Time;
+            state.SyncTime = NetworkManager.Singleton ? NetworkManager.Singleton.ServerTime.Time : 0;
             PlaybackState = state;
         }
     }
