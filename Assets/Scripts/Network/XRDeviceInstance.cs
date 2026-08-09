@@ -60,7 +60,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         base.Awake();
         if (IsInstance) {
             _logger = new CustomLogger(this, Color.green);
-            //StartXR();
+            StartXR();
             LeftTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
             RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
         }
