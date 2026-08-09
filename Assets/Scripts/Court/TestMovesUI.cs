@@ -39,7 +39,7 @@ public class TestMovesUI : MonoBehaviour {
 
             _play.onClick.AddListener(() => DrillPlayer.Instance.Play());
             _pause.onClick.AddListener(() => DrillPlayer.Instance.Pause());
-            _play.onClick.AddListener(() => DrillPlayer.Instance.RestartAndPause());
+            _play.onClick.AddListener(() => DrillPlayer.Instance.ResetTimeAndPlay());
             UpdateDebugUIActivation();
         }
         else gameObject.SafeDestroy();

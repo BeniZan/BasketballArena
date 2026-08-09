@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
  
-public class DrillActivator : SingletonMono<DrillActivator> { 
+public class XRDrillActivator : SingletonMono<XRDrillActivator> { 
     [SerializeField] CharComponent _templateChar;  
     
     [SerializeField, ReadOnly] List<CharComponent> _spawnedChars = new List<CharComponent>();

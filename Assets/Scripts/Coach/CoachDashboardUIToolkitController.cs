@@ -387,7 +387,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         UpdateTimerDisplay();
         _session.Reset(); // clears active drill -> HandleActiveDrillChanged updates repText + highlight
 
-        DrillPlayer.Instance.RestartAndPause(); // resets the animation/timer to 0 and pauses
+        DrillPlayer.Instance.ResetTimeAndPlay(); // resets the animation/timer to 0 and pauses
         //NetCoachDashboardState.Instance?.Server_SetTimerRunning(false); 
 
         // Exit the active session state: hide the LIVE SESSION tag, restore the placeholder,

@@ -43,8 +43,7 @@ public class NetDrillsActivator : NetworkBehaviour
 
     void OnSyncManeuverChange(FixedString512Bytes _, FixedString512Bytes cur) {
         var name = cur.ToString();
-        _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetDrill(name);
-        DrillActivator.Instance.Activate(_activeManeuver.Value);
+        _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetDrill(name); 
     }
 
     public void Server_SetActiveDrill(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;

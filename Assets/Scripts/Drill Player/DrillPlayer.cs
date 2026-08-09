@@ -19,7 +19,14 @@ public class DrillPlayer : NetworkBehaviour {
 
     NetworkVariable<AnimationPlaybackState> SyncState 
         = new NetworkVariable<AnimationPlaybackState>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
-    public AnimationPlaybackState PlaybackState { get => SyncState.Value; set => SyncState.Value = value; }
+    public AnimationPlaybackState PlaybackState { get => SyncState.Value;
+        set {
+            if(IsServer)
+                SyncState.Value = value;
+            else
+                _logger.LogError("Attempted to set PlaybackState on client. This is not allowed.");
+        }
+    }
     CustomLogger _logger;
     [SerializeField, Get] NetDrillsActivator _netDrillActivator;
     [ShowInInspector]
@@ -50,6 +57,11 @@ public class DrillPlayer : NetworkBehaviour {
     public void Play() => SetSpeed(1f);
     public void Pause() => SetSpeed(0f);
     void SetSpeed(float speed) {
+        if (!IsServer) {
+            _logger.LogError("Attempted to set DrillPlayer Speed on client. This is not allowed.");
+            return;
+        }
+
         _logger.Log("Setting DrillPlayer Speed: " + speed);
         var state = PlaybackState;
         state.Time = AnimationTime;
@@ -61,19 +73,27 @@ public class DrillPlayer : NetworkBehaviour {
     private void Awake() {
         _logger = new CustomLogger(this, Color.magenta);
         _instance = this;
-        _netDrillActivator.ActiveManeuver.Sub(DrillActivator_OnDrillChange);
-    } 
-    private void DrillActivator_OnDrillChange(DrillData _) => DrillActivator_OnDrillChange(); 
-    private void DrillActivator_OnDrillChange() {
+    }
+
+    public override void OnNetworkSpawn() {
+        base.OnNetworkSpawn();
+        if(IsServer)
+            _netDrillActivator.ActiveManeuver.Sub(Server_DrillActivator_OnDrillChange);
+    }
+
+    public override void OnNetworkDespawn() {
+        base.OnNetworkDespawn();
+        if (IsServer)
+            _netDrillActivator.ActiveManeuver.Sub(Server_DrillActivator_OnDrillChange);
+    }
+    private void Server_DrillActivator_OnDrillChange(DrillData _) => DrillActivator_OnDrillChange(); 
+    private void DrillActivator_OnDrillChange() => ResetTimeAndPlay();
+
+    public void ResetTimeAndPlay() {
         AnimationTime = 0;
         IsPlaying = true;
     }
-
-    public void RestartAndPause() {
-        AnimationTime = 0;
-        IsPlaying = false;
-    }
-
+     
     public override void OnDestroy() {
         base.OnDestroy();
         if (_instance == this)

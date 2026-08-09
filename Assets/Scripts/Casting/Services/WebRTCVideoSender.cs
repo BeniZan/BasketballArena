@@ -67,6 +67,8 @@ public class WebRTCVideoSender : MonoBehaviour
         netMnger.OnConnectionEvent += Singleton_OnConnectionEvent;
         if (netMnger.IsConnectedClient && !netMnger.IsServer)
             StartConnection();
+
+
     }
 
     private void Singleton_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {

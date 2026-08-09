@@ -407,6 +407,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeamManeuverManager
   ShowTopMostFoldoutHeaderGroup: 1
   _allTeamManeuvers:
+  - {fileID: 11400000, guid: 8578fe07452e3f346b24f698b63f696b, type: 2}
+  - {fileID: 11400000, guid: b85cc892e64d0ee468f1ce72e5f2ad1c, type: 2}
+  - {fileID: 11400000, guid: 94d048d742df8564ba2e0196a982f910, type: 2}
+  - {fileID: 11400000, guid: f1c9591af921a8843b1639b541e3ea0d, type: 2}
   - {fileID: 11400000, guid: 7161002f443647648a3edef55487e3cc, type: 2}
   - {fileID: 11400000, guid: 57a59fbd776a7934c96c0c4b3eefa0d1, type: 2}
   - {fileID: 11400000, guid: 502123242fefc6a41b11e3969eb8808f, type: 2}
