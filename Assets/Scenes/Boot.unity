@@ -348,6 +348,25 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &722716381 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1747382679837752365, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+  m_PrefabInstance: {fileID: 1009212371}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &722716383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722716381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62625b748ebab5846886c9a557b66a63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::XRDrillActivator
+  _templateChar: {fileID: 2499888353544917440, guid: 7daf483a6f4418b4cb16a2ed329ee9b1, type: 3}
+  _spawnedChars: []
 --- !u!1 &775255778
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,6 +818,7 @@ PrefabInstance:
       objectReference: {fileID: 2052934927}
     m_RemovedComponents:
     - {fileID: 6345435547691427319, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+    - {fileID: 6577352677013559756, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
     m_RemovedGameObjects:
     - {fileID: 7233190935812968499, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
     m_AddedGameObjects:
@@ -809,6 +829,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2122369787266574141, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2052934929}
+    - targetCorrespondingSourceObject: {fileID: 1747382679837752365, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 722716383}
   m_SourcePrefab: {fileID: 100100000, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
 --- !u!4 &1009212373 stripped
 Transform:

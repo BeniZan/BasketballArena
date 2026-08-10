@@ -47,6 +47,7 @@ public class NetDrillsActivator : NetworkBehaviour
     }
 
     public void Server_SetActiveDrill(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;
+    [Button, ShowIf(nameof(IsServer))]
     public void Server_SetActiveDrill(DrillData teamManeuver) => _syncActiveManeuver.Value = teamManeuver ? teamManeuver.name : "";
     public DrillData GetDrill(string teamManeuverName) => _allTeamManeuvers.Find(tm => tm.name == teamManeuverName);
 }

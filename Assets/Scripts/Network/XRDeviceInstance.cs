@@ -57,15 +57,13 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
 
     CustomLogger _logger;
     protected override void Awake() {
-        base.Awake();
-        if (IsInstance) {
-            _logger = new CustomLogger(this, Color.green);
-            StartXR();
-            LeftTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
-            RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
-        }
-    } 
-
+        base.Awake(); 
+        _logger = new CustomLogger(this, Color.green);
+        LeftTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
+        RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
+    }
+    private void OnEnable() => StartXR(); 
+    private void OnDisable() => StopXR(); 
     void OnTrackingChanged() { 
         TrackedLeftHand = InputSystem.GetDevice<XRHandDevice>(CommonUsages.LeftHand);
         TrackedRightHand = InputSystem.GetDevice<XRHandDevice>(CommonUsages.RightHand);
@@ -74,6 +72,15 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     void StartXR() {
         StopAllCoroutines();
         StartCoroutine(StartXRCoroutine());
+    }
+
+    void StopXR() {
+        StopAllCoroutines();
+        var mnger = XRGeneralSettings.Instance.Manager;
+        if (mnger && mnger.activeLoader) {
+            _logger.Log("Shutting down xr...");
+            mnger.DeinitializeLoader();
+        }
     }
 
     IEnumerator StartXRCoroutine() {
@@ -97,5 +104,5 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         }
         _logger.Log("XR initialized successfully. Starting subsystems..."); 
         mnger.StartSubsystems(); 
-    } 
+    }  
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Test Drill
   m_EditorClassIdentifier: Assembly-CSharp::TeamManeuver
   DrillCategory: 0
-  OriginPoint: {x: 0, y: 0, z: 0}
+  OriginPoint: {x: 2.95, y: 0, z: 0}
   OriginYRotation: 46.2
   MirrorLeftRight: 0
   CharsData:
@@ -26,7 +26,7 @@ MonoBehaviour:
     yRotation: 227
     Animation: {fileID: 7400000, guid: 9b298e2246f07a34baaf5963a005196a, type: 2}
     AnimationTimeOffset: 0
-    IsFriendly: 0
+    IsFriendly: 1
   - FieldStandardPosition: {x: -0.62, y: 10.71}
     yRotation: 24
     Animation: {fileID: 7400000, guid: 996d3f406be56c249b3bab3ee192ec23, type: 2}
