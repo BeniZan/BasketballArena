@@ -15,6 +15,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     private static WaitForSeconds _waitForRetryConnectXR = new WaitForSeconds(RetryConnectXRDelay);
     static public bool ENABLE_SIMULATED_ROOM => Application.isEditor;
     [field: SerializeField] public XROrigin Origin { get; private set; }
+    [field: SerializeField] public ARAnchorManager AnchorManager { get; private set; }
     [field: SerializeField] public Camera HeadCam { get; private set; }
     [field: SerializeField] public ARRaycastManager Raycaster { get; private set; }
     [field: SerializeField] public XRHandDevice TrackedRightHand { get; private set; }
@@ -39,7 +40,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
 
     public bool TryGetRightPinchValues(out float pinchValue) { 
         pinchValue = default;
-        if (!TryGetHandSubsystem(out var xrHandSubSys)) {
+        if (!TryGetHandSubsystem(out var xrHandSubSys) && Time.realtimeSinceStartup > 8f) {
             _logger.LogError("No XR hand subsystem found. Ensure XR is properly configured in Project Settings.");
             return false;
         }
@@ -67,14 +68,16 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     void OnTrackingChanged() { 
         TrackedLeftHand = InputSystem.GetDevice<XRHandDevice>(CommonUsages.LeftHand);
         TrackedRightHand = InputSystem.GetDevice<XRHandDevice>(CommonUsages.RightHand);
-    } 
-
+    }
+    [SerializeField] ARSession _arSession;
     void StartXR() {
         StopAllCoroutines();
         StartCoroutine(StartXRCoroutine());
+        _arSession.enabled = true;
     }
 
     void StopXR() {
+        _logger.Log("XR Disabled");
         StopAllCoroutines();
         var mnger = XRGeneralSettings.Instance.Manager;
         if (mnger && mnger.activeLoader) {

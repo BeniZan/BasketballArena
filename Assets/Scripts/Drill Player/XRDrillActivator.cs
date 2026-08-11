@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
- 
+using UnityEngine.XR.ARFoundation;
+
 public class XRDrillActivator : SingletonMono<XRDrillActivator> { 
-    [SerializeField] CharComponent _templateChar;  
-    
+    [SerializeField] CharComponent _templateChar;
     [SerializeField, ReadOnly] List<CharComponent> _spawnedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
     [ShowInInspector, HideInEditorMode, ReadOnly] Transform _courtCenter, _drillOrigin;
@@ -38,9 +38,9 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
 
        
 
-        if (!_courtCenter) {
-            _courtCenter = new GameObject("CourtCenter").transform;
-            _courtCenter.parent = transform;
+        if (!_courtCenter) { 
+            _courtCenter = new GameObject("CourtCenter").transform; 
+            _courtCenter.parent = transform; 
         }
 
         if (!_drillOrigin) {
@@ -48,9 +48,10 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
             _drillOrigin.parent = _courtCenter;
         }
 
-        var courtCenter =
-            calib.CourtSurface.TransformPose(new Pose(Calibration.LENGTH_AXIS_V3 * -0.5f, Quaternion.identity));
-        _courtCenter.SetPositionAndRotation(courtCenter.position, courtCenter.rotation);
+        var courtHalfSurface = calib.CourtHalfSurface.ScalingTransform;
+        var courtCenter = courtHalfSurface.TransformPoint(Calibration.LENGTH_AXIS_V3 * -0.5f);
+        var courtRotation = calib.CourtHalfSurface.Surface.Rotation;
+        _courtCenter.SetPositionAndRotation(courtCenter, courtRotation);
 
         var localOriginPoint = _currentActive.OriginPoint;
         var localOriginRotation = Quaternion.Euler(0f, _currentActive.OriginYRotation, 0f);

@@ -5,8 +5,7 @@ public struct SurfaceData {
     public Vector3 Center;
     public Vector3 Size;
     public Vector3 Forward;
-    public Quaternion Rotation;
-    public Matrix4x4 GetMatrix() => Matrix4x4.TRS(Center, Rotation, Size); 
+    public Quaternion Rotation; 
 }
 public class SurfaceHandler : MonoBehaviour {
     public Transform ScalingTransform;
@@ -34,14 +33,10 @@ public class SurfaceHandler : MonoBehaviour {
 
     private void OnDrawGizmos() {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(-0.5f, 0f, 0f), 2f);
+        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(-0.5f, 0f, 0f), 0.5f);
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(0f, 0f, -0.5f), 2f);
-    }
-    public Pose TransformPose(Pose pose) {
-        var surfaceMatrix = Surface.GetMatrix();
-        var surfacePosition = surfaceMatrix.MultiplyPoint(pose.position);
-        var surfaceRotation = surfaceMatrix.rotation * pose.rotation;
-        return new Pose(surfacePosition, surfaceRotation);
+        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(0f, 0f, -0.5f), 0.5f);
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(-0.5f, 0f, -0.5f), 0.5f);
     }
 }

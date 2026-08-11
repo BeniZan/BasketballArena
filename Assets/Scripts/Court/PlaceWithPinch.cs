@@ -19,7 +19,13 @@ public class PlaceWithPinch : MonoBehaviour {
     [NonSerialized, ShowInInspector] public bool WasPlaced; 
     public Transform PreviewObj => _preview;
     public Transform PlacedObj => _placeObj; 
-    public Vector3 PreviewOrPlacedPosition => WasPlaced ? _placeObj.position : _preview.position;
+    public Vector3 PreviewOrPlacedPosition {
+        get => WasPlaced ? _placeObj.position : _preview.position;
+        set {
+            var tf = WasPlaced ? _placeObj : _preview;
+            tf.position = value;
+        }
+    } 
     CustomLogger _logger;
     public bool IsPlacing {
         get => isActiveAndEnabled;
