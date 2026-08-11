@@ -34,13 +34,11 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
         if (!calib) {
             Debug.LogError("Calibration instance is null. Make sure Calibration script is present in the scene.");
             return;
-        }
-
-       
+        } 
 
         if (!_courtCenter) { 
             _courtCenter = new GameObject("CourtCenter").transform; 
-            _courtCenter.parent = transform; 
+            _courtCenter.parent = transform;  
         }
 
         if (!_drillOrigin) {

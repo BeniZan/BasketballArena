@@ -33,10 +33,8 @@ public class SurfaceHandler : MonoBehaviour {
 
     private void OnDrawGizmos() {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(-0.5f, 0f, 0f), 0.5f);
+        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(-0.5f, 0f, 0f), 2f);
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(0f, 0f, -0.5f), 0.5f);
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(-0.5f, 0f, -0.5f), 0.5f);
-    }
+        Gizmos.DrawWireSphere(ScalingTransform.TransformPoint(0f, 0f, -0.5f), 2f);
+    } 
 }

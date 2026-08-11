@@ -49,6 +49,9 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
         base.Awake();
         _logger = new CustomLogger(this, Color.green);  
         _calibrationAwait = BeginCalibration();
+#if UNITY_EDITOR
+        CreateSurface(_test_p1, _test_p2, _test_p3);
+#endif
     }
 
     public const int LENGTH_AXIS = 0; //x
@@ -60,6 +63,10 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
     [SerializeField, BoxGroup("Auto Calibrate")] bool _editorAutoCalibrate;
     [SerializeField, BoxGroup("Auto Calibrate")] float _editorCalibrateWidth = 15f;
     [SerializeField, BoxGroup("Auto Calibrate")] float _editorCalibrateLength = 28f;
+
+    [SerializeField, BoxGroup("Surface Test")] 
+    Vector3 _test_p1, _test_p2, _test_p3;
+
     private async Awaitable Start() {
         if (!_editorAutoCalibrate)
             return;
@@ -72,10 +79,11 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
 
     [Button("Auto Calibrate"), HideInEditorMode]
     void AutoCalibration() {
-        var playerPos = _xrPlayer.HeadCam.transform.position - (Vector3.up * 1.2f); 
+        var playerPos = _xrPlayer.HeadCam.transform.position - (Vector3.up * 1.2f);
 
-        var bottomCenter = playerPos + (WIDTH_AXIS_V3 * _editorCalibrateWidth /2f);
-        var userPoint = bottomCenter + (LENGTH_AXIS_V3 * _editorCalibrateLength /2f);
+        var rndRotation = Quaternion.Euler(0, UnityEngine.Random.Range(0, 360f), 0);
+        var bottomCenter = playerPos + (rndRotation * WIDTH_AXIS_V3 * _editorCalibrateWidth /2f);
+        var userPoint = bottomCenter + (rndRotation * LENGTH_AXIS_V3 * _editorCalibrateLength /2f);
         var surface = CreateSurface(playerPos, bottomCenter, userPoint);
         _courtHalfSurface.SetSurface(surface);
         SetState(Step.Calibrated);
@@ -155,7 +163,7 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
     void UpdateSurface(SurfaceHandler surface, Vector3 basketCornerPos) { 
         var center = GetPlacer(Step.CalibratingCenter).PlacedObj.position;
         var centerCorner = GetPlacer(Step.CalibratingCenterCorner).PlacedObj.position;
-        basketCornerPos.y = centerCorner.y = center.y;
+        //basketCornerPos.y = centerCorner.y = center.y;
         var surfaceDat = CreateSurface(center, centerCorner, basketCornerPos);
         surface.SetSurface(surfaceDat);
     }
@@ -165,39 +173,32 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
         Vector3 p2,
         Vector3 p3) {
         // Length axis
-        Vector3 right = (p2 - p1).normalized;
-        
-        // Length
+        Vector3 forw =  - (p2 - p1).normalized;
+
+        // Width
         float width = Vector3.Distance(p1, p2) * 2f;
 
         // Perpendicular axis on floor
-        Vector3 forward = Vector3.Cross(right, Vector3.up).normalized;
+        Vector3 right = Vector3.Cross(forw, Vector3.up).normalized;
 
-        // Vector to user's third point
-        Vector3 p1ToP3diagnol = p3 - p1;
+        Debug.DrawRay(p2, right);
+        var rawP1toP3 = p3 - p1;
 
-        // Remove any width component
-        Vector3 projected =
-            Vector3.ProjectOnPlane(p1ToP3diagnol, right);
+        // Ensure forward points toward p3, not away from it
+        if (Vector3.Dot(rawP1toP3, right) < 0f)
+            right = -right;
 
-        // Determine side
-        if (Vector3.Dot(projected, forward) < 0f)
-            forward = -forward;
-
-        // Width is distance along forward axis only
-        float length =
-            Mathf.Abs(Vector3.Dot(p1ToP3diagnol, forward));
+        float length = Vector3.Project(rawP1toP3, right).magnitude;
 
         // Center of rectangle
-        Vector3 center =
-            p1 +
-            forward * (width * 0.5f);
+        Vector3 center = p1 + right * (length * 0.5f);
+        var rotation = Quaternion.LookRotation(forw, Vector3.up);
 
         return new SurfaceData {
             Center = center,
-            Size = new Vector3 { [LENGTH_AXIS] = length, [WIDTH_AXIS] = width, [UNUSED_AXIS] = 1f },
-            Forward = forward,
-            Rotation = Quaternion.LookRotation(forward, Vector3.up)
+            Size = new Vector3() { [LENGTH_AXIS] = length, [WIDTH_AXIS] = width, [UNUSED_AXIS] = 1f },
+            Forward = right,
+            Rotation = rotation
         };
 
     } 

@@ -48,7 +48,11 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
             _logger.LogError("No XR origin");
             return false;
         }
-         
+
+        if (!xrHandSubSys.rightHand.isTracked) {
+            return false;
+        }
+
         var idx = 
             xrHandSubSys.rightHand.CalculateFingerShape(XRHandFingerID.Index,  XRFingerShapeTypes.Pinch);
         idx.TryGetPinch(out pinchValue);
