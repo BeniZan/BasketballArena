@@ -142,12 +142,12 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
 
         if(pointCount == 3) {
             _tempLine[2] = _placers[2].PreviewOrPlacedPosition;
-            _tempLine[2].y = _tempLine[1].y = _tempLine[0].y;
             var surface = 
                 CreateSurface(_tempLine[0], _tempLine[1], _tempLine[2]);
             var topCorner =
                 surface.Center + (surface.Rotation * surface.Size / 2f);
             _tempLine[2] = topCorner;
+            _tempLine[2].y = _tempLine[1].y = _tempLine[0].y;
         }
 
         _inBetweenPlacersLine.SetPositions(_tempLine);

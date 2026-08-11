@@ -36,8 +36,7 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
             return;
         }
 
-        var pos = _currentActive.OriginPoint;
-        var rot = Quaternion.Euler(0f, _currentActive.OriginYRotation, 0f);
+       
 
         if (!_courtCenter) {
             _courtCenter = new GameObject("CourtCenter").transform;
@@ -51,8 +50,11 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
 
         var courtCenter =
             calib.CourtSurface.TransformPose(new Pose(Calibration.LENGTH_AXIS_V3 * -0.5f, Quaternion.identity));
-        _courtCenter.SetPositionAndRotation(courtCenter.position, courtCenter.rotation); 
-        _drillOrigin.SetLocalPositionAndRotation(pos, rot);
+        _courtCenter.SetPositionAndRotation(courtCenter.position, courtCenter.rotation);
+
+        var localOriginPoint = _currentActive.OriginPoint;
+        var localOriginRotation = Quaternion.Euler(0f, _currentActive.OriginYRotation, 0f);
+        _drillOrigin.SetLocalPositionAndRotation(localOriginPoint, localOriginRotation);
 
         int i = 0;
         for (; i < _currentActive.CharsData.Count; i++) {
