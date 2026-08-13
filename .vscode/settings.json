@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "BasketballArena.sln"
+    "dotnet.defaultSolution": "BasketballArena.sln",
+    "dotnet.preferCSharpExtension": true
 }

@@ -82,6 +82,19 @@ public class DrillPlayer : NetworkBehaviour {
             _netDrillActivator.ActiveManeuver.Sub(Server_DrillActivator_OnDrillChange);
     }
 
+    public bool ReachedMaxAnimationTime() {
+        if (!IsSpawned)
+            return false;
+
+        var maxAnimationLength = 0.01f;
+        var activeDrill = _netDrillActivator.ActiveManeuver.Value;
+        foreach (var data in activeDrill.CharsData) {
+            maxAnimationLength = Mathf.Max(maxAnimationLength, data.Animation.length);
+        }
+
+        return AnimationTime >= maxAnimationLength;
+    } 
+
     public override void OnNetworkDespawn() {
         base.OnNetworkDespawn();
         if (IsServer)
