@@ -1,8 +1,9 @@
-using Unity.WebRTC;
-using Unity.Netcode;
-using System;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
+using Unity.WebRTC;
 
 public class WebRTCHandshakeManager : NetworkBehaviour {
     static WebRTCHandshakeManager _instance;
@@ -44,9 +45,13 @@ public class WebRTCHandshakeManager : NetworkBehaviour {
     public event Action<IceCandidateData> OnICECandidateReceived;
 
     private void OnEnable() {
-        WebRTC.ConfigureNativeLogging(true, NativeLoggingSeverity.Warning);
+        WebRTC.ConfigureNativeLogging(true, NativeLoggingSeverity.Info); 
         StartCoroutine(WebRTC.Update()); 
     }
+
+    private void OnDisable() {
+        StopAllCoroutines();
+    } 
 
     public void Client_BeginSendHandshake(string sdp) {
         var handShake = new Handshake() 

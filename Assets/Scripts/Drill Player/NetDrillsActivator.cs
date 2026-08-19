@@ -6,10 +6,18 @@ using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
-
+#if UNITY_EDITOR
+using Sirenix.OdinInspector.Editor;
+[CustomEditor(typeof(OdinNetworkBehaviour), true)]
+[CanEditMultipleObjects]
+public class OdinNetworkBehaviourEditor : OdinEditor {
+    // Leaving this empty forces Unity to use Odin's drawing pipeline 
+    // for this script while bypassing the network framework's default drawing.
+}
+#endif
+public abstract class OdinNetworkBehaviour : NetworkBehaviour {}
 [DefaultExecutionOrder(-1000)]
-public class NetDrillsActivator : NetworkBehaviour
-{
+public class NetDrillsActivator : OdinNetworkBehaviour {
     static public NetDrillsActivator Instance { get; private set; }
     [SerializeField, Sirenix.OdinInspector.ReadOnly] List<DrillData> _allTeamManeuvers;
     NetworkVariable<FixedString512Bytes> _syncActiveManeuver 

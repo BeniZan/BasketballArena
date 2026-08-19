@@ -1,12 +1,13 @@
+using Sirenix.OdinInspector;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
+using Unity.WebRTC;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.WebRTC;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using Sirenix.OdinInspector;
-using Unity.Netcode;
-using System;
 using UnityEngine.UIElements;
 
 public class WebRTCVideoReceiver : MonoBehaviour {   
@@ -38,7 +39,14 @@ public class WebRTCVideoReceiver : MonoBehaviour {
         // Use local-only ICE candidates (no STUN/TURN).
         var config = new RTCConfiguration
         {
-            iceServers = new RTCIceServer[0],
+            iceServers = new RTCIceServer[] {
+                new() {
+                    urls = new string[] {
+                        "stun:stun.l.google.com:19302",
+                        "stun:stun1.l.google.com:19302"
+                    }
+                }
+            },
             iceTransportPolicy = RTCIceTransportPolicy.All
         }; 
         peerConnection = new RTCPeerConnection(ref config) {
@@ -68,6 +76,25 @@ public class WebRTCVideoReceiver : MonoBehaviour {
         if (TryGetComponent(out RawImage raw))
             raw.texture = _recievedVideo; // for testing   
     }
+
+    void SetupCodecs() {
+        var codecs = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs;
+
+        // Log available codecs for debugging
+        foreach (var c in codecs)
+            _logger.Log($"Available codec: {c.mimeType}");
+
+        var preferredCodecs = codecs.Where(c => c.mimeType == "video/H264").ToList();
+
+        if (preferredCodecs.Count == 0) {
+            _logger.Log("H264 not available, falling back to VP8");
+            preferredCodecs = codecs.Where(c => c.mimeType == "video/VP8").ToList();
+        }
+
+        RTCRtpTransceiver transceiver = peerConnection.AddTransceiver(TrackKind.Video);
+        transceiver.SetCodecPreferences(preferredCodecs.ToArray()); 
+    }
+
 
     private void Instance_OnOfferReceived(WebRTCHandshakeManager.Handshake handshake) {
         StartCoroutine(RecieveOffer(handshake));

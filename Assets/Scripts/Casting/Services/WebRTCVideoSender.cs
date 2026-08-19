@@ -116,33 +116,17 @@ public class WebRTCVideoSender : MonoBehaviour
         yield return CreateAndSendOffer();
     }
 
-    void CreateAndAddVideoTrack() {
-        //SetupCodecs();
-        var codecs = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs;
-
-        if(codecs.Length == 0)
-            _logger.LogError("No video codecs available. Cannot create video track.");
-
-        // Log available codecs for debugging
-        foreach (var c in codecs)
-            _logger.Log($"Available codec: {c.mimeType}");
-
+    void CreateAndAddVideoTrack() { 
         if (_copiedCameraRT && _copiedCameraRT.IsCreated())
             _copiedCameraRT.Release();
 
         int width = 1280, height = 720;
-        int depthValue = (int)RenderTextureDepth.Depth24;
-        var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-        _copiedCameraRT = new RenderTexture(width, height, depthValue, format);
+        //int depthValue = (int)RenderTextureDepth.Depth24;
+        var format = WebRTC.GetSupportedRenderTextureFormat(GraphicsDeviceType.Vulkan);
+        _copiedCameraRT = new RenderTexture(width, height, 0, format);
         _copiedCameraRT.Create();
         videoTrack = new VideoStreamTrack(_copiedCameraRT, Graphics.Blit);
         peerConnection.AddTrack(videoTrack);
-    }
-    private void LateUpdate() {
-        // copy via camera to avoid issues with XR rendering
-        return;
-        if(_copiedCameraRT && _copiedCameraRT.IsCreated())
-            ScreenCapture.CaptureScreenshotIntoRenderTexture(_copiedCameraRT);
     }
 
     //todo: consider using a CommandBuffer to copy the camera's render target to the RenderTexture
@@ -166,23 +150,6 @@ public class WebRTCVideoSender : MonoBehaviour
         CommandBufferPool.Release(cmd);
     }
 
-    void SetupCodecs() {
-        var codecs = RTCRtpSender.GetCapabilities(TrackKind.Video).codecs;
-
-        // Log available codecs for debugging
-        foreach (var c in codecs)
-            _logger.Log($"Available codec: {c.mimeType}");
-
-        var preferredCodecs = codecs.Where(c => c.mimeType == "video/H264").ToList();
-
-        if (preferredCodecs.Count == 0) {
-            _logger.Log("H264 not available, falling back to VP8");
-            preferredCodecs = codecs.Where(c => c.mimeType == "video/VP8").ToList();
-        }
-
-        RTCRtpTransceiver transceiver = peerConnection.AddTransceiver(TrackKind.Video);
-        transceiver.SetCodecPreferences(preferredCodecs.ToArray());
-    }
 
     IEnumerator CreateAndSendOffer() { 
         _logger.Log("Creating peer session offer...");

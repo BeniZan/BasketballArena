@@ -75,6 +75,7 @@ public class NetBoot : SingletonMono<NetBoot> {
 #endif
     void SetupPlayerType(PlayerType player) => SetupPlayerType(player.HasFlag(PlayerType.XRPlayer), player.HasFlag(PlayerType.Coach));
     public void SetupPlayerType(bool isXR) => SetupPlayerType(isXR, !isXR);
+    [Button, HideInEditorMode]
     public void SetupPlayerType(bool isXR, bool isCoach) {
         PlayerType type = PlayerType.NotSetup;
         if (isXR)
