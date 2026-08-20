@@ -29,6 +29,65 @@ public class WebRTCVideoSender : MonoBehaviour
         WebRTCHandshakeManager.Instance.OnICECandidateReceived += Instance_OnICECandidateReceived;
     }
 
+    private void OnEnable() {
+        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+        _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] ");
+        var netMnger = NetBoot.Instance.NetMnger;
+        netMnger.OnConnectionEvent += Singleton_OnConnectionEvent;
+        if (netMnger.IsConnectedClient && !netMnger.IsServer)
+            StartConnection();
+    }
+    private void OnDisable() {
+        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+        CloseConnection();
+        if (NetBoot.HasInstance) {
+            var netMnger = NetBoot.Instance.NetMnger;
+            netMnger.OnConnectionEvent -= Singleton_OnConnectionEvent;
+        }
+    }
+    void StartConnection() => StartCoroutine(SetupConnection());
+    private IEnumerator SetupConnection() {
+        _logger.Log("Setting up socket");
+
+        // Use local-only ICE candidates (no STUN/TURN) so peers attempt direct LAN connections.
+        var config = new RTCConfiguration {
+            iceServers = WebRTCHandshakeManager.GetIceServers(),
+            iceTransportPolicy = RTCIceTransportPolicy.All
+        };
+
+        peerConnection = new RTCPeerConnection(ref config) {
+            OnConnectionStateChange = state => _logger.Log($"Connection state: {state}"),
+            OnIceConnectionChange = state => _logger.Log($"ICE state: {state}"),
+
+            OnIceCandidate = candidate => {
+                var c = new WebRTCHandshakeManager.IceCandidateData {
+                    candidate = candidate.Candidate,
+                    sdpMid = candidate.SdpMid,
+                    sdpMLineIndex = candidate.SdpMLineIndex ?? 0
+                };
+                WebRTCHandshakeManager.Instance.SendICEData(c, NetworkManager.ServerClientId);
+            }
+        };
+
+        CreateAndAddVideoTrack();
+
+        _logger.Log("Waiting for socket to be ready...");
+
+        yield return CreateAndSendOffer();
+    }
+    IEnumerator CreateAndSendOffer() {
+        _logger.Log("Creating peer session offer...");
+        var offerOp = peerConnection.CreateOffer();
+        yield return offerOp;
+
+        _logger.Log("Setting peer description...");
+        var desc = offerOp.Desc;
+        yield return peerConnection.SetLocalDescription(ref desc);
+        if (!NetBoot.Instance.IsConnected)
+            _logger.Log("Waiting for network boot...");
+        yield return new WaitUntil(() => NetBoot.Instance.IsConnected);
+        WebRTCHandshakeManager.Instance.Client_BeginSendHandshake(desc.sdp);
+    }
     private void Handshake_OnServerHandshakeResponse(string sdp) {
         StartCoroutine(ReceiveAnswer(sdp));
     }
@@ -61,16 +120,6 @@ public class WebRTCVideoSender : MonoBehaviour
         { candidate = data.candidate, sdpMid = data.sdpMid, sdpMLineIndex = data.sdpMLineIndex });
     } 
 
-    private void OnEnable() {
-        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
-        _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] ");
-        var netMnger = NetBoot.Instance.NetMnger;
-        netMnger.OnConnectionEvent += Singleton_OnConnectionEvent;
-        if (netMnger.IsConnectedClient && !netMnger.IsServer)
-            StartConnection();
-
-
-    }
 
     private void Singleton_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {
         if(data.ClientId == nm.LocalClientId && ! nm.IsServer) {
@@ -82,39 +131,7 @@ public class WebRTCVideoSender : MonoBehaviour
         }
     } 
 
-    void StartConnection() => StartCoroutine(SetupConnection()); 
 
-    private IEnumerator SetupConnection()
-    {
-        _logger.Log("Setting up socket");
-
-        // Use local-only ICE candidates (no STUN/TURN) so peers attempt direct LAN connections.
-        var config = new RTCConfiguration
-        {
-            iceServers = new RTCIceServer[0],
-            iceTransportPolicy = RTCIceTransportPolicy.All
-        }; 
-         
-        peerConnection = new RTCPeerConnection(ref config) {
-            OnConnectionStateChange = state => _logger.Log($"Connection state: {state}"),
-            OnIceConnectionChange = state => _logger.Log($"ICE state: {state}"),
-             
-            OnIceCandidate = candidate => { 
-                var c = new WebRTCHandshakeManager.IceCandidateData {
-                    candidate = candidate.Candidate,
-                    sdpMid = candidate.SdpMid,
-                    sdpMLineIndex = candidate.SdpMLineIndex ?? 0
-                };
-                WebRTCHandshakeManager.Instance.SendICEData(c, NetworkManager.ServerClientId);
-            }
-        };
-
-        CreateAndAddVideoTrack(); 
-
-        _logger.Log("Waiting for socket to be ready...");
-
-        yield return CreateAndSendOffer();
-    }
 
     void CreateAndAddVideoTrack() { 
         if (_copiedCameraRT && _copiedCameraRT.IsCreated())
@@ -150,30 +167,7 @@ public class WebRTCVideoSender : MonoBehaviour
         CommandBufferPool.Release(cmd);
     }
 
-
-    IEnumerator CreateAndSendOffer() { 
-        _logger.Log("Creating peer session offer...");
-        var offerOp = peerConnection.CreateOffer();
-        yield return offerOp;
-
-        _logger.Log("Setting peer description...");
-        var desc = offerOp.Desc;
-        yield return peerConnection.SetLocalDescription(ref desc);
-        if (!NetBoot.Instance.IsConnected)
-            _logger.Log("Waiting for network boot...");
-        yield return new WaitUntil(() => NetBoot.Instance.IsConnected);
-        WebRTCHandshakeManager.Instance.Client_BeginSendHandshake(desc.sdp);
-    } 
-
-    private void OnDisable() {
-        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
-        CloseConnection();
-        if (NetBoot.HasInstance) {
-            var netMnger = NetBoot.Instance.NetMnger;
-            netMnger.OnConnectionEvent -= Singleton_OnConnectionEvent;
-        }
-    }
-
+     
     void CloseConnection() {
         _setupRemoteDescription = false;
         vrCamera.targetTexture = null;

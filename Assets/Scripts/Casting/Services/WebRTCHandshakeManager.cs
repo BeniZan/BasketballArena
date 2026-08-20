@@ -6,6 +6,21 @@ using Unity.Netcode;
 using Unity.WebRTC;
 
 public class WebRTCHandshakeManager : NetworkBehaviour {
+    static readonly bool USE_GOOGLE_STUN_SERVERS = false;
+    static public RTCIceServer[] GetIceServers() {
+        if (USE_GOOGLE_STUN_SERVERS) {
+            return new RTCIceServer[] {
+                    new() {
+                        urls = new string[] {
+                            "stun:stun.l.google.com:19302",
+                            "stun:stun1.l.google.com:19302"
+                        }
+                    }
+                };
+        }
+        return new RTCIceServer[0];
+    }
+
     static WebRTCHandshakeManager _instance;
     public static WebRTCHandshakeManager Instance {
         get {
@@ -53,6 +68,7 @@ public class WebRTCHandshakeManager : NetworkBehaviour {
         StopAllCoroutines();
     } 
 
+    // 1. create offer from XR client
     public void Client_BeginSendHandshake(string sdp) {
         var handShake = new Handshake() 
         { SDP = sdp, SenderNetID = NetworkManager.Singleton.LocalClientId };

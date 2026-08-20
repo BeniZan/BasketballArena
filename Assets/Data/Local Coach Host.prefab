@@ -329,8 +329,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8128598171603372272, guid: 8a3d9f39528982440bb9e0abce2d17d0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1381373216586062845}
   m_SourcePrefab: {fileID: 100100000, guid: 8a3d9f39528982440bb9e0abce2d17d0, type: 3}
+--- !u!1 &1499804163833366913 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8128598171603372272, guid: 8a3d9f39528982440bb9e0abce2d17d0, type: 3}
+  m_PrefabInstance: {fileID: 7214426890960863601}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1381373216586062845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499804163833366913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2e9f77b57d44d94a8fdf112bec24e49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WebRTCVideoReceiver
+  _testImg: {fileID: 0}
 --- !u!4 &4906317828127401612 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2308223561292883965, guid: 8a3d9f39528982440bb9e0abce2d17d0, type: 3}

@@ -17,6 +17,7 @@ public class WebRTCVideoReceiver : MonoBehaviour {
     CustomLogger _logger;
     [ShowInInspector, HideInEditorMode, ReadOnly] bool _isConnectionActive;
     [ShowInInspector, HideInEditorMode, ReadOnly] Texture _recievedVideo;
+    [SerializeField] RawImage _testImg;
     public Texture VideoTexture { get; private set; }
     public event Action<Texture> OnVideoTextureChanged;
     private void Awake() {
@@ -34,19 +35,11 @@ public class WebRTCVideoReceiver : MonoBehaviour {
     {
         _isConnectionActive = true;
         _logger = new CustomLogger(this, Color.cyan, "[WebRTC-Receiver] ");
-        _logger.Log("Starting WebRTC connection..."); 
+        _logger.Log("Starting WebRTC connection...");
 
         // Use local-only ICE candidates (no STUN/TURN).
-        var config = new RTCConfiguration
-        {
-            iceServers = new RTCIceServer[] {
-                new() {
-                    urls = new string[] {
-                        "stun:stun.l.google.com:19302",
-                        "stun:stun1.l.google.com:19302"
-                    }
-                }
-            },
+        var config = new RTCConfiguration {
+            iceServers = WebRTCHandshakeManager.GetIceServers(),
             iceTransportPolicy = RTCIceTransportPolicy.All
         }; 
         peerConnection = new RTCPeerConnection(ref config) {
@@ -73,8 +66,8 @@ public class WebRTCVideoReceiver : MonoBehaviour {
         VideoTexture = tex;
         _recievedVideo = tex;
         OnVideoTextureChanged?.Invoke(tex); 
-        if (TryGetComponent(out RawImage raw))
-            raw.texture = _recievedVideo; // for testing   
+        if (_testImg)
+            _testImg.texture = _recievedVideo; // for testing   
     }
 
     void SetupCodecs() {
@@ -115,17 +108,37 @@ public class WebRTCVideoReceiver : MonoBehaviour {
 
         _setupRemoteDescription = true;
         while (_pendingCandidates.TryDequeue(out var candidate)) {
-            peerConnection.AddIceCandidate(new RTCIceCandidate(candidate));
+            if( ! peerConnection.AddIceCandidate(new RTCIceCandidate(candidate))) {
+                _logger.LogError("Failed to add ICE candidate");
+            }
         }
 
         var answer = peerConnection.CreateAnswer();
 
         yield return answer;
+        if (answer.IsError) {
+            LogRTCError(answer.Error);
+            yield break;
+        }
 
         var answerDesc = answer.Desc;
-        yield return peerConnection.SetLocalDescription(ref answerDesc); 
+        var localDescriptionSet = peerConnection.SetLocalDescription(ref answerDesc);
+        yield return localDescriptionSet;
+
+        if (localDescriptionSet.IsError) {
+            LogRTCError(localDescriptionSet.Error);
+            yield break;
+        }
+
+        _logger.Log("Sending answer...");
+
         WebRTCHandshakeManager.Instance.Server_SendAnswer(answerDesc.sdp, handshake.SenderNetID);
     } 
+
+    void LogRTCError(RTCError error) {
+        _logger.LogError(error.errorType + ":" +error.message);
+    }
+
     void OnReceivedICE(WebRTCHandshakeManager.IceCandidateData c) {
         RTCIceCandidateInit candInit = new RTCIceCandidateInit {
             candidate = c.candidate,
