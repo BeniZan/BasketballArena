@@ -8,29 +8,70 @@ using Unity.Netcode.Transports.UTP;
 using Unity.WebRTC;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;  
 
+#if UNITY_ANDROID
+using UnityEngine.Android;
+#endif
 public enum WebRTCState { Disconnected, Connecting, Connected } 
 public class WebRTCVideoSender : MonoBehaviour
 {
     public const string TYPE_OFFER = "offer";
-
-    public Camera vrCamera; 
-    
+     
     private RTCPeerConnection peerConnection;
     private VideoStreamTrack videoTrack;
     [ShowInInspector, HideInEditorMode] private RenderTexture _copiedCameraRT;
-
     CustomLogger _logger;
     Queue<RTCIceCandidateInit> _pendingCandidates = new Queue<RTCIceCandidateInit>();
     bool _setupRemoteDescription;
-
+    [ShowInInspector, HideInEditorMode, ReadOnly] WebCamTexture _questCamTexture;
+    Awaitable _awaitGettingWebcamTexture;
     private void Awake() {
         WebRTCHandshakeManager.Instance.OnServerHandshakeResponse += Handshake_OnServerHandshakeResponse;
         WebRTCHandshakeManager.Instance.OnICECandidateReceived += Instance_OnICECandidateReceived;
+        _awaitGettingWebcamTexture = AwaitGetQuestWebcam();
     }
 
+    [Button]
+    private async Awaitable AwaitGetQuestWebcam() {
+
+#if UNITY_EDITOR
+        _logger.Log("Requesting webcam permission in editor..."); 
+        await Application.RequestUserAuthorization(UserAuthorization.WebCam);
+        while(!Application.HasUserAuthorization(UserAuthorization.WebCam)) {
+            _logger.LogError("Webcam permission denied in editor.");
+            await Application.RequestUserAuthorization(UserAuthorization.WebCam);
+        }
+#else
+        Permission.RequestUserPermission(Permission.Camera);
+        await Awaitable.WaitForSecondsAsync(10f);
+        while (!Permission.HasUserAuthorizedPermission(Permission.Camera)) {
+            _logger.LogError("Webcam permission denied on device.");
+            await Awaitable.WaitForSecondsAsync(10f);
+            Permission.RequestUserPermission(Permission.Camera);
+        } 
+#endif
+
+        _logger.Log("Searching for XR WebCam...");
+
+        while (! _questCamTexture) {
+            await Awaitable.WaitForSecondsAsync(0.5f);
+            WebCamDevice[] devices = WebCamTexture.devices;
+            if (devices.Length > 0) {
+                string log = "Found Webcams: ";
+                foreach (var cams in devices) {
+                    log += cams.name + " | ";
+                }
+                _logger.Log(log);
+                // Meta maps the passthrough cameras through standard WebCamTexture interfaces
+                _questCamTexture = new WebCamTexture(devices[0].name, 1280, 720, 60);
+                if(!_questCamTexture.isPlaying)
+                    _questCamTexture.Play();
+            }
+        }
+    } 
+
     private void OnEnable() {
-        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
         _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] ");
         var netMnger = NetBoot.Instance.NetMnger;
         netMnger.OnConnectionEvent += Singleton_OnConnectionEvent;
@@ -38,7 +79,6 @@ public class WebRTCVideoSender : MonoBehaviour
             StartConnection();
     }
     private void OnDisable() {
-        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
         CloseConnection();
         if (NetBoot.HasInstance) {
             var netMnger = NetBoot.Instance.NetMnger;
@@ -69,7 +109,7 @@ public class WebRTCVideoSender : MonoBehaviour
             }
         };
 
-        CreateAndAddVideoTrack();
+        yield return CreateAndAddVideoTrack();
 
         _logger.Log("Waiting for socket to be ready...");
 
@@ -129,48 +169,31 @@ public class WebRTCVideoSender : MonoBehaviour
                 CloseConnection();
             }
         }
-    } 
+    }
 
 
+    UniversalRenderPipeline.SingleCameraRequest _camRequest;
 
-    void CreateAndAddVideoTrack() { 
+    IEnumerator CreateAndAddVideoTrack() { 
         if (_copiedCameraRT && _copiedCameraRT.IsCreated())
             _copiedCameraRT.Release();
 
+        yield return new WaitUntil(() => _questCamTexture);
+
         int width = 1280, height = 720;
-        //int depthValue = (int)RenderTextureDepth.Depth24;
-        var format = WebRTC.GetSupportedRenderTextureFormat(GraphicsDeviceType.Vulkan);
-        _copiedCameraRT = new RenderTexture(width, height, 0, format);
+        //int depthValue = (int)RenderTextureDepth.Depth24;  
+        var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+        _copiedCameraRT = new RenderTexture(width, height, 24, UnityEngine.Experimental.Rendering.GraphicsFormat.B8G8R8A8_SRGB);
         _copiedCameraRT.Create();
-        videoTrack = new VideoStreamTrack(_copiedCameraRT, Graphics.Blit);
+        _camRequest = new UniversalRenderPipeline.SingleCameraRequest() { destination = _copiedCameraRT };
+        videoTrack = new VideoStreamTrack(_questCamTexture);
         peerConnection.AddTrack(videoTrack);
     }
-
-    //todo: consider using a CommandBuffer to copy the camera's render target to the RenderTexture
-    private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
-        // Filter out other cameras (like scene view or overlay cameras)
-        if (camera != vrCamera) return;
-
-        if (!_copiedCameraRT || !_copiedCameraRT.IsCreated()) { 
-            return;
-        }
-
-        // Get a temporary CommandBuffer allocated from the pool
-        CommandBuffer cmd = CommandBufferPool.Get("CopyCameraTexture");
-
-        // Use Blit to copy the camera's current target buffer to your custom RenderTexture
-        // BuiltinRenderTextureType.CameraTarget points directly to the active camera buffer
-        cmd.Blit(BuiltinRenderTextureType.CameraTarget, _copiedCameraRT);
-
-        // Execute and immediately clean up the buffer
-        context.ExecuteCommandBuffer(cmd);
-        CommandBufferPool.Release(cmd);
-    }
-
      
+     
+
     void CloseConnection() {
-        _setupRemoteDescription = false;
-        vrCamera.targetTexture = null;
+        _setupRemoteDescription = false; 
         videoTrack?.Dispose();
         peerConnection?.Dispose(); 
         StopAllCoroutines();

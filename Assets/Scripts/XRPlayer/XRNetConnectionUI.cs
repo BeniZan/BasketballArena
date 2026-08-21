@@ -8,11 +8,20 @@ public class XRNetConnectionUI : MonoBehaviour {
     {
         _netMnger = NetBoot.Instance.NetMnger;
         _netMnger.OnConnectionEvent += Singleton_OnConnectionEvent;
+        _netMnger.OnClientStopped += _netMnger_OnClientStopped;
+        _netMnger.OnPreShutdown += _netMnger_OnPreShutdown;
         ValidateConnectionUI();
     }
+
+    private void _netMnger_OnPreShutdown() => ValidateConnectionUI();
+    private void _netMnger_OnClientStopped(bool obj) => ValidateConnectionUI();
+
     private void OnDestroy() {
-        if(_netMnger)
+        if (_netMnger) {
             _netMnger.OnConnectionEvent -= Singleton_OnConnectionEvent;
+            _netMnger.OnClientStopped -= _netMnger_OnClientStopped;
+            _netMnger.OnPreShutdown -= _netMnger_OnPreShutdown;
+        }
     } 
 
     private void Singleton_OnConnectionEvent(NetworkManager arg1, ConnectionEventData arg2) {

@@ -431,6 +431,7 @@ Transform:
   m_Children:
   - {fileID: 8621506129029750512}
   - {fileID: 6112329214505387213}
+  - {fileID: 4836414954735762826}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &650769533150834104
@@ -484,6 +485,50 @@ MonoBehaviour:
   - platformType: 0
     permissions:
     - permissionId: com.oculus.permission.USE_SCENE
+      enabled: 1
+      requested: 0
+      responseReceived: 0
+      granted: 0
+      onPermissionGranted:
+        m_PersistentCalls:
+          m_Calls: []
+      onPermissionDenied:
+        m_PersistentCalls:
+          m_Calls: []
+    - permissionId: android.permission.INTERNET
+      enabled: 1
+      requested: 0
+      responseReceived: 0
+      granted: 0
+      onPermissionGranted:
+        m_PersistentCalls:
+          m_Calls: []
+      onPermissionDenied:
+        m_PersistentCalls:
+          m_Calls: []
+    - permissionId: android.permission.ACCESS_NETWORK_STATE
+      enabled: 1
+      requested: 0
+      responseReceived: 0
+      granted: 0
+      onPermissionGranted:
+        m_PersistentCalls:
+          m_Calls: []
+      onPermissionDenied:
+        m_PersistentCalls:
+          m_Calls: []
+    - permissionId: android.permission.CHANGE_WIFI_MULTICAST_STATE
+      enabled: 1
+      requested: 0
+      responseReceived: 0
+      granted: 0
+      onPermissionGranted:
+        m_PersistentCalls:
+          m_Calls: []
+      onPermissionDenied:
+        m_PersistentCalls:
+          m_Calls: []
+    - permissionId: com.meta.permission.USE_PASSTHROUGH_CAMERA
       enabled: 1
       requested: 0
       responseReceived: 0
@@ -572,6 +617,69 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SurfaceHandler
   ScalingTransform: {fileID: 1275167770661773134}
+--- !u!1 &2677397766970047437
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4836414954735762826}
+  - component: {fileID: 8762245741817152930}
+  - component: {fileID: 1098452571969941909}
+  m_Layer: 0
+  m_Name: NDI Sender
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4836414954735762826
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2677397766970047437}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5816307049958330872}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8762245741817152930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2677397766970047437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2d98e5bfcdff4847ad69efa861a8e7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Klak.Ndi.Runtime::Klak.Ndi.NdiSender
+  _ndiName: NDI_ARENA_RENDER_STREAM
+  _keepAlpha: 0
+  _captureMethod: 2
+  _sourceCamera: {fileID: 4829052437376163220}
+  _sourceTexture: {fileID: 8400000, guid: c9107f85bf387be4299db84773292c57, type: 2}
+  _resources: {fileID: 11400000, guid: 69304b86950074db7ba8caba75214004, type: 2}
+--- !u!114 &1098452571969941909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2677397766970047437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b45594959baa2214f899ba52216a9f5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CopyCamToRenderTexture
 --- !u!1 &3366986342834232361
 GameObject:
   m_ObjectHideFlags: 0
@@ -1199,6 +1307,9 @@ MonoBehaviour:
   _editorAutoCalibrate: 0
   _editorCalibrateWidth: 15
   _editorCalibrateLength: 28
+  _test_p1: {x: 0, y: 0, z: 0}
+  _test_p2: {x: 0, y: 0, z: 0}
+  _test_p3: {x: 0, y: 0, z: 0}
 --- !u!114 &7182274678011611614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1990,7 +2101,7 @@ PrefabInstance:
       addedObject: {fileID: 61156878821906817}
     - targetCorrespondingSourceObject: {fileID: 657184242118504722, guid: d6878e1999eb4b44a9f5a263af86c185, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6795334225948136705}
+      addedObject: {fileID: 4535296401477633499}
     - targetCorrespondingSourceObject: {fileID: 6355494128053973299, guid: d6878e1999eb4b44a9f5a263af86c185, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7770843320478321102}
@@ -2139,7 +2250,7 @@ MonoBehaviour:
   m_AttemptUpdate: 1
   m_MatchFrameRate: 1
   m_TrackingMode: 2
---- !u!114 &6795334225948136705
+--- !u!114 &4535296401477633499
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
