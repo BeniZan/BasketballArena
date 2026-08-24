@@ -128,8 +128,12 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
         } 
         catch(System.Exception ex) { Debug.LogException(ex); } 
         finally {
-            _courtHalfSurfacePreview.gameObject.SetActive(IsCalibrating);
             CalibrationStep.Value = Step.Calibrated;
+            _courtHalfSurfacePreview.gameObject.SetActive(IsCalibrating);
+            _courtHalfSurface.gameObject.SetActive(IsCalibrating); 
+            foreach(var placer in _placers) {
+                placer.gameObject.SetActive(IsCalibrating);
+            }
             _calibrationAwait = null;
             _logger.Log("Calibration Done");
         }
@@ -152,9 +156,8 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
             _tempLine[2] = _placers[2].PreviewOrPlacedPosition;
             var surface = 
                 CreateSurface(_tempLine[0], _tempLine[1], _tempLine[2]);
-            var topCorner =
-                surface.Center + (surface.Rotation * surface.Size / 2f);
-            _tempLine[2] = topCorner;
+            var rightTop = surface.Matrix.MultiplyPoint3x4(new Vector3() { [LENGTH_AXIS] = 0.5f, [WIDTH_AXIS] = -0.5f }); 
+            _tempLine[2] = rightTop;
             _tempLine[2].y = _tempLine[1].y = _tempLine[0].y;
         }
 
@@ -197,7 +200,6 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
         return new SurfaceData {
             Center = center,
             Size = new Vector3() { [LENGTH_AXIS] = length, [WIDTH_AXIS] = width, [UNUSED_AXIS] = 1f },
-            Forward = right,
             Rotation = rotation
         };
 

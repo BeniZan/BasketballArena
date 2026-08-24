@@ -4,8 +4,9 @@ using UnityEngine;
 public struct SurfaceData {
     public Vector3 Center;
     public Vector3 Size;
-    public Vector3 Forward;
-    public Quaternion Rotation; 
+    public Quaternion Rotation;
+    public readonly Vector3 Forward => Rotation * Vector3.forward;
+    public readonly Matrix4x4 Matrix => Matrix4x4.TRS(Center, Rotation, Size);
 }
 public class SurfaceHandler : MonoBehaviour {
     public Transform ScalingTransform;
