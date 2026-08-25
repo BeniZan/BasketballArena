@@ -159,9 +159,9 @@ public class WebRTCVideoSender : MonoBehaviour
         _camRequest = new UniversalRenderPipeline.SingleCameraRequest() { destination = _webRTCSubmitTexture };
 #elif UNITY_ANDROID
         yield return new WaitUntil(() => _questWebCamTexture);
-        if (_previewSentTexture)
-            _previewSentTexture.texture = _questWebCamTexture;
 #endif
+        if (_previewSentTexture)
+            _previewSentTexture.texture = _webRTCSubmitTexture;
         videoTrack = new VideoStreamTrack(_webRTCSubmitTexture);
         peerConnection.AddTrack(videoTrack);
         _logger.Log("Created and added video track to peer connection.");
