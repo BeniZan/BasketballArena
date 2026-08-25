@@ -97,7 +97,7 @@ public class Calibration : SingletonBehaviors.SingletonMono<Calibration> {
         for (int i = 0; i < _placers.Length; i++) {
             _placers[i].IsPlacing = (i == stepInt);
         }
-        _courtHalfSurface.gameObject.SetActive(step == Step.Calibrated);
+        _courtHalfSurface.gameObject.SetActive(IsDoneCalibration);
         CalibrationStep.Value = step;
     }
     async Awaitable BeginCalibration() {

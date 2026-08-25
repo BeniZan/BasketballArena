@@ -8,37 +8,114 @@ using Unity.Netcode.Transports.UTP;
 using Unity.WebRTC;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
-public enum WebRTCState { Disconnected, Connecting, Connected } 
+
+#if UNITY_ANDROID
+using UnityEngine.Android;
+#endif
+public enum WebRTCState { Disconnected, Connecting, Connected }
+
+/// <summary>
+/// In editor copy the screen texture
+/// In quest use WebCam to get the camera
+/// in both cases we need to copy the texture to render texture
+/// </summary>
 public class WebRTCVideoSender : MonoBehaviour
 {
     public const string TYPE_OFFER = "offer";
-
-    public Camera vrCamera; 
-    
+    [SerializeField] Camera _cam;
     private RTCPeerConnection peerConnection;
     private VideoStreamTrack videoTrack;
-    [ShowInInspector, HideInEditorMode] private RenderTexture _copiedCameraRT;
-
     CustomLogger _logger;
     Queue<RTCIceCandidateInit> _pendingCandidates = new Queue<RTCIceCandidateInit>();
     bool _setupRemoteDescription;
+    [SerializeField] RawImage _previewSentTexture;
+    [ShowInInspector, HideInEditorMode, ReadOnly] RenderTexture _webRTCSubmitTexture;
+#if UNITY_ANDROID && !UNITY_EDITOR
+    [ShowInInspector, HideInEditorMode, ReadOnly] WebCamTexture _questWebCamTexture;
+#endif
+    Awaitable _awaitGettingWebcamTexture;
 
+#if UNITY_EDITOR
+    UniversalRenderPipeline.SingleCameraRequest _camRequest;
+#endif
     private void Awake() {
+        if (!_logger.PingObj)
+            _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender]");
         WebRTCHandshakeManager.Instance.OnServerHandshakeResponse += Handshake_OnServerHandshakeResponse;
         WebRTCHandshakeManager.Instance.OnICECandidateReceived += Instance_OnICECandidateReceived;
+        _previewSentTexture.texture = Texture2D.normalTexture;
+        _awaitGettingWebcamTexture = AwaitGetQuestWebcam();
+    }
+
+#if UNITY_ANDROID
+	async Awaitable AwaitAndroidPermission(string permission){
+        if (Permission.HasUserAuthorizedPermission(permission))
+            return;
+        Permission.RequestUserPermission(permission);
+        await Awaitable.WaitForSecondsAsync(10f);
+        while (!Permission.HasUserAuthorizedPermission(permission)){
+            _logger.LogError("Webcam permission denied on device.");
+            await Awaitable.WaitForSecondsAsync(10f);
+            Permission.RequestUserPermission(permission);
+        }
+        _logger.Log($"Recieved permission [{permission}].");
+	}
+#endif
+    [Button] private async Awaitable AwaitGetQuestWebcam() {
+        if (_webRTCSubmitTexture) {
+            try {Destroy(_webRTCSubmitTexture);  }
+            catch {  }
+            _webRTCSubmitTexture = null;
+        } 
+        int width = 1280, height = 720;
+        var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
+        _webRTCSubmitTexture = new RenderTexture(width, height, 24, format);
+        _webRTCSubmitTexture.Create();
+#if UNITY_ANDROID && !UNITY_EDITOR
+        _logger.Log("Getting Android Permissions...");
+        await AwaitAndroidPermission("com.oculus.permission.USE_SCENE");
+        await AwaitAndroidPermission("horizonos.permission.HEADSET_CAMERA");
+        await AwaitAndroidPermission("android.permission.CHANGE_WIFI_MULTICAST_STATE");
+        while (! _questWebCamTexture) {
+            _logger.Log("Searching for XR WebCam...");
+            await Awaitable.WaitForSecondsAsync(1f);
+            WebCamDevice[] devices = WebCamTexture.devices;
+            if (devices.Length > 0) {
+                string log = "Found Webcams: ";
+                foreach (var cams in devices) {
+                    log += cams.name + " | ";
+                }
+                _logger.Log(log);
+                _questWebCamTexture = new WebCamTexture(devices[1].name, 1280, 720, 60);
+                if(!_questWebCamTexture.isPlaying)
+                    _questWebCamTexture.Play(); 
+            }
+        }
+#endif
+    }
+
+    private void LateUpdate() {
+#if UNITY_EDITOR
+        if (_camRequest != null && _camRequest.destination && _camRequest.destination.IsCreated())
+            RenderPipeline.SubmitRenderRequest(_cam, _camRequest);
+#elif UNITY_ANDROID
+        if(_questWebCamTexture && _webRTCSubmitTexture)
+            Graphics.Blit(_questWebCamTexture, _webRTCSubmitTexture.graphicsTexture);
+#endif 
     }
 
     private void OnEnable() {
-        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
-        _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender] ");
+        if(!_logger.PingObj)
+            _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender]");
         var netMnger = NetBoot.Instance.NetMnger;
         netMnger.OnConnectionEvent += Singleton_OnConnectionEvent;
         if (netMnger.IsConnectedClient && !netMnger.IsServer)
             StartConnection();
     }
     private void OnDisable() {
-        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
         CloseConnection();
         if (NetBoot.HasInstance) {
             var netMnger = NetBoot.Instance.NetMnger;
@@ -69,11 +146,25 @@ public class WebRTCVideoSender : MonoBehaviour
             }
         };
 
-        CreateAndAddVideoTrack();
+        yield return CreateAndAddVideoTrack();
 
         _logger.Log("Waiting for socket to be ready...");
 
         yield return CreateAndSendOffer();
+    }
+
+    IEnumerator CreateAndAddVideoTrack() {
+        yield return new WaitUntil(() => _webRTCSubmitTexture);
+#if UNITY_EDITOR
+        _camRequest = new UniversalRenderPipeline.SingleCameraRequest() { destination = _webRTCSubmitTexture };
+#elif UNITY_ANDROID
+        yield return new WaitUntil(() => _questWebCamTexture);
+        if (_previewSentTexture)
+            _previewSentTexture.texture = _questWebCamTexture;
+#endif
+        videoTrack = new VideoStreamTrack(_webRTCSubmitTexture);
+        peerConnection.AddTrack(videoTrack);
+        _logger.Log("Created and added video track to peer connection.");
     }
     IEnumerator CreateAndSendOffer() {
         _logger.Log("Creating peer session offer...");
@@ -129,48 +220,9 @@ public class WebRTCVideoSender : MonoBehaviour
                 CloseConnection();
             }
         }
-    } 
-
-
-
-    void CreateAndAddVideoTrack() { 
-        if (_copiedCameraRT && _copiedCameraRT.IsCreated())
-            _copiedCameraRT.Release();
-
-        int width = 1280, height = 720;
-        //int depthValue = (int)RenderTextureDepth.Depth24;
-        var format = WebRTC.GetSupportedRenderTextureFormat(GraphicsDeviceType.Vulkan);
-        _copiedCameraRT = new RenderTexture(width, height, 0, format);
-        _copiedCameraRT.Create();
-        videoTrack = new VideoStreamTrack(_copiedCameraRT, Graphics.Blit);
-        peerConnection.AddTrack(videoTrack);
     }
-
-    //todo: consider using a CommandBuffer to copy the camera's render target to the RenderTexture
-    private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
-        // Filter out other cameras (like scene view or overlay cameras)
-        if (camera != vrCamera) return;
-
-        if (!_copiedCameraRT || !_copiedCameraRT.IsCreated()) { 
-            return;
-        }
-
-        // Get a temporary CommandBuffer allocated from the pool
-        CommandBuffer cmd = CommandBufferPool.Get("CopyCameraTexture");
-
-        // Use Blit to copy the camera's current target buffer to your custom RenderTexture
-        // BuiltinRenderTextureType.CameraTarget points directly to the active camera buffer
-        cmd.Blit(BuiltinRenderTextureType.CameraTarget, _copiedCameraRT);
-
-        // Execute and immediately clean up the buffer
-        context.ExecuteCommandBuffer(cmd);
-        CommandBufferPool.Release(cmd);
-    }
-
-     
     void CloseConnection() {
-        _setupRemoteDescription = false;
-        vrCamera.targetTexture = null;
+        _setupRemoteDescription = false; 
         videoTrack?.Dispose();
         peerConnection?.Dispose(); 
         StopAllCoroutines();

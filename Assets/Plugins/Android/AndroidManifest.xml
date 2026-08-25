@@ -15,12 +15,18 @@
     <meta-data android:name="com.oculus.telemetry.project_guid" android:value="3b98a492-5a1d-48df-b194-035346eff5df" />
     <meta-data android:name="com.oculus.supportedDevices" android:value="quest3" tools:replace="android:value" />
   </application>
+
+  <uses-feature android:name="android.hardware.camera" android:required="false" />
   <uses-feature android:name="android.hardware.vr.headtracking" android:version="1" android:required="true" />
   <uses-feature android:name="oculus.software.handtracking" android:required="true" />
   <uses-permission android:name="com.oculus.permission.HAND_TRACKING" />
-  <uses-permission android:name="com.oculus.permission.USE_ANCHOR_API" />
-  <uses-feature android:name="com.oculus.feature.PASSTHROUGH" android:required="true" />
+	<uses-permission android:name="com.oculus.permission.USE_ANCHOR_API" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="com.meta.permission.USE_PASSTHROUGH_CAMERA" /> 
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> 
+	<uses-feature android:name="com.oculus.feature.PASSTHROUGH" android:required="true" />
   <uses-permission android:name="com.oculus.permission.USE_SCENE" />
+  <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
   <horizonos:uses-horizonos-sdk horizonos:minSdkVersion="60" horizonos:targetSdkVersion="203" />
   <uses-permission android:name="horizonos.permission.HEADSET_CAMERA" />
 </manifest>
