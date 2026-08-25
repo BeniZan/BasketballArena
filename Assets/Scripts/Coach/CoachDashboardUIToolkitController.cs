@@ -252,7 +252,8 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void Update()
     {
-        UpdateTimerDisplay();  
+        UpdateTimerDisplay();
+        UpdateAutoAdvance();
     }  
 
     // ---- XR headset indicator --------------------------------------------------
@@ -404,6 +405,63 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         {
             _session.Next(); // advances active drill -> HandleActiveDrillChanged updates repText + highlight
         }
+    }
+
+    /// <summary>
+    /// Advances the Training Flow when the active drill's animation reaches its end.
+    /// On the last drill the animation pauses instead, so the session stays active and the
+    /// coach can still resume, advance manually, or stop.
+    /// </summary>
+    private void UpdateAutoAdvance()
+    {
+        if (!Application.isPlaying || !_isSessionActive) return;
+
+        var player = DrillPlayer.Instance;
+        // Advancing writes server-owned NetworkVariables, so only the coach host may do it.
+        if (player == null || !player.IsServer || !player.IsPlaying) return;
+        if (!ReachedDrillEnd(player)) return;
+
+        if (_session.ActiveIndex >= _session.Drills.Count - 1)
+        {
+            PauseTimer();
+            return;
+        }
+
+        _session.Next();
+
+        // Two identical drills in a row leave NetDrillsActivator's synced value unchanged, so its
+        // change notification (which normally restarts playback) never fires. Reset explicitly.
+        player.ResetTimeAndPlay();
+    }
+
+    /// <summary>
+    /// True once every character in the active drill has finished its animation. Computed here
+    /// rather than through DrillPlayer.ReachedMaxAnimationTime(), which dereferences every
+    /// CharData.Animation and so throws on the many drills that leave a clip unassigned.
+    /// </summary>
+    private static bool ReachedDrillEnd(DrillPlayer player)
+    {
+        if (!player.IsSpawned) return false;
+
+        var activator = NetDrillsActivator.Instance;
+        var drill = activator != null ? activator.ActiveManeuver.Value : null;
+        if (drill == null) return false;
+
+        float drillLength = 0f;
+        foreach (var data in drill.CharsData)
+        {
+            if (data == null || data.Animation == null) continue;
+
+            // CharComponent plays each character at (AnimationTime + AnimationTimeOffset), so a
+            // character with an offset reaches the end of its clip that much earlier.
+            drillLength = Mathf.Max(drillLength, data.Animation.length - data.AnimationTimeOffset);
+        }
+
+        // A drill with no usable clip has no defined end. Treating it as finished would make
+        // auto-advance race through the whole session within a few frames.
+        if (drillLength <= 0f) return false;
+
+        return player.AnimationTime >= drillLength;
     }
 
     private void ForceSession()
