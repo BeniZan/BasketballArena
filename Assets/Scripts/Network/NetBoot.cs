@@ -99,8 +99,10 @@ public class NetBoot : SingletonMono<NetBoot> {
     private void NetMng_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {
         var isLocalClientEvent = data.ClientId == nm.LocalClientId;
         if (isLocalClientEvent) {
-            if (data.EventType == ConnectionEvent.ClientConnected)
-                _logger.Log("Connected");
+            if (data.EventType == ConnectionEvent.ClientConnected) {
+                _logger.Log("Connected");  
+            }
+                
             if(data.EventType == ConnectionEvent.ClientDisconnected) {
                 _logger.Log("Disconnected"); 
             }
@@ -108,6 +110,14 @@ public class NetBoot : SingletonMono<NetBoot> {
         else {
             _logger.Log($"ConnectionEvent: client[{data.ClientId}] -> {data.EventType}");
         } 
+
+        if(data.EventType == ConnectionEvent.ClientConnected) { 
+            if(data.ClientId != NetworkManager.ServerClientId) { 
+                _logger.Log("Spawning XR Network object for clientId: " + data.ClientId);
+                nm.SpawnManager.InstantiateAndSpawn(_XRClientPrefab, data.ClientId, true, true);
+            }
+        }
+
     }
 
 

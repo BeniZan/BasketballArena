@@ -14,7 +14,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "359c363f56d740bf6cc7279646144d74ad69e01d"
+      "hash": "8a80343f4d3479acc113651e404d6b4d33112d96"
     },
     "com.google.external-dependency-manager": {
       "version": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",

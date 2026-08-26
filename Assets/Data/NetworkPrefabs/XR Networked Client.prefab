@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4121043501438209210}
   - component: {fileID: -1720271785283989664}
+  - component: {fileID: 3803588981242625622}
   m_Layer: 0
   m_Name: XR Networked Client
   m_TagString: Untagged
@@ -58,3 +59,21 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &3803588981242625622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8558883640438443848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57c2da43239c10048b8184d85f8c1c02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetSpawnedXRData
+  ShowTopMostFoldoutHeaderGroup: 1
+  FPS:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
