@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7f63e253653e34893818f789375768, type: 3}
+  m_Name: 'Pick&roll '
+  m_EditorClassIdentifier: Assembly-CSharp::TeamManeuver
+  DrillCategory: 0
+  OriginPoint: {x: 0, y: 0, z: 0}
+  OriginYRotation: 0
+  MirrorLeftRight: 1
+  CharsData:
+  - FieldStandardPosition: {x: -2.42, y: 6.49}
+    yRotation: -126.86
+    Animation: {fileID: 7400000, guid: 90eb13975f8ad3c449b474b24cdf7a48, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -2.42, y: 6.49}
+    yRotation: -126.86
+    Animation: {fileID: 7400000, guid: 2cb2ba4391738f646a0d1bf7e317bf6b, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 1
+  - FieldStandardPosition: {x: -2.42, y: 6.49}
+    yRotation: -126.86
+    Animation: {fileID: 7400000, guid: 1b3ebeff13152b349af7f462385c460f, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 3.19, y: 5.86}
+    yRotation: -126.36
+    Animation: {fileID: 7400000, guid: 90eb13975f8ad3c449b474b24cdf7a48, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 5.45, y: 11.17}
+    yRotation: -307.25
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 1
+  - FieldStandardPosition: {x: -1.3, y: 11.24}
+    yRotation: 85.4
+    Animation: {fileID: 7400000, guid: b6f623a315bc42a4b8e6102690ab63c1, type: 2}
+    AnimationTimeOffset: -3
+    IsFriendly: 0
+  - FieldStandardPosition: {x: 4.16, y: 4.78}
+    yRotation: -320
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 1
+  - FieldStandardPosition: {x: -5.1, y: 11.22}
+    yRotation: 0
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+  - FieldStandardPosition: {x: -4.65, y: 13.78}
+    yRotation: 309
+    Animation: {fileID: 7400000, guid: 90eb13975f8ad3c449b474b24cdf7a48, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 1
