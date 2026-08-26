@@ -37,7 +37,7 @@ public class NetBoot : SingletonMono<NetBoot> {
         _logger = new CustomLogger(this, Color.softBlue);
         if (HasInstance && Instance != this) {
             gameObject.SafeDestroy();
-            _logger.Log(this, "Multiple instances of NetBoot detected, destroying self duplicate");
+            _logger.Log("Multiple instances of NetBoot detected, destroying self duplicate", this);
             return;
         }
         base.Awake(); 
