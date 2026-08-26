@@ -35,7 +35,7 @@ public class FPSDisplay : MonoBehaviour
             return;
 
         var fps = _frames / _elapsed;
-        if(NetSpawnedXRData.Local)
+        if(NetSpawnedXRData.Local && NetSpawnedXRData.Local.IsSpawned)
             NetSpawnedXRData.Local.FPS.Value = fps;
 
         if (_showFrameTime)
