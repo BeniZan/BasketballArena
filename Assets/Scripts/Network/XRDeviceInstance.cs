@@ -37,11 +37,14 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         xrHandSubSys = _reuseSubsystems.Count > 0 ? _reuseSubsystems[0] : null;
         return xrHandSubSys != null;
     }
-
+    RealTimer _logNoXRFoundTimer = new RealTimer(2f, true);
     public bool TryGetRightPinchValues(out float pinchValue) { 
         pinchValue = default;
-        if (!TryGetHandSubsystem(out var xrHandSubSys) && Time.realtimeSinceStartup > 8f) {
-            _logger.LogError("No XR hand subsystem found. Ensure XR is properly configured in Project Settings.");
+        if (!TryGetHandSubsystem(out var xrHandSubSys) && Time.realtimeSinceStartup > 8f) {  
+            if (_logNoXRFoundTimer.TimerOver) {
+                _logNoXRFoundTimer.Restart();
+                _logger.LogWarning("No XR hand subsystem found. Ensure XR is properly configured in Project Settings.");
+            }
             return false;
         }
         if (!Origin) {

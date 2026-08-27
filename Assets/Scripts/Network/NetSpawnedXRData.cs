@@ -10,9 +10,10 @@ public class NetSpawnedXRData : NetworkBehaviour {
         return netManager.SpawnManager.GetPlayerNetworkObject(clientID).GetComponent<NetSpawnedXRData>();
     }
     public NetworkVariable<float> FPS = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> IsInStartingPosition = new(true, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     protected override void OnNetworkPostSpawn() {
-        base.OnNetworkPostSpawn();
+        base.OnNetworkPostSpawn(); 
         if (IsOwner)
             Local = this;
     }

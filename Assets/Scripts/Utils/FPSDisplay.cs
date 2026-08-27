@@ -9,7 +9,6 @@ public class FPSDisplay : MonoBehaviour
     [SerializeField] bool _onlyInDebugBuild;
     
     int _frames;
-    float _elapsed;
     float _lastRealtime;
 
     void Awake() {
@@ -28,13 +27,13 @@ public class FPSDisplay : MonoBehaviour
 
     void Update() {
         _frames++;
-        var realtimeDelta = Time.realtimeSinceStartup - _lastRealtime;
-        _lastRealtime = Time.realtimeSinceStartup;
-        _elapsed += realtimeDelta;
-        if (_elapsed < _updateInterval)
+        var realTime = Time.realtimeSinceStartup;
+        var realtimeSinceLastInternal = realTime - _lastRealtime; 
+        if (realtimeSinceLastInternal < _updateInterval)
             return;
+        _lastRealtime = realTime;
 
-        var fps = _frames / _elapsed;
+        var fps = _frames / realtimeSinceLastInternal;
         if(NetSpawnedXRData.Local && NetSpawnedXRData.Local.IsSpawned)
             NetSpawnedXRData.Local.FPS.Value = fps;
 
@@ -43,7 +42,6 @@ public class FPSDisplay : MonoBehaviour
         else
             _text.SetText("{0:1} FPS", fps);
 
-        _frames = 0;
-        _elapsed = 0f;
+        _frames = 0; 
     }
 }

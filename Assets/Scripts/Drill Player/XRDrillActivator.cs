@@ -15,6 +15,10 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
     [SerializeField, ReadOnly] List<CharComponent> _spawnedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
     [ShowInInspector, HideInEditorMode, ReadOnly] Transform _courtCenter, _drillOrigin;
+
+    public Transform DrillOrigin => _drillOrigin;
+    public DrillData CurrentDrill => _currentActive;
+
     public IReadOnlyList<CharComponent> PlacedChars => _spawnedChars;
     protected override void Awake() {
         base.Awake(); 
