@@ -10,11 +10,11 @@
       "hash": "fd8ff1fb700caf062eb5cce364c1d0a85f99ebe6"
     },
     "com.bz.drills": {
-      "version": "https://github.com/BeniZan/Drills.git",
+      "version": "https://github.com/BeniZan/ARena-Exporter.git?path=Assets/Scripts/Drills-Package",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "38be595041b96266a90a9fefec9b3466780bf69e"
+      "hash": "73e7a69a940848f0fb159de69adafc2ede6767d2"
     },
     "com.google.external-dependency-manager": {
       "version": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",
