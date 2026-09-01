@@ -1,3 +1,6 @@
+#if UNITY_ANDROID && !UNITY_EDITOR
+#define UNITY_BUILD_ANDROID
+#endif 
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -10,11 +13,12 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
-
-
 #if UNITY_ANDROID
 using UnityEngine.Android;
+using System.Reflection;
 #endif
+
+
 public enum WebRTCState { Disconnected, Connecting, Connected }
 
 /// <summary>
@@ -33,14 +37,12 @@ public class WebRTCVideoSender : MonoBehaviour
     bool _setupRemoteDescription;
     [SerializeField] RawImage _previewSentTexture;
     [ShowInInspector, HideInEditorMode, ReadOnly] RenderTexture _webRTCSubmitTexture;
-#if UNITY_ANDROID && !UNITY_EDITOR
+    UniversalRenderPipeline.SingleCameraRequest _camRequest;
+#if UNITY_BUILD_ANDROID
     [ShowInInspector, HideInEditorMode, ReadOnly] WebCamTexture _questWebCamTexture;
 #endif
-    Awaitable _awaitGettingWebcamTexture;
-
-#if UNITY_EDITOR
-    UniversalRenderPipeline.SingleCameraRequest _camRequest;
-#endif
+    [SerializeField] Material _combineTexturesMaterial;
+    Awaitable _awaitGettingWebcamTexture; 
     private void Awake() {
         if (!_logger.PingObj)
             _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender]");
@@ -69,19 +71,26 @@ public class WebRTCVideoSender : MonoBehaviour
             try {Destroy(_webRTCSubmitTexture);  }
             catch {  }
             _webRTCSubmitTexture = null;
-        } 
-        int width = 1280, height = 720;
+        }
+        int width = 1280, height = 720; int depth = 24;
+        _camRequest = new UniversalRenderPipeline.SingleCameraRequest() {
+            destination = new RenderTexture(width, height, depth, WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType)),
+        };
+        _camRequest.destination.Create();
+
         var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
-        _webRTCSubmitTexture = new RenderTexture(width, height, 24, format);
+        _webRTCSubmitTexture = new RenderTexture(width, height, depth, format);
         _webRTCSubmitTexture.Create();
-#if UNITY_ANDROID && !UNITY_EDITOR
+
+        _combineTexturesMaterial.SetTexture("_MainTex", _camRequest.destination);
+        _combineTexturesMaterial.SetTexture("_BlendTex", _webRTCSubmitTexture);
+#if UNITY_BUILD_ANDROID
         _logger.Log("Getting Android Permissions...");
         await AwaitAndroidPermission("com.oculus.permission.USE_SCENE");
         await AwaitAndroidPermission("horizonos.permission.HEADSET_CAMERA");
         await AwaitAndroidPermission("android.permission.CHANGE_WIFI_MULTICAST_STATE");
         while (! _questWebCamTexture) {
             _logger.Log("Searching for XR WebCam...");
-            await Awaitable.WaitForSecondsAsync(1f);
             WebCamDevice[] devices = WebCamTexture.devices;
             if (devices.Length > 0) {
                 string log = "Found Webcams: ";
@@ -89,22 +98,38 @@ public class WebRTCVideoSender : MonoBehaviour
                     log += cams.name + " | ";
                 }
                 _logger.Log(log);
-                _questWebCamTexture = new WebCamTexture(devices[1].name, 1280, 720, 60);
+                int camIdx = 1;
+                var chosenCam = devices[camIdx];
+                _logger.Log($"Chose Camera[{camIdx}]: " + chosenCam.name);
+                _questWebCamTexture = new WebCamTexture(devices[camIdx].name, 1280, 720, 60);
                 if(!_questWebCamTexture.isPlaying)
                     _questWebCamTexture.Play(); 
             }
+            if(!_questWebCamTexture)
+                await Awaitable.WaitForSecondsAsync(1f);
         }
 #endif
     }
 
     private void LateUpdate() {
-#if UNITY_EDITOR
-        if (_camRequest != null && _camRequest.destination && _camRequest.destination.IsCreated())
+        bool hasWebRTCSubmitTex = _webRTCSubmitTexture && _webRTCSubmitTexture.IsCreated();
+        if (!hasWebRTCSubmitTex)
+            return;
+        var hasCamTex = _camRequest != null && _camRequest.destination && _camRequest.destination.IsCreated();
+        if (hasCamTex) {
             RenderPipeline.SubmitRenderRequest(_cam, _camRequest);
-#elif UNITY_ANDROID
-        if(_questWebCamTexture && _webRTCSubmitTexture)
-            Graphics.Blit(_questWebCamTexture, _webRTCSubmitTexture.graphicsTexture);
-#endif 
+            Graphics.Blit(_camRequest.destination, _webRTCSubmitTexture.graphicsTexture);
+        }
+#if UNITY_BUILD_ANDROID
+        var hasQuestWebCamTex = _questWebCamTexture != null && _questWebCamTexture.isPlaying;
+        if (hasQuestWebCamTex) {
+            if (hasCamTex) {
+                Graphics.Blit(_questWebCamTexture , _webRTCSubmitTexture, _combineTexturesMaterial);
+            } else {
+                Graphics.Blit(_questWebCamTexture, _webRTCSubmitTexture);
+            }
+        }
+#endif
     }
 
     private void OnEnable() {
@@ -152,14 +177,8 @@ public class WebRTCVideoSender : MonoBehaviour
 
         yield return CreateAndSendOffer();
     }
-
     IEnumerator CreateAndAddVideoTrack() {
-        yield return new WaitUntil(() => _webRTCSubmitTexture);
-#if UNITY_EDITOR
-        _camRequest = new UniversalRenderPipeline.SingleCameraRequest() { destination = _webRTCSubmitTexture };
-#elif UNITY_ANDROID
-        yield return new WaitUntil(() => _questWebCamTexture);
-#endif
+        yield return new WaitUntil(() => _webRTCSubmitTexture);  
         if (_previewSentTexture)
             _previewSentTexture.texture = _webRTCSubmitTexture;
         videoTrack = new VideoStreamTrack(_webRTCSubmitTexture);
@@ -196,22 +215,18 @@ public class WebRTCVideoSender : MonoBehaviour
         _setupRemoteDescription = true;
         while (_pendingCandidates.TryDequeue(out var candidate)){
             peerConnection.AddIceCandidate(new RTCIceCandidate(candidate));
-        }
+        } 
     }
-
     void AddIceCandidate(RTCIceCandidateInit candInit) {
         if (_setupRemoteDescription) {
             peerConnection.AddIceCandidate(new RTCIceCandidate(candInit));
         }
         else _pendingCandidates.Enqueue(candInit);
     }
-
     private void Instance_OnICECandidateReceived(WebRTCHandshakeManager.IceCandidateData data) {
         AddIceCandidate(new RTCIceCandidateInit 
         { candidate = data.candidate, sdpMid = data.sdpMid, sdpMLineIndex = data.sdpMLineIndex });
     } 
-
-
     private void Singleton_OnConnectionEvent(NetworkManager nm, ConnectionEventData data) {
         if(data.ClientId == nm.LocalClientId && ! nm.IsServer) {
             if(data.EventType == ConnectionEvent.ClientConnected) {
