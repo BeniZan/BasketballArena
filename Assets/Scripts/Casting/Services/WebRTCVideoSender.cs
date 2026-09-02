@@ -16,6 +16,8 @@ using UnityEngine.UI;
 #if UNITY_ANDROID
 using UnityEngine.Android;
 using System.Reflection;
+using Unity.XR.Oculus.Input;
+using UnityEngine.XR.ARFoundation;
 #endif
 
 
@@ -41,6 +43,7 @@ public class WebRTCVideoSender : MonoBehaviour
 #if UNITY_BUILD_ANDROID
     [ShowInInspector, HideInEditorMode, ReadOnly] WebCamTexture _questWebCamTexture;
 #endif
+    [SerializeField, GetParent] AROcclusionManager _arOcclusion;
     [SerializeField] Material _combineTexturesMaterial;
     Awaitable _awaitGettingWebcamTexture; 
     private void Awake() {
@@ -49,7 +52,8 @@ public class WebRTCVideoSender : MonoBehaviour
         WebRTCHandshakeManager.Instance.OnServerHandshakeResponse += Handshake_OnServerHandshakeResponse;
         WebRTCHandshakeManager.Instance.OnICECandidateReceived += Instance_OnICECandidateReceived;
         _previewSentTexture.texture = Texture2D.normalTexture;
-        _awaitGettingWebcamTexture = AwaitGetQuestWebcam();
+        _logger.Log("Starting WebRTCVideoSender...");
+        _awaitGettingWebcamTexture = AwaitGetQuestWebcam(); 
     }
 
 #if UNITY_ANDROID
@@ -73,29 +77,37 @@ public class WebRTCVideoSender : MonoBehaviour
             _webRTCSubmitTexture = null;
         }
         int width = 1280, height = 720; int depth = 24;
+        var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
         _camRequest = new UniversalRenderPipeline.SingleCameraRequest() {
-            destination = new RenderTexture(width, height, depth, WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType)),
+            destination = new RenderTexture(width, height, depth, format),
         };
         _camRequest.destination.Create();
 
-        var format = WebRTC.GetSupportedRenderTextureFormat(SystemInfo.graphicsDeviceType);
         _webRTCSubmitTexture = new RenderTexture(width, height, depth, format);
         _webRTCSubmitTexture.Create();
 
-        _combineTexturesMaterial.SetTexture("_MainTex", _camRequest.destination);
-        _combineTexturesMaterial.SetTexture("_BlendTex", _webRTCSubmitTexture);
-#if UNITY_BUILD_ANDROID
+#if UNITY_BUILD_ANDROID 
         _logger.Log("Getting Android Permissions...");
         await AwaitAndroidPermission("com.oculus.permission.USE_SCENE");
         await AwaitAndroidPermission("horizonos.permission.HEADSET_CAMERA");
         await AwaitAndroidPermission("android.permission.CHANGE_WIFI_MULTICAST_STATE");
+        await Awaitable.NextFrameAsync();
+        await Awaitable.WaitForSecondsAsync(2f);
+
+        //_arOcclusion.TryGetEnvironmentDepthTexture(out var depthTex);
+        //var gotDepthTex = _arOcclusion.TryGetEnvironmentDepthTexture(out depthTex) && depthTex;
+        //_combineTexturesMaterial.SetTexture("_RealDepthTex", depthTex);
+        //if (gotDepthTex) {
+        //    _logger.Log("Got depth texture from AR Occlusion Manager: " + depthTex.dimension);
+        //} else _logger.LogError("Failed to get depth texture from AR Occlusion Manager.");
+
         while (! _questWebCamTexture) {
             _logger.Log("Searching for XR WebCam...");
             WebCamDevice[] devices = WebCamTexture.devices;
             if (devices.Length > 0) {
                 string log = "Found Webcams: ";
-                foreach (var cams in devices) {
-                    log += cams.name + " | ";
+                foreach (var cam in devices) {
+                    log += $"[camName:{cam.name} depthName:{cam.depthCameraName} kind:{cam.kind}] | ";
                 }
                 _logger.Log(log);
                 int camIdx = 1;
@@ -118,13 +130,13 @@ public class WebRTCVideoSender : MonoBehaviour
         var hasCamTex = _camRequest != null && _camRequest.destination && _camRequest.destination.IsCreated();
         if (hasCamTex) {
             RenderPipeline.SubmitRenderRequest(_cam, _camRequest);
-            Graphics.Blit(_camRequest.destination, _webRTCSubmitTexture.graphicsTexture);
+            Graphics.Blit(_camRequest.destination, _webRTCSubmitTexture);
         }
 #if UNITY_BUILD_ANDROID
         var hasQuestWebCamTex = _questWebCamTexture != null && _questWebCamTexture.isPlaying;
         if (hasQuestWebCamTex) {
             if (hasCamTex) {
-                Graphics.Blit(_questWebCamTexture , _webRTCSubmitTexture, _combineTexturesMaterial);
+                Graphics.Blit(_questWebCamTexture , _webRTCSubmitTexture.graphicsTexture, _combineTexturesMaterial);
             } else {
                 Graphics.Blit(_questWebCamTexture, _webRTCSubmitTexture);
             }
