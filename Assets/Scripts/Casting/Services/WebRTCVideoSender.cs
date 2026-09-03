@@ -85,6 +85,8 @@ public class WebRTCVideoSender : MonoBehaviour
 
         _webRTCSubmitTexture = new RenderTexture(width, height, depth, format);
         _webRTCSubmitTexture.Create();
+        if(_previewSentTexture)
+            _previewSentTexture.texture = _webRTCSubmitTexture;
 
 #if UNITY_BUILD_ANDROID 
         _logger.Log("Getting Android Permissions...");
@@ -131,12 +133,13 @@ public class WebRTCVideoSender : MonoBehaviour
         if (hasCamTex) {
             RenderPipeline.SubmitRenderRequest(_cam, _camRequest);
             Graphics.Blit(_camRequest.destination, _webRTCSubmitTexture);
-        }
+        } 
 #if UNITY_BUILD_ANDROID
         var hasQuestWebCamTex = _questWebCamTexture != null && _questWebCamTexture.isPlaying;
         if (hasQuestWebCamTex) {
             if (hasCamTex) {
-                Graphics.Blit(_questWebCamTexture , _webRTCSubmitTexture.graphicsTexture, _combineTexturesMaterial);
+                _combineTexturesMaterial.SetTexture("_BlendTex", _webRTCSubmitTexture);
+                Graphics.Blit(_questWebCamTexture , _webRTCSubmitTexture, _combineTexturesMaterial);
             } else {
                 Graphics.Blit(_questWebCamTexture, _webRTCSubmitTexture);
             }
@@ -190,9 +193,7 @@ public class WebRTCVideoSender : MonoBehaviour
         yield return CreateAndSendOffer();
     }
     IEnumerator CreateAndAddVideoTrack() {
-        yield return new WaitUntil(() => _webRTCSubmitTexture);  
-        if (_previewSentTexture)
-            _previewSentTexture.texture = _webRTCSubmitTexture;
+        yield return new WaitUntil(() => _webRTCSubmitTexture);   
         videoTrack = new VideoStreamTrack(_webRTCSubmitTexture);
         peerConnection.AddTrack(videoTrack);
         _logger.Log("Created and added video track to peer connection.");

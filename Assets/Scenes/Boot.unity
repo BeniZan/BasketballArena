@@ -610,7 +610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2421362364080831141, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000034332275
+      value: -0.000036239624
       objectReference: {fileID: 0}
     - target: {fileID: 2761171821578306995, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: m_Value
@@ -640,6 +640,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3445427246522596465, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+      propertyPath: m_EnvironmentDepthTemporalSmoothing
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4829052437376163220, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: m_ClearFlags
       value: 2
@@ -651,6 +655,10 @@ PrefabInstance:
     - target: {fileID: 5106049163539762421, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: m_Order
       value: -14
+      objectReference: {fileID: 0}
+    - target: {fileID: 5316685307094958272, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+      propertyPath: m_UseCustomMaterial
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5816307049958330872, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: m_LocalPosition.x
@@ -747,6 +755,18 @@ PrefabInstance:
     - target: {fileID: 6927545427034015038, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8678827030701224150, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+      propertyPath: m_RenderPostProcessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8678827030701224150, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+      propertyPath: m_RequiresDepthTextureOption
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8678827030701224150, guid: a1c7be68311b64743a4152b5d2199304, type: 3}
+      propertyPath: m_RequiresOpaqueTextureOption
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
