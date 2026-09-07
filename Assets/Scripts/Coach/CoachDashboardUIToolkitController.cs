@@ -50,6 +50,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private Button _stopBtn;
     private Button _nextBtn;
     private Button _forceBtn;
+    private Label _forceBtnLabel;
     private Button _realisticBtn;
     private Button _hologramBtn;
 
@@ -137,6 +138,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _stopBtn = _root.Q<Button>("stopBtn");
         _nextBtn = _root.Q<Button>("nextBtn");
         _forceBtn = _root.Q<Button>("forceBtn");
+        _forceBtnLabel = _forceBtn != null ? _forceBtn.Q<Label>(className: "playback-text") : null;
 
         _realisticBtn = _root.Q<Button>("realisticBtn");
         _hologramBtn = _root.Q<Button>("hologramBtn");
@@ -253,7 +255,67 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private void Update()
     {
         UpdateTimerDisplay();  
+        UpdateGateStatusDisplay();
     }  
+
+    // ---- Trigger gates ---------------------------------------------------------
+
+    // The status label is normally written once per click (RUNNING / PAUSED / READY). The gate
+    // readout runs every frame instead, so it only takes the label over while the drill is
+    // actually held back, and hands it back the frame the hold clears.
+    private bool _gateStatusOwnsStatusText;
+
+    private static readonly Color _RunningColor = new Color(16f / 255f, 185f / 255f, 129f / 255f, 1f);
+    private static readonly Color _PausedColor = new Color(255f / 255f, 107f / 255f, 0f, 1f);
+    private static readonly Color _WaitingColor = new Color(250f / 255f, 204f / 255f, 21f / 255f, 1f);
+
+    private void UpdateGateStatusDisplay()
+    {
+        if (_statusText == null) return;
+
+        string blockedOn = _isSessionActive ? GetDrillBlockedLabel() : null;
+
+        if (blockedOn != null)
+        {
+            _statusText.text = blockedOn;
+            _statusText.style.color = new StyleColor(_WaitingColor);
+            _gateStatusOwnsStatusText = true;
+        }
+        else if (_gateStatusOwnsStatusText)
+        {
+            _gateStatusOwnsStatusText = false;
+            bool isPlaying = DrillPlayer.Instance != null && DrillPlayer.Instance.IsPlaying;
+            _statusText.text = isPlaying ? "RUNNING" : "PAUSED";
+            _statusText.style.color = new StyleColor(isPlaying ? _RunningColor : _PausedColor);
+        }
+
+        // FORCE means "push the drill forward", so it renames itself to match what it will do.
+        if (_forceBtnLabel != null)
+            _forceBtnLabel.text = blockedOn != null ? "RELEASE" : "FORCE";
+    }
+
+    /// <summary>
+    /// What the drill is waiting for, or null when nothing is holding it back.
+    /// </summary>
+    private static string GetDrillBlockedLabel()
+    {
+        var drillPlayer = DrillPlayer.Instance;
+        if (drillPlayer == null) return null;
+
+        if (drillPlayer.IsWaitingForStartPosition)
+            return "WAITING FOR PLAYER";
+
+        int waitingIdx = drillPlayer.WaitingGateIndex;
+        if (waitingIdx < 0) return null;
+
+        var drill = NetDrillsActivator.Instance != null ? NetDrillsActivator.Instance.ActiveManeuver.Value : null;
+        if (drill == null || waitingIdx >= drill.Triggers.Count) return null;
+
+        string triggerName = drill.Triggers[waitingIdx].Name;
+        return string.IsNullOrWhiteSpace(triggerName)
+            ? string.Format("WAITING AT TRIGGER {0}", waitingIdx + 1)
+            : "WAITING AT " + triggerName.ToUpperInvariant();
+    }
 
     // ---- XR headset indicator --------------------------------------------------
 
@@ -366,7 +428,11 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         if (_session.ActiveIndex < 0)
             _session.Start();
 
-        DrillPlayer.Instance.IsPlaying = true;
+        // Activating a drill puts it on hold until the headset is on its mark, so don't
+        // stomp that here. It starts itself once the player arrives, and FORCE releases it.
+        var drillPlayer = DrillPlayer.Instance;
+        if (drillPlayer != null && !drillPlayer.IsWaitingForStartPosition)
+            drillPlayer.IsPlaying = true;
 
         UpdateControlInteractability();
     }
@@ -408,7 +474,29 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void ForceSession()
     {
+        // While the drill is held at a trigger, forcing means releasing that gate. Only when
+        // nothing is blocking does it fall back to skipping to the end of the session.
+        if (TryReleaseDrill())
+            return;
+
         _session.ForceToEnd();
+    }
+
+    private static bool TryReleaseDrill()
+    {
+        var drillPlayer = DrillPlayer.Instance;
+        if (drillPlayer == null) return false;
+
+        if (drillPlayer.IsWaitingForStartPosition)
+        {
+            drillPlayer.IsPlaying = true; // overrides the start position hold
+            return true;
+        }
+
+        if (drillPlayer.WaitingGateIndex < 0) return false;
+
+        drillPlayer.Server_ForceOpenNextGate();
+        return true;
     }
 
     private void UpdateTimerDisplay()

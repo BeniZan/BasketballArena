@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7f63e253653e34893818f789375768, type: 3}
+  m_Name: _Trigger Test
+  m_EditorClassIdentifier: Drills::DrillData
+  DrillCategory: 0
+  OriginPoint: {x: 0, y: 0, z: 0}
+  OriginYRotation: 0
+  MirrorLeftRight: 0
+  _localPlayerStartPos: {x: 0, y: 7}
+  _triggers:
+  - Name: Ball Screen
+    FieldStandardPositionXZ: {x: 2, y: 7}
+    NominalTime: 4
+  - Name: Roll
+    FieldStandardPositionXZ: {x: 4, y: 8.5}
+    NominalTime: 8
+  CharsData:
+  - FieldStandardPositionXZ: {x: 2, y: 8.5}
+    yRotation: 180
+    Animation: {fileID: 7400000, guid: 14c953f79b3822b49b7eaea1d43c6760, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 1
+    AnimationTriggers:
+    - TriggerIndex: 0
+      TriggeredClip: {fileID: 7400000, guid: b29e9dbf7d217084682b4b83a0be86cb, type: 2}
+      DelayAfterTrigger: 0
+  - FieldStandardPositionXZ: {x: 3, y: 6}
+    yRotation: 0
+    Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
+    AnimationTimeOffset: 0
+    IsFriendly: 0
+    AnimationTriggers:
+    - TriggerIndex: 1
+      TriggeredClip: {fileID: 7400000, guid: e4d5634eff5459d4ab2ae477d6dc485f, type: 2}
+      DelayAfterTrigger: 0.5

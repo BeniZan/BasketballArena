@@ -6,11 +6,12 @@ public class ValidateDrillXRPosition : MonoBehaviour
     {
         if (Calibration.Instance.IsDoneCalibration && 
             NetSpawnedXRData.Local &&
-            XRDrillActivator.Instance && XRDrillActivator.Instance.DrillOrigin) {
+            XRDrillActivator.Instance && XRDrillActivator.Instance.DrillOrigin &&
+            XRDrillActivator.Instance.CurrentDrill) {
 
             var XRdrill = XRDrillActivator.Instance;
             var drill = XRdrill.CurrentDrill;
-            var startPos = XRdrill.DrillOrigin.TransformPoint(drill.PlayerStartPosition);
+            var startPos = XRdrill.DrillOrigin.TransformPoint(drill.LocalPlayerStartPosition);
             var startPosXZ = startPos.XZ();
             var posXZ = transform.position.XZ();
             var distance = startPosXZ.Distance(posXZ);

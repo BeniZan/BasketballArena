@@ -57,6 +57,10 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
 
         var localOriginPoint = _currentActive.OriginPoint;
         var localOriginRotation = Quaternion.Euler(0f, _currentActive.OriginYRotation, 0f);
+        // Matches the exporter, which spins the court around so a mirrored drill lands where
+        // it was authored. Without it the characters and trigger points drift apart.
+        if (_currentActive.MirrorLeftRight)
+            localOriginRotation *= Quaternion.Euler(0f, 180f, 0f);
         _drillOrigin.SetLocalPositionAndRotation(localOriginPoint, localOriginRotation);
 
         int i = 0;
@@ -92,8 +96,19 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
             Activate(netDrillActivator.ActiveManeuver.Value);
         }
 
-        foreach (var c in PlacedChars)
-            c.SetAnimationTime(drillPlayer.AnimationTime);
+        if (!_currentActive)
+            return;
+
+        var gateOpenTimes = drillPlayer.GateOpenTimes;
+        var animationTime = drillPlayer.AnimationTime;
+        foreach (var c in PlacedChars) {
+            if (!c || c.Data == null)
+                continue;
+
+            DrillSegmentResolver.ResolveSegment(_currentActive, c.Data, animationTime, gateOpenTimes,
+                                                out var clip, out var localTime);
+            c.SetSegment(clip, localTime);
+        }
     }
     public void Deactivate() {
         foreach (var placedChar in _spawnedChars)
