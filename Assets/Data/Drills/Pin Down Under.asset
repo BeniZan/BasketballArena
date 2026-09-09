@@ -16,44 +16,54 @@ MonoBehaviour:
   OriginPoint: {x: 0, y: 0, z: 0}
   OriginYRotation: 0
   MirrorLeftRight: 0
+  _localPlayerStartPos: {x: 0, y: 0}
+  _triggers: []
   CharsData:
-  - FieldStandardPosition: {x: -2.86, y: 8.83}
+  - FieldStandardPositionXZ: {x: -2.86, y: 8.83}
     yRotation: 0
     Animation: {fileID: 7400000, guid: 86f04cb5e0872c44dafec789a3116c14, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 1
-  - FieldStandardPosition: {x: -2.86, y: 8.83}
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -2.86, y: 8.83}
     yRotation: 0
     Animation: {fileID: 7400000, guid: de53eaaeefb10f0448f6acef9dce902a, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
-  - FieldStandardPosition: {x: -2.86, y: 8.83}
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -2.86, y: 8.83}
     yRotation: 0
     Animation: {fileID: 7400000, guid: e15d639dcf4231042a31511303e7e407, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 1
-  - FieldStandardPosition: {x: 4.39, y: 11.82}
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: 4.39, y: 11.82}
     yRotation: 0
     Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 1
-  - FieldStandardPosition: {x: 1.72, y: 11.84}
-    yRotation: -106.2
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: 1.72, y: 11.84}
+    yRotation: 253.8
     Animation: {fileID: 7400000, guid: d40a334fb76cd9f45927030249998e56, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
-  - FieldStandardPosition: {x: 1.6, y: 6.69}
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: 1.6, y: 6.69}
     yRotation: 305
     Animation: {fileID: 7400000, guid: fa30bc0b36fad4b46aab9b043b36d307, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
-  - FieldStandardPosition: {x: -4.34, y: 8.23}
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -4.34, y: 8.23}
     yRotation: 0
     Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
-  - FieldStandardPosition: {x: -0.81, y: 9.04}
-    yRotation: -447
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -0.81, y: 9.04}
+    yRotation: 273
     Animation: {fileID: 7400000, guid: b8759e2644314764f9fe4f7bcf0495e2, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
+    AnimationTriggers: []

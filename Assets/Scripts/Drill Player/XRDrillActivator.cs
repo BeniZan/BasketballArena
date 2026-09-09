@@ -12,14 +12,26 @@ using UnityEngine.XR.ARFoundation;
 
 public class XRDrillActivator : SingletonMono<XRDrillActivator> { 
     [SerializeField] CharComponent _templateChar;
+    [SerializeField] Transform _templateTriggerMarker;
     [SerializeField, ReadOnly] List<CharComponent> _spawnedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
     [ShowInInspector, HideInEditorMode, ReadOnly] Transform _courtCenter, _drillOrigin;
+
+    static readonly Color _MarkerClosedColor = new Color(0.55f, 0.55f, 0.6f);
+    static readonly Color _MarkerWaitingColor = new Color(1f, 0.8f, 0.15f);
+    static readonly Color _MarkerOpenColor = new Color(0.25f, 0.85f, 0.4f);
+    static readonly Color _StartMarkerReachedColor = new Color(0.2f, 0.55f, 1f);
+
+    readonly List<Transform> _triggerMarkers = new();
+    readonly List<Renderer> _triggerMarkerRenderers = new();
+    Transform _startMarker;
+    Renderer _startMarkerRenderer;
 
     public Transform DrillOrigin => _drillOrigin;
     public DrillData CurrentDrill => _currentActive;
 
     public IReadOnlyList<CharComponent> PlacedChars => _spawnedChars;
+    public IReadOnlyList<Transform> TriggerMarkers => _triggerMarkers;
     protected override void Awake() {
         base.Awake(); 
     } 
@@ -77,6 +89,90 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
                 _spawnedChars[i].gameObject.SafeDestroy();
             _spawnedChars.RemoveAt(i);
         }
+
+        UpdateTriggerMarkers();
+    }
+
+    // Markers are spawned and placed exactly like the characters: instantiated from a template
+    // under the drill origin, then given their authored position in that origin's local space.
+    // That way they inherit whatever the court transform does to the drill, at the same ratio
+    // as the players standing next to them.
+    void UpdateTriggerMarkers() {
+        if (!_templateTriggerMarker) {
+            Debug.LogError("Trigger marker template is not assigned on " + nameof(XRDrillActivator), this);
+            return;
+        }
+
+        var triggers = _currentActive.Triggers;
+
+        int i = 0;
+        for (; i < triggers.Count; i++) {
+            if (_triggerMarkers.Count <= i)
+                SpawnTriggerMarker();
+
+            var marker = _triggerMarkers[i];
+            if (!marker)
+                continue;
+
+            marker.name = "Trigger Marker - " + triggers[i].Name;
+            marker.SetLocalPositionAndRotation(triggers[i].LocalPosition, Quaternion.identity);
+        }
+        while (i < _triggerMarkers.Count) {
+            if (_triggerMarkers[i])
+                _triggerMarkers[i].SafeDestroy();
+            _triggerMarkers.RemoveAt(i);
+            _triggerMarkerRenderers.RemoveAt(i);
+        }
+
+        UpdateStartMarker();
+    }
+
+    void SpawnTriggerMarker() {
+        var marker = Instantiate(_templateTriggerMarker, _drillOrigin);
+        marker.gameObject.SetActive(true);
+
+        _triggerMarkers.Add(marker);
+        _triggerMarkerRenderers.Add(marker.GetComponentInChildren<Renderer>());
+    }
+
+    // The drill is held on frame zero until a headset stands on the player's start position,
+    // so that spot gets a marker of its own, from the same template as the triggers.
+    void UpdateStartMarker() {
+        if (!_startMarker) {
+            _startMarker = Instantiate(_templateTriggerMarker, _drillOrigin);
+            _startMarker.gameObject.SetActive(true);
+            _startMarkerRenderer = _startMarker.GetComponentInChildren<Renderer>();
+        }
+
+        _startMarker.name = "Player Start Marker";
+        _startMarker.SetLocalPositionAndRotation(_currentActive.LocalPlayerStartPosition, Quaternion.identity);
+    }
+
+    void PaintTriggerMarkers(DrillPlayer drillPlayer) {
+        var waitingIdx = drillPlayer ? drillPlayer.WaitingGateIndex : -1;
+
+        for (int i = 0; i < _triggerMarkerRenderers.Count; i++) {
+            var markerRenderer = _triggerMarkerRenderers[i];
+            if (!markerRenderer)
+                continue;
+
+            var color = _MarkerClosedColor;
+            if (drillPlayer && drillPlayer.IsGateOpen(i))
+                color = _MarkerOpenColor;
+            else if (i == waitingIdx)
+                color = _MarkerWaitingColor;
+
+            if (markerRenderer.material.color != color)
+                markerRenderer.material.color = color;
+        }
+
+        if (_startMarkerRenderer) {
+            var startColor = drillPlayer && drillPlayer.IsWaitingForStartPosition
+                ? _MarkerWaitingColor
+                : _StartMarkerReachedColor;
+            if (_startMarkerRenderer.material.color != startColor)
+                _startMarkerRenderer.material.color = startColor;
+        }
     }
 
     private void Update() {
@@ -99,6 +195,8 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
         if (!_currentActive)
             return;
 
+        PaintTriggerMarkers(drillPlayer);
+
         var gateOpenTimes = drillPlayer.GateOpenTimes;
         var animationTime = drillPlayer.AnimationTime;
         foreach (var c in PlacedChars) {
@@ -115,6 +213,18 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
             if(placedChar)
                 placedChar.gameObject.SafeDestroy();
         _spawnedChars.Clear();
+
+        foreach (var marker in _triggerMarkers)
+            if (marker)
+                marker.SafeDestroy();
+        _triggerMarkers.Clear();
+        _triggerMarkerRenderers.Clear();
+
+        if (_startMarker)
+            _startMarker.SafeDestroy();
+        _startMarker = null;
+        _startMarkerRenderer = null;
+
         _currentActive = null;
     }
     private void OnEnable() {

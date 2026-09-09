@@ -111,6 +111,9 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _session.OnDrillsChanged -= HandleDrillsChanged;
         _session.OnActiveDrillChanged -= HandleActiveDrillChanged;
         if (_drillListView != null) _drillListView.itemIndexChanged -= OnDrillReordered;
+
+        var drillPlayer = DrillPlayer.Instance;
+        if (drillPlayer != null) drillPlayer.Server_OnDrillEnded -= HandleDrillEnded;
     }
 
     private void InitializeUI(bool logIfNotReady = false)
@@ -232,6 +235,15 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
             if (_hologramBtn != null) _hologramBtn.clicked += () => SetStreamMode(false);
 
             if (_randomDrillBtn != null) _randomDrillBtn.clicked += AddRandomDrill;
+
+            // The drill player raises this on the server the moment the running drill passes
+            // its last frame, and that is what advances the Training Flow.
+            var drillPlayer = DrillPlayer.Instance;
+            if (drillPlayer != null)
+            {
+                drillPlayer.Server_OnDrillEnded -= HandleDrillEnded;
+                drillPlayer.Server_OnDrillEnded += HandleDrillEnded;
+            }
 
             SetStreamMode(true);
         }
@@ -428,11 +440,12 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         if (_session.ActiveIndex < 0)
             _session.Start();
 
-        // Activating a drill puts it on hold until the headset is on its mark, so don't
-        // stomp that here. It starts itself once the player arrives, and FORCE releases it.
+        // Activating a drill puts it on hold until the headset is on its mark, and that hold
+        // is set from inside _session.Start() above. START is the coach saying "run it now",
+        // so it releases the hold instead of leaving the drill frozen on frame zero.
         var drillPlayer = DrillPlayer.Instance;
-        if (drillPlayer != null && !drillPlayer.IsWaitingForStartPosition)
-            drillPlayer.IsPlaying = true;
+        if (drillPlayer != null)
+            drillPlayer.Server_StartNow();
 
         UpdateControlInteractability();
     }
@@ -470,6 +483,45 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         {
             _session.Next(); // advances active drill -> HandleActiveDrillChanged updates repText + highlight
         }
+    }
+
+    /// <summary>
+    /// A drill that ran to its end moves the session on by itself. The next drill comes up
+    /// held on frame zero (HandleActiveDrillChanged -> ResetTimeAndPlay), so the player has to
+    /// take its start mark before it runs, and the status label shows WAITING FOR PLAYER.
+    /// </summary>
+    private void HandleDrillEnded()
+    {
+        if (!_isSessionActive) return;
+
+        // TrainingSession.Next() wraps around, so the last drill has to be caught here or the
+        // session would loop back to the first one instead of finishing.
+        if (_session.ActiveIndex >= _session.Drills.Count - 1)
+        {
+            FinishSession();
+            return;
+        }
+
+        _session.Next();
+    }
+
+    /// <summary>
+    /// End of the Training Flow: leave the last drill frozen on its final frame and put the
+    /// dashboard back in its idle state (START re-enabled, NEXT/PAUSE/STOP/FORCE locked).
+    /// </summary>
+    private void FinishSession()
+    {
+        _gateStatusOwnsStatusText = false;
+        if (_statusText != null)
+        {
+            _statusText.text = "COMPLETE";
+            _statusText.style.color = new StyleColor(_RunningColor);
+        }
+
+        _isSessionActive = false;
+        if (_liveTag != null) _liveTag.style.display = DisplayStyle.None;
+        if (_streamPlaceholder != null) _streamPlaceholder.style.display = DisplayStyle.Flex;
+        UpdateControlInteractability();
     }
 
     private void ForceSession()

@@ -383,6 +383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::XRDrillActivator
   _templateChar: {fileID: 2499888353544917440, guid: 7daf483a6f4418b4cb16a2ed329ee9b1, type: 3}
+  _templateTriggerMarker: {fileID: 1341779392272434421, guid: 74ae26760a4021a44a4fcea987c1fbf4, type: 3}
   _spawnedChars: []
 --- !u!114 &2798121075354656285
 MonoBehaviour:
@@ -2296,7 +2297,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::XRTriggerProximity
   _enterRadius: 0.75
   _exitRadius: 1.1
-  _showMarkers: 1
 --- !u!20 &4829052437376163220 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 657184242118504724, guid: d6878e1999eb4b44a9f5a263af86c185, type: 3}

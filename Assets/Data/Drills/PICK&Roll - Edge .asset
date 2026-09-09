@@ -16,49 +16,60 @@ MonoBehaviour:
   OriginPoint: {x: 0, y: 0, z: 0}
   OriginYRotation: 0
   MirrorLeftRight: 0
+  _localPlayerStartPos: {x: 0, y: 0}
+  _triggers: []
   CharsData:
-  - FieldStandardPosition: {x: -3.21, y: 7.79}
-    yRotation: -80.7
+  - FieldStandardPositionXZ: {x: -3.21, y: 7.79}
+    yRotation: 279.3
     Animation: {fileID: 7400000, guid: f65ef1565f408734b84d39013044dfdc, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
-  - FieldStandardPosition: {x: -3.21, y: 7.79}
-    yRotation: -80.7
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -3.21, y: 7.79}
+    yRotation: 279.3
     Animation: {fileID: 7400000, guid: 55bbcbf21e0db994995f35c3aacf0d63, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 1
-  - FieldStandardPosition: {x: -3.21, y: 7.79}
-    yRotation: -80.7
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -3.21, y: 7.79}
+    yRotation: 279.3
     Animation: {fileID: 7400000, guid: 9e8fd06f0f28f394cb20c65a707d60d9, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
-  - FieldStandardPosition: {x: -1.7, y: 10.35}
-    yRotation: -288.3
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -1.7, y: 10.35}
+    yRotation: 71.7
     Animation: {fileID: 7400000, guid: b6f623a315bc42a4b8e6102690ab63c1, type: 2}
     AnimationTimeOffset: -3
     IsFriendly: 0
-  - FieldStandardPosition: {x: -5.72, y: 10.8}
-    yRotation: -253.82
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -5.72, y: 10.8}
+    yRotation: 106.18
     Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 1
-  - FieldStandardPosition: {x: -3.92, y: 12.52}
-    yRotation: -97.2
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: -3.92, y: 12.52}
+    yRotation: 262.8
     Animation: {fileID: 7400000, guid: d40a334fb76cd9f45927030249998e56, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
-  - FieldStandardPosition: {x: 5.04, y: 11.38}
-    yRotation: -327.62
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: 5.04, y: 11.38}
+    yRotation: 32.38
     Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 1
-  - FieldStandardPosition: {x: 3, y: 6.18}
-    yRotation: -165.83
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: 3, y: 6.18}
+    yRotation: 194.17
     Animation: {fileID: 7400000, guid: d40a334fb76cd9f45927030249998e56, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 0
-  - FieldStandardPosition: {x: 3.3, y: 5}
+    AnimationTriggers: []
+  - FieldStandardPositionXZ: {x: 3.3, y: 5}
     yRotation: 0
     Animation: {fileID: 7400000, guid: e2d790e92a3329e4e9b38f7516b27a38, type: 2}
     AnimationTimeOffset: 0
     IsFriendly: 1
+    AnimationTriggers: []

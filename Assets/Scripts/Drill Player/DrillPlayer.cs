@@ -56,10 +56,17 @@ public class DrillPlayer : NetworkBehaviour {
         idx >= 0 && idx < _mirroredGateOpenTimes.Count && _mirroredGateOpenTimes[idx] >= 0f;
 
     bool _serverWaitingForStartPosition;
+    bool _serverDrillEndedRaised;
 
     /// <summary>Server side: the drill is rewound and waiting for a headset to take its spot.</summary>
     [ShowInInspector, HideInEditorMode]
     public bool IsWaitingForStartPosition => _serverWaitingForStartPosition;
+
+    /// <summary>
+    /// Server side: raised once when the running drill passes its last frame. Whoever owns the
+    /// order of the drills listens to this and activates the next one.
+    /// </summary>
+    public event Action Server_OnDrillEnded;
 
     CustomLogger _logger;
     [SerializeField, Get] NetDrillsActivator _netDrillActivator;
@@ -91,6 +98,21 @@ public class DrillPlayer : NetworkBehaviour {
     }
     public void Play() => SetSpeed(1f);
     public void Pause() => SetSpeed(0f);
+
+    /// <summary>
+    /// Coach override: starts the drill right now, whether or not a headset has taken its
+    /// spot. The start position hold is meant for a drill that came up on its own, so an
+    /// explicit start has to be able to release it.
+    /// </summary>
+    public void Server_StartNow() {
+        if (!IsServer) {
+            _logger.LogError("Attempted to start the drill on a client. This is not allowed.");
+            return;
+        }
+
+        _serverWaitingForStartPosition = false;
+        Play();
+    }
     void SetSpeed(float speed) {
         if (!IsServer) {
             _logger.LogError("Attempted to set DrillPlayer Speed on client. This is not allowed.");
@@ -153,6 +175,15 @@ public class DrillPlayer : NetworkBehaviour {
             var nominalTime = drill.Triggers[i].NominalTime;
             if (animationTime >= nominalTime)
                 Server_OpenGate(i, nominalTime);
+        }
+
+        // The drill freezes on its last frame and reports that it is done exactly once, so a
+        // listener that moves on to the next drill cannot be called again while it does so.
+        if (IsPlaying && !_serverDrillEndedRaised && ReachedMaxAnimationTime()) {
+            _serverDrillEndedRaised = true;
+            Pause();
+            _logger.Log($"Drill ended at {AnimationTime:0.00}");
+            Server_OnDrillEnded?.Invoke();
         }
     }
 
@@ -222,7 +253,7 @@ public class DrillPlayer : NetworkBehaviour {
     public override void OnNetworkDespawn() {
         base.OnNetworkDespawn();
         if (IsServer)
-            _netDrillActivator.ActiveManeuver.Sub(Server_DrillActivator_OnDrillChange);
+            _netDrillActivator.ActiveManeuver.Unsub(Server_DrillActivator_OnDrillChange);
     }
     private void Server_DrillActivator_OnDrillChange(DrillData _) => DrillActivator_OnDrillChange(); 
     private void DrillActivator_OnDrillChange() => ResetTimeAndPlay();
@@ -235,6 +266,7 @@ public class DrillPlayer : NetworkBehaviour {
         Server_ResetGates();
         AnimationTime = 0;
         _serverWaitingForStartPosition = true;
+        _serverDrillEndedRaised = false;
         IsPlaying = false;
     }
 
