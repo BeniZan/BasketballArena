@@ -4,37 +4,38 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEditor;
+using DecisionEngine.Model.Rating;
 
 public class CoachDashboardUIToolkitController : MonoBehaviour
 {
     [Header("Fonts")]
-    [SerializeField] private Font _barlow600;
-    [SerializeField] private Font _barlow700;
-    [SerializeField] private Font _barlow900;
-    [SerializeField] private Font _inter400;
-    [SerializeField] private Font _inter700;
+    [SerializeField] private Font barlow600;
+    [SerializeField] private Font barlow700;
+    [SerializeField] private Font barlow900;
+    [SerializeField] private Font inter400;
+    [SerializeField] private Font inter700;
 
     [Header("Sprites")]
-    [SerializeField] private Sprite _logoSprite;
-    [SerializeField] private Sprite _streamEyeSprite;
-    [SerializeField] private Sprite _iconRealistic;
-    [SerializeField] private Sprite _iconHologram;
-    [SerializeField] private Sprite _iconStart;
-    [SerializeField] private Sprite _iconNext;
-    [SerializeField] private Sprite _iconPause;
-    [SerializeField] private Sprite _iconStop;
-    [SerializeField] private Sprite _iconForce;
-    [SerializeField] private Sprite _iconPickAndRoll;
-    [SerializeField] private Sprite _iconShooting;
-    [SerializeField] private Sprite _iconPostPlays;
-    [SerializeField] private Sprite _iconMargin;
-    [SerializeField] private Sprite _iconRandomDrill;
-    [SerializeField] private Sprite _iconAnalytics;
+    [SerializeField] private Sprite logoSprite;
+    [SerializeField] private Sprite streamEyeSprite;
+    [SerializeField] private Sprite iconRealistic;
+    [SerializeField] private Sprite iconHologram;
+    [SerializeField] private Sprite iconStart;
+    [SerializeField] private Sprite iconNext;
+    [SerializeField] private Sprite iconPause;
+    [SerializeField] private Sprite iconStop;
+    [SerializeField] private Sprite iconForce;
+    [SerializeField] private Sprite iconPickAndRoll;
+    [SerializeField] private Sprite iconShooting;
+    [SerializeField] private Sprite iconPostPlays;
+    [SerializeField] private Sprite iconMargin;
+    [SerializeField] private Sprite iconRandomDrill;
+    [SerializeField] private Sprite iconAnalytics;
 
     [Header("Exercise Foldouts")]
-    [SerializeField] private string[] _pickAndRollDrills = { "High Screen", "Side P&R", "Horns", "Spain P&R", "Step-Up", "Drag Screen" };
-    [SerializeField] private string[] _shootingDrills = { "Catch & Shoot", "Off The Dribble", "Spot-Up Corner", "Pull-Up Mid", "Transition 3", "Free Throws" };
-    [SerializeField] private string[] _postPlaysDrills = { "Drop Step", "Up & Under", "Seal & Feed", "Face Up" };
+    [SerializeField] private string[] pickAndRollDrills = { "High Screen", "Side P&R", "Horns", "Spain P&R", "Step-Up", "Drag Screen" };
+    [SerializeField] private string[] shootingDrills = { "Catch & Shoot", "Off The Dribble", "Spot-Up Corner", "Pull-Up Mid", "Transition 3", "Free Throws" };
+    [SerializeField] private string[] postPlaysDrills = { "Drop Step", "Up & Under", "Seal & Feed", "Face Up" };
 
     private readonly Dictionary<string, System.Action> _foldoutToggleHandlers = new Dictionary<string, System.Action>();
 
@@ -64,6 +65,11 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private ListView _drillListView;
 
     private VisualElement _castingView;
+
+    // Decision engine (HoopEval) report overlay + hex-grid toggle for the player's headset
+    private DecisionCardView _decisionCard;
+    private Button _hexGridBtn;
+    private bool _hexGridOn;
     private VisualElement _castingPlaceholder;
     private UnityEngine.UIElements.Image _castingImage;
     private VisualElement _liveTag;
@@ -71,7 +77,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     // WebRTCVideoReceiver exposes no public API (no singleton, event, or property), so the
     // casting view polls its private "_recievedVideo" field via cached reflection each frame.
-    [SerializeField] WebRTCVideoReceiver _videoReceiver;
+    [SerializeField] WebRTCVideoReceiver videoReceiver;
 
     // State variables
     private readonly TrainingSession _session = new TrainingSession();
@@ -107,6 +113,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
      
     private void OnDisable()
     {
+        NetSpawnedXRData.ScoringReportReceived -= OnScoringReportReceived;
         _session.OnDrillsChanged -= HandleDrillsChanged;
         _session.OnActiveDrillChanged -= HandleActiveDrillChanged;
         if (_drillListView != null) _drillListView.itemIndexChanged -= OnDrillReordered;
@@ -152,6 +159,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         _liveTag = _root.Q<VisualElement>("liveTag");
         _streamPlaceholder = _root.Q<VisualElement>(className: "viewport-placeholder");
         SetupCastingView();
+        SetupDecisionReport();
         NetBoot.Instance.NetMnger.OnConnectionEvent += NetMnger_OnConnectionEvent;
 
         // Robustly acquire the Training Flow ListView. The runtime UI Toolkit importer in
@@ -182,14 +190,14 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         ApplySprites();
         ApplyTypography();
 
-        _pickAndRollDrills = NetDrillsActivator.Instance.AllTeamManeuvers.Select(t => t.name).ToArray();
-        _shootingDrills = new string[0];
-        _postPlaysDrills = new string[0];
+        pickAndRollDrills = NetDrillsActivator.Instance.AllTeamManeuvers.Select(t => t.name).ToArray();
+        shootingDrills = new string[0];
+        postPlaysDrills = new string[0];
 
         // Build collapsible exercise category foldouts (works in EditMode preview and PlayMode)
-        SetupExerciseFoldout("pickAndRoll", _pickAndRollDrills);
-        SetupExerciseFoldout("shooting", _shootingDrills);
-        SetupExerciseFoldout("postPlays", _postPlaysDrills);
+        SetupExerciseFoldout("pickAndRoll", pickAndRollDrills);
+        SetupExerciseFoldout("shooting", shootingDrills);
+        SetupExerciseFoldout("postPlays", postPlaysDrills);
 
         // Bind the data-driven Training Flow ListView and observe the session model.
         SetupDrillListView();
@@ -281,6 +289,53 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         return nm.ConnectedClients.Count > 0;
     }
 
+    // ---- Decision engine report ---------------------------------------------------
+
+    private void SetupDecisionReport()
+    {
+        var host = _root.Q<VisualElement>("decisionReport");
+        if (host == null) return;
+        if (_decisionCard == null)
+        {
+            _decisionCard = new DecisionCardView(barlow900, barlow700, inter400);
+            host.Add(_decisionCard);
+            _hexGridBtn = _decisionCard.AddToggle("HEX GRID", ToggleHexGrid);
+        }
+
+        NetSpawnedXRData.ScoringReportReceived -= OnScoringReportReceived;
+        NetSpawnedXRData.ScoringReportReceived += OnScoringReportReceived;
+        RefreshDecisionToggles();
+    }
+
+    private void OnScoringReportReceived(NetSpawnedXRData player, DecisionEngine.Model.Rating.ScoringReport report)
+    {
+        _decisionCard?.SetReport(report);
+    }
+
+    private static void SetHexGridOnAllPlayers(bool on)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsServer) return;
+        foreach (var client in nm.ConnectedClientsList)
+        {
+            var data = client.PlayerObject != null ? client.PlayerObject.GetComponent<NetSpawnedXRData>() : null;
+            if (data != null) data.ShowHexGrid.Value = on;
+        }
+    }
+
+    // Flip the hex-grid overlay on every connected headset (server-authoritative).
+    private void ToggleHexGrid()
+    {
+        _hexGridOn = !_hexGridOn;
+        SetHexGridOnAllPlayers(_hexGridOn);
+        RefreshDecisionToggles();
+    }
+
+    private void RefreshDecisionToggles()
+    {
+        DecisionCardView.SetToggle(_hexGridBtn, _hexGridOn, "HEX GRID", "HEX GRID ON");
+    }
+
     // ---- Casting view (player stream) -------------------------------------------
 
     private void SetupCastingView()
@@ -305,11 +360,11 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         // Locate the receiver now (Update keeps retrying if it appears later) and reflect the
         // current stream state (covers re-initialization while already streaming).
-        if (Application.isPlaying && _videoReceiver == null)
-            _videoReceiver = FindObjectOfType<WebRTCVideoReceiver>(); 
+        if (Application.isPlaying && videoReceiver == null)
+            videoReceiver = FindObjectOfType<WebRTCVideoReceiver>(); 
 
-        _videoReceiver.OnVideoTextureChanged -= VideoReceiver_OnVideoTextureChanged; 
-        _videoReceiver.OnVideoTextureChanged += VideoReceiver_OnVideoTextureChanged;
+        videoReceiver.OnVideoTextureChanged -= VideoReceiver_OnVideoTextureChanged; 
+        videoReceiver.OnVideoTextureChanged += VideoReceiver_OnVideoTextureChanged;
     }
 
     private void VideoReceiver_OnVideoTextureChanged(Texture texture) {
@@ -455,7 +510,7 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
             var lbl = new Label(drillName);
             lbl.AddToClassList("exercise-sub-text");
-            if (_barlow700 != null) lbl.style.unityFontDefinition = new StyleFontDefinition(_barlow700);
+            if (barlow700 != null) lbl.style.unityFontDefinition = new StyleFontDefinition(barlow700);
 
             row.Add(icon);
             row.Add(lbl);
@@ -511,9 +566,9 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         var label = new Label();
         label.AddToClassList("drill-item-text-uss");
-        if (_barlow700 != null)
+        if (barlow700 != null)
         {
-            label.style.unityFontDefinition = new StyleFontDefinition(_barlow700);
+            label.style.unityFontDefinition = new StyleFontDefinition(barlow700);
         }
 
         var close = new Button { text = "\u2715" }; // ✕
@@ -608,21 +663,21 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void ApplySprites()
     {
-        SetImageSprite("logoImage", _logoSprite);
-        SetImageSprite("streamEyeIcon", _streamEyeSprite);
-        SetImageSprite("realisticIcon", _iconRealistic);
-        SetImageSprite("hologramIcon", _iconHologram);
-        SetImageSprite("startIcon", _iconStart);
-        SetImageSprite("nextIcon", _iconNext);
-        SetImageSprite("pauseIcon", _iconPause);
-        SetImageSprite("stopIcon", _iconStop);
-        SetImageSprite("forceIcon", _iconForce);
-        SetImageSprite("pickAndRollIcon", _iconPickAndRoll);
-        SetImageSprite("shootingIcon", _iconShooting);
-        SetImageSprite("postPlaysIcon", _iconPostPlays);
-        SetImageSprite("marginIcon", _iconMargin);
-        SetImageSprite("randomDrillIcon", _iconRandomDrill);
-        SetImageSprite("analyticsIcon", _iconAnalytics);
+        SetImageSprite("logoImage", logoSprite);
+        SetImageSprite("streamEyeIcon", streamEyeSprite);
+        SetImageSprite("realisticIcon", iconRealistic);
+        SetImageSprite("hologramIcon", iconHologram);
+        SetImageSprite("startIcon", iconStart);
+        SetImageSprite("nextIcon", iconNext);
+        SetImageSprite("pauseIcon", iconPause);
+        SetImageSprite("stopIcon", iconStop);
+        SetImageSprite("forceIcon", iconForce);
+        SetImageSprite("pickAndRollIcon", iconPickAndRoll);
+        SetImageSprite("shootingIcon", iconShooting);
+        SetImageSprite("postPlaysIcon", iconPostPlays);
+        SetImageSprite("marginIcon", iconMargin);
+        SetImageSprite("randomDrillIcon", iconRandomDrill);
+        SetImageSprite("analyticsIcon", iconAnalytics);
 
         // The ARena logo is much wider than it is tall; Image defaults to ScaleAndCrop, which would
         // crop it inside the header slot (USS -unity-background-scale-mode doesn't affect Image.sprite).
@@ -642,10 +697,10 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
     private void ApplyTypography()
     {
-        SetFontToLabel(_timerText, _inter700);
-        SetFontToLabel(_repText, _inter400);
-        SetFontToLabel(_statusText, _barlow700);
-        SetFontToLabel(_drillsCountText, _inter400);
+        SetFontToLabel(_timerText, inter700);
+        SetFontToLabel(_repText, inter400);
+        SetFontToLabel(_statusText, barlow700);
+        SetFontToLabel(_drillsCountText, inter400);
 
         _root.Query<Label>().ForEach(lbl =>
         {
@@ -655,20 +710,20 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
                 lbl.ClassListContains("random-drill-text") || lbl.ClassListContains("analytics-text") ||
                 lbl.ClassListContains("pro-badge-text"))
             {
-                SetFontToLabel(lbl, _barlow700);
+                SetFontToLabel(lbl, barlow700);
             }
             else if (lbl.ClassListContains("viewport-header") || lbl.ClassListContains("build-session-heading"))
             {
-                SetFontToLabel(lbl, _barlow600);
+                SetFontToLabel(lbl, barlow600);
             }
             else if (lbl.ClassListContains("xr-status-text") || lbl.ClassListContains("status-timer") ||
                      lbl.ClassListContains("exercise-badge-text") || lbl.ClassListContains("upgrade-btn-text"))
             {
-                SetFontToLabel(lbl, _inter700);
+                SetFontToLabel(lbl, inter700);
             }
             else
             {
-                SetFontToLabel(lbl, _inter400);
+                SetFontToLabel(lbl, inter400);
             }
         });
     }
@@ -684,35 +739,35 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
     private void OnDestroy() {
         if(NetBoot.Instance && NetBoot.Instance.NetMnger)
             NetBoot.Instance.NetMnger.OnConnectionEvent -= NetMnger_OnConnectionEvent;
-        if (_videoReceiver)
-            _videoReceiver.OnVideoTextureChanged -= VideoReceiver_OnVideoTextureChanged;
+        if (videoReceiver)
+            videoReceiver.OnVideoTextureChanged -= VideoReceiver_OnVideoTextureChanged;
     }
 
 #if UNITY_EDITOR
     private void Reset()
     {
-        _barlow600 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Barlow Condensed_600.ttf");
-        _barlow700 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Barlow Condensed_700.ttf");
-        _barlow900 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Barlow Condensed_900.ttf");
-        _inter400 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Inter_400.ttf");
-        _inter700 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Inter_700.ttf");
+        barlow600 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Barlow Condensed_600.ttf");
+        barlow700 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Barlow Condensed_700.ttf");
+        barlow900 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Barlow Condensed_900.ttf");
+        inter400 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Inter_400.ttf");
+        inter700 = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Figma/Fonts/Inter_700.ttf");
 
         string spriteDir = "Assets/UI/FigmaImport/CoachDashboard";
-        _logoSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Container.png");
-        _streamEyeSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Container_1_87.png");
-        _iconRealistic = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon.png");
-        _iconHologram = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_80.png");
-        _iconStart = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_112.png");
-        _iconNext = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_117.png");
-        _iconPause = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_123.png");
-        _iconStop = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_129.png");
-        _iconForce = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_134.png");
-        _iconPickAndRoll = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_148.png");
-        _iconShooting = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_156.png");
-        _iconPostPlays = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_164.png");
-        _iconMargin = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_margin.png");
-        _iconRandomDrill = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_188.png");
-        _iconAnalytics = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_200.png");
+        logoSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Container.png");
+        streamEyeSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Container_1_87.png");
+        iconRealistic = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon.png");
+        iconHologram = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_80.png");
+        iconStart = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_112.png");
+        iconNext = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_117.png");
+        iconPause = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_123.png");
+        iconStop = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_129.png");
+        iconForce = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_134.png");
+        iconPickAndRoll = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_148.png");
+        iconShooting = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_156.png");
+        iconPostPlays = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_164.png");
+        iconMargin = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_margin.png");
+        iconRandomDrill = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_188.png");
+        iconAnalytics = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteDir + "/Icon_1_200.png");
     }
 #endif
 }

@@ -31,6 +31,7 @@
                     <ui:Label text="Awaiting Player Stream" class="viewport-header"/>
                     <ui:Label text="Start session to view live POV" class="viewport-subtext"/>
                 </ui:VisualElement>
+                <ui:VisualElement name="decisionReport" class="decision-host"/>
             </ui:VisualElement>
             <ui:VisualElement class="bottom-control-bar">
                 <ui:VisualElement name="controller" class="control-bar-inner">

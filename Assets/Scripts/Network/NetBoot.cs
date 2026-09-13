@@ -126,6 +126,27 @@ public class NetBoot : SingletonMono<NetBoot> {
         _netMng.OnConnectionEvent -= NetMng_OnConnectionEvent;
         _netMng.OnServerStarted -= NetMng_OnServerStarted;
         _netMng.OnPreShutdown -= NetMng_OnShutdown; 
+        ForceReleaseTransport();
+    }
+
+    private void OnApplicationQuit() {
+        ForceReleaseTransport();
+    }
+
+    // NGO shuts the transport down asynchronously; when Play mode is stopped (or the app
+    // quits) mid-session the domain can unload before the native UDP socket is closed,
+    // leaving port 7777 bound inside the editor process until Unity is restarted
+    // ("Server failed to bind" on the next Play). Force a synchronous release here.
+    void ForceReleaseTransport() {
+        if (!_netMng) return;
+        try {
+            if (_netMng.IsListening && !_netMng.ShutdownInProgress)
+                _netMng.Shutdown(discardMessageQueue: true);
+            var transport = _netMng.NetworkConfig?.NetworkTransport;
+            if (transport) transport.Shutdown();
+        } catch (Exception e) {
+            Debug.LogWarning($"[NetBoot] Transport release on teardown threw: {e.Message}", this);
+        }
     }
 
 #if UNITY_EDITOR 

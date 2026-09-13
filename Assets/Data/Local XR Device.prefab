@@ -409,6 +409,10 @@ GameObject:
   - component: {fileID: 650769533150834104}
   - component: {fileID: 118851635660374947}
   - component: {fileID: 6982249563916527128}
+  - component: {fileID: 5816307049958330000}
+  - component: {fileID: 5816307049958330002}
+  - component: {fileID: 5816307049958330006}
+  - component: {fileID: 5816307049958330003}
   m_Layer: 0
   m_Name: Local XR Device
   m_TagString: Untagged
@@ -539,6 +543,84 @@ MonoBehaviour:
       onPermissionDenied:
         m_PersistentCalls:
           m_Calls: []
+--- !u!114 &5816307049958330000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122369787266574141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1d3c5e7f9b2400d8e6f1a2b3c4d5e01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dt: 0.2
+  hexesAcross: 15
+  shotBaseline: 0.4
+  qsqParams:
+    intercept: 0.6
+    distancePenalty: 0.425
+    defenderBonus: 0.5
+    defenderDistanceCap: 3
+  movement:
+    maxRing: 1
+    blockedRadius: 0.6
+    decisionWindowSeconds: 3
+  showHexagons: 0
+  colorByQsq: 0
+  driftCheck: 1
+  driftWarnMeters: 0.3
+--- !u!114 &5816307049958330002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122369787266574141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1d3c5e7f9b2400d8e6f1a2b3c4d5e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5816307049958330006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122369787266574141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1d3c5e7f9b2400d8e6f1a2b3c4d5e09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parameters:
+    gatherWristHeight: -0.35
+    gatherHandsDistance: 0.35
+    gatherLookbackSeconds: 0.7
+    releaseWristSpeed: 2
+    releaseWristHeight: 0
+    followThroughPalmAlignment: 0.3
+    velocityWindowSeconds: 0.06
+    minConfidence: 0.6
+    refractorySeconds: 2
+  verbose: 1
+--- !u!114 &5816307049958330003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122369787266574141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1d3c5e7f9b2400d8e6f1a2b3c4d5e04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drawGrid: 1
+  drawPaths: 1
+  drawOpponents: 1
 --- !u!1 &2257610829456435984
 GameObject:
   m_ObjectHideFlags: 0
