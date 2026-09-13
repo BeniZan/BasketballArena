@@ -3,14 +3,14 @@ using UnityEngine;
 using Field.Hexagons;
 
 namespace DecisionEngine.Model.Environment {
-    // Physical constraints on the evaluated player. HoopEval's raw action space (any of the
-    // 19 nearest hexes per 0.2 s) allows ~10 m/s and running through defenders; with scripted,
-    // non-reacting opponents that makes "sprint to the rim" trivially optimal. These knobs
-    // keep the optimal path human and consistent with the test bot.
+    // Physical constraints on the evaluated player. HoopEval's action space (any of the 19
+    // nearest hexes per 0.2 s) says nothing about running through defenders, and with scripted,
+    // non-reacting opponents an unbounded horizon makes "sprint to the rim" trivially optimal.
+    // These knobs keep the optimal path human.
     [Serializable]
     public class MovementModel {
-        [Tooltip("How many hex rings the player may move per frame: 1 ≈ 5 m/s bursts (realistic), 2 = the paper's full 19-cell action space (~10 m/s).")]
-        [Range(1, 2)] public int maxRing = 1;
+        [Tooltip("How many hex rings the player may move per 0.2 s frame. With the paper's cell size (20 across): 1 = one cell ≈ 3.8 m/s (jog), 2 = the paper's full 19-cell action space, up to ≈ 7.5 m/s (sprint).")]
+        [Range(1, 2)] public int maxRing = 2;
 
         [Tooltip("Cells whose center is within this many meters of an opponent are impassable (you cannot run through a defender).")]
         [Min(0f)] public float blockedRadius = 0.6f;

@@ -556,7 +556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dt: 0.2
-  hexesAcross: 15
+  hexesAcross: 20
   shotBaseline: 0.4
   qsqParams:
     intercept: 0.6
@@ -564,7 +564,7 @@ MonoBehaviour:
     defenderBonus: 0.5
     defenderDistanceCap: 3
   movement:
-    maxRing: 1
+    maxRing: 2
     blockedRadius: 0.6
     decisionWindowSeconds: 3
   showHexagons: 0

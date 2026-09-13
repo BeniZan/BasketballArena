@@ -41,7 +41,7 @@ clock, headset, hand tracking, Netcode) into the core's inputs.
 
 ```
 drill activated ─► wait 2 frames for characters ─► CalibratedCourtFrame (adaptive size)
-   ─► HexagonGrid (15 hexes across the calibrated width) ─► LiveTrajectoryCapture (≈50 ms)
+   ─► HexagonGrid (20 hexes across the calibrated width ≈ HoopEval's 454 cells per half court) ─► LiveTrajectoryCapture (≈50 ms)
    ─► qSQ table ─► drill clock starts ─► BackwardInduction from the player's cell
    ─► 5 Hz OnFrame from HeadCam ─► shot recognized (wrist kinematics) / Space / Force Shot ─► ScoringReport
    ─► CustomLogger + NetSpawnedXRData.SubmitScoringReport ─► coach dashboard panel

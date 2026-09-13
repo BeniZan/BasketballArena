@@ -7,9 +7,12 @@ namespace Field.Hexagons {
     
     // A Hex grid we are using to divide the court to hexagons
     public sealed class HexagonGrid {
-        // According to MIT Sloan paper:
-        // 15 Hexagons, each with a radius of 0.6 meters (Normal person's step length)
-        public const int DefaultHexagonsCount = 15;
+        // HoopEval (MIT Sloan) discretizes a half court into ~454 hexagons. With cells kept when
+        // their center is on the court, 20 hexagons across a 15 m width gives 450 cells:
+        // radius ≈ 0.43 m, adjacent centers 0.75 m apart. At 5 Hz that makes one cell per frame
+        // a jog (3.8 m/s) and two cells a sprint (7.5 m/s), so the paper's 19-move action
+        // space is physically plausible.
+        public const int DefaultHexagonsCount = 20;
 
         // Number of movement actions:
         // 1. Stay
