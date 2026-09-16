@@ -317,6 +317,11 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         if (drillPlayer.IsWaitingForStartPosition)
             return "WAITING FOR PLAYER";
 
+        // The digits are intentionally headset-only, but the coach still needs a truthful
+        // non-numeric status while the player sees the synchronized countdown.
+        if (drillPlayer.IsCountdownActive)
+            return "STARTING";
+
         int waitingIdx = drillPlayer.WaitingGateIndex;
         if (waitingIdx < 0) return null;
 
@@ -440,9 +445,9 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
         if (_session.ActiveIndex < 0)
             _session.Start();
 
-        // Activating a drill puts it on hold until the headset is on its mark, and that hold
-        // is set from inside _session.Start() above. START is the coach saying "run it now",
-        // so it releases the hold instead of leaving the drill frozen on frame zero.
+        // Activating a drill puts it on hold until the headset is on its mark. START is an
+        // override of that position hold, but still runs the same synchronized 3-2-1 shown
+        // to the player before playback begins.
         var drillPlayer = DrillPlayer.Instance;
         if (drillPlayer != null)
             drillPlayer.Server_StartNow();
@@ -541,9 +546,14 @@ public class CoachDashboardUIToolkitController : MonoBehaviour
 
         if (drillPlayer.IsWaitingForStartPosition)
         {
-            drillPlayer.IsPlaying = true; // overrides the start position hold
+            drillPlayer.Server_StartNow();
             return true;
         }
+
+        // Do not let a second FORCE click release the first animation gate while the
+        // pre-drill countdown is still in progress.
+        if (drillPlayer.IsCountdownActive)
+            return true;
 
         if (drillPlayer.WaitingGateIndex < 0) return false;
 

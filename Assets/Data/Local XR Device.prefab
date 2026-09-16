@@ -2109,6 +2109,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 657184242118504722, guid: d6878e1999eb4b44a9f5a263af86c185, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8412663077195430118}
+    - targetCorrespondingSourceObject: {fileID: 657184242118504722, guid: d6878e1999eb4b44a9f5a263af86c185, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7291048576123409876}
     - targetCorrespondingSourceObject: {fileID: 6355494128053973299, guid: d6878e1999eb4b44a9f5a263af86c185, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7770843320478321102}
@@ -2297,6 +2300,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::XRTriggerProximity
   _enterRadius: 0.75
   _exitRadius: 1.1
+--- !u!114 &7291048576123409876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4829052437376163218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c0dc843d564083af399a58d29f7417, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::XRCountdownHUD
+  _canvas: {fileID: 0}
+  _canvasGroup: {fileID: 0}
+  _countdownText: {fileID: 0}
+  _content: {fileID: 0}
+  _digitPulseDuration: 0.25
+  _digitStartScale: 1.15
 --- !u!20 &4829052437376163220 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 657184242118504724, guid: d6878e1999eb4b44a9f5a263af86c185, type: 3}

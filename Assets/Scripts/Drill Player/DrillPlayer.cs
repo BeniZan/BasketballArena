@@ -29,6 +29,29 @@ public class DrillPlayer : NetworkBehaviour {
         }
     }
 
+    [SerializeField, Min(1f)] float _countdownDuration = 3f;
+    readonly NetworkVariable<double> _syncCountdownEndTime = new(
+        0d,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+
+    /// <summary>True on every peer while the server-authoritative pre-drill countdown is running.</summary>
+    public bool IsCountdownActive => _syncCountdownEndTime.Value > 0d;
+
+    /// <summary>The synchronized digit the XR HUD should currently display, or zero when hidden.</summary>
+    public int CountdownNumber {
+        get {
+            if (!IsCountdownActive)
+                return 0;
+
+            var remaining = _syncCountdownEndTime.Value - CurrentNetworkTime;
+            return Mathf.Clamp(Mathf.CeilToInt((float)remaining), 1, Mathf.CeilToInt(_countdownDuration));
+        }
+    }
+
+    double CurrentNetworkTime =>
+        NetworkManager.Singleton ? NetworkManager.Singleton.ServerTime.Time : 0d;
+
     // One entry per trigger of the active drill, holding the animation time the gate opened
     // at, or DrillSegmentResolver.GATE_CLOSED while it is still shut. Server authoritative:
     // clients report that they reached a trigger, the server decides when a gate opens.
@@ -100,9 +123,8 @@ public class DrillPlayer : NetworkBehaviour {
     public void Pause() => SetSpeed(0f);
 
     /// <summary>
-    /// Coach override: starts the drill right now, whether or not a headset has taken its
-    /// spot. The start position hold is meant for a drill that came up on its own, so an
-    /// explicit start has to be able to release it.
+    /// Coach override: starts the synchronized countdown whether or not a headset has taken
+    /// its spot. Calling this on an already-running drill keeps the old resume behaviour.
     /// </summary>
     public void Server_StartNow() {
         if (!IsServer) {
@@ -110,8 +132,20 @@ public class DrillPlayer : NetworkBehaviour {
             return;
         }
 
+        if (IsCountdownActive)
+            return;
+
+        // Debug controls also use this API to resume a paused drill. Only frame zero is a
+        // pre-drill start and therefore needs the countdown.
+        if (AnimationTime > 0f) {
+            Play();
+            return;
+        }
+
         _serverWaitingForStartPosition = false;
-        Play();
+        Pause();
+        _syncCountdownEndTime.Value = CurrentNetworkTime + _countdownDuration;
+        _logger.Log($"Starting drill countdown ({_countdownDuration:0.#} seconds)");
     }
     void SetSpeed(float speed) {
         if (!IsServer) {
@@ -154,15 +188,25 @@ public class DrillPlayer : NetworkBehaviour {
         if (!drill)
             return;
 
-        // Hold the drill on frame zero until a headset is standing on the start position.
-        // A coach who presses play anyway overrides the hold.
-        if (_serverWaitingForStartPosition) {
-            if (!IsPlaying && !Server_AnyXRPlayerInStartingPosition())
+        // Keep animation time and trigger gates frozen until the shared server timestamp is
+        // reached. Clients derive their displayed digit from this same timestamp.
+        if (IsCountdownActive) {
+            if (CurrentNetworkTime < _syncCountdownEndTime.Value)
                 return;
 
-            _serverWaitingForStartPosition = false;
-            if (!IsPlaying)
-                IsPlaying = true;
+            _syncCountdownEndTime.Value = 0d;
+            Play();
+            return;
+        }
+
+        // Hold the drill on frame zero until a headset is standing on the start position.
+        // Reaching it begins the same countdown used by the coach override.
+        if (_serverWaitingForStartPosition) {
+            if (!Server_AnyXRPlayerInStartingPosition())
+                return;
+
+            Server_StartNow();
+            return;
         }
 
         // A gate that the player never walked into still has to open, otherwise the drill
@@ -264,6 +308,8 @@ public class DrillPlayer : NetworkBehaviour {
     /// </summary>
     public void ResetTimeAndPlay() {
         Server_ResetGates();
+        if (IsServer)
+            _syncCountdownEndTime.Value = 0d;
         AnimationTime = 0;
         _serverWaitingForStartPosition = true;
         _serverDrillEndedRaised = false;
