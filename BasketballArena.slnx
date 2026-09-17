@@ -2,6 +2,7 @@
   <Project Path="Unity.Timeline.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStats.csproj" />
   <Project Path="Unity.RenderPipelines.GPUDriven.Runtime.csproj" />
+  <Project Path="Unity.XR.ARFoundation.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStatsMonitor.Configuration.csproj" />
   <Project Path="Unity.ShaderGraph.Editor.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.csproj" />
@@ -28,7 +29,6 @@
   <Project Path="Unity.Netcode.Runtime.csproj" />
   <Project Path="Unity.VisualStudio.Editor.csproj" />
   <Project Path="Unity.InputSystem.csproj" />
-  <Project Path="Unity.XR.ARFoundation.csproj" />
   <Project Path="Unity.XR.Interaction.Toolkit.Editor.csproj" />
   <Project Path="PPv2URPConverters.csproj" />
   <Project Path="Unity.XR.CoreUtils.csproj" />
@@ -160,6 +160,7 @@
   <Project Path="Unity.Timeline.Player.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStats.Player.csproj" />
   <Project Path="Unity.RenderPipelines.GPUDriven.Runtime.Player.csproj" />
+  <Project Path="Unity.XR.ARFoundation.Player.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStatsMonitor.Configuration.Player.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.Player.csproj" />
   <Project Path="Unity.Mathematics.Player.csproj" />
@@ -175,7 +176,6 @@
   <Project Path="Unity.XR.Interaction.Toolkit.Player.csproj" />
   <Project Path="Unity.Netcode.Runtime.Player.csproj" />
   <Project Path="Unity.InputSystem.Player.csproj" />
-  <Project Path="Unity.XR.ARFoundation.Player.csproj" />
   <Project Path="Unity.XR.CoreUtils.Player.csproj" />
   <Project Path="Unity.Multiplayer.Tools.MetricTypes.Player.csproj" />
   <Project Path="Unity.XR.Hands.Player.csproj" />

@@ -40,8 +40,8 @@ public class WebRTCVideoSender : MonoBehaviour
 
 #if UNITY_EDITOR
     UniversalRenderPipeline.SingleCameraRequest _camRequest;
-#endif
-    private void Awake() {
+#endif 
+    private void Start() {
         if (!_logger.PingObj)
             _logger = new CustomLogger(this, Color.green, "[WebRTC-Sender]");
         WebRTCHandshakeManager.Instance.OnServerHandshakeResponse += Handshake_OnServerHandshakeResponse;
@@ -50,8 +50,9 @@ public class WebRTCVideoSender : MonoBehaviour
         _awaitGettingWebcamTexture = AwaitGetQuestWebcam();
     }
 
+
 #if UNITY_ANDROID
-	async Awaitable AwaitAndroidPermission(string permission){
+    async Awaitable AwaitAndroidPermission(string permission){
         if (Permission.HasUserAuthorizedPermission(permission))
             return;
         Permission.RequestUserPermission(permission);
