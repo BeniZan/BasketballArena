@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.Hands;
@@ -15,6 +16,7 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
     private static WaitForSeconds _waitForRetryConnectXR = new WaitForSeconds(RetryConnectXRDelay);
     static public bool ENABLE_SIMULATED_ROOM => Application.isEditor;
     [field: SerializeField] public XROrigin Origin { get; private set; }
+    [field: SerializeField] public ARRaycastManager RaycastManager { get; private set; }
     [field: SerializeField] public ARAnchorManager AnchorManager { get; private set; }
     [field: SerializeField] public Camera HeadCam { get; private set; }
     [field: SerializeField] public ARRaycastManager Raycaster { get; private set; }
@@ -69,7 +71,8 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         _logger = new CustomLogger(this, Color.green);
         LeftTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
         RightTracking.trackingChanged.AddListener(_ => OnTrackingChanged());
-    }
+    } 
+
     private void OnEnable() => StartXR(); 
     private void OnDisable() => StopXR(); 
     void OnTrackingChanged() { 
@@ -81,6 +84,18 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         StopAllCoroutines();
         StartCoroutine(StartXRCoroutine());
         _arSession.enabled = true;
+        AwaitPermission();
+    }
+
+    async void AwaitPermission() {
+        var perm = "com.oculus.permission.USE_SCENE";
+        while (!Permission.HasUserAuthorizedPermission(perm) || !this || !enabled) {
+            _logger.LogWarning("Waiting for " + perm + " permission...");
+            Permission.RequestUserPermission(perm);
+            await Awaitable.WaitForSecondsAsync(1f);
+        }
+        if(this && enabled)
+            RaycastManager.enabled = true;
     }
 
     void StopXR() {

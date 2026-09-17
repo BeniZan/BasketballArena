@@ -447,7 +447,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::XRDevice
   <Origin>k__BackingField: {fileID: 6007754690238498127}
-  <AnchorManager>k__BackingField: {fileID: 0}
+  <RaycastManager>k__BackingField: {fileID: 5644926542321279588}
+  <AnchorManager>k__BackingField: {fileID: 8989269072028892189}
   <HeadCam>k__BackingField: {fileID: 4829052437376163220}
   <Raycaster>k__BackingField: {fileID: 5644926542321279588}
   <CenterEyes>k__BackingField: {fileID: 4829052437376163217}
