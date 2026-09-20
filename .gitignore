@@ -97,3 +97,8 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Local dev tooling (not part of the product)
+.idea/
+Assets/Samples/XR Interaction Toolkit/3.3.2/XR Device Simulator*
+Assets/Samples/XR Interaction Toolkit/3.3.2/XR Interaction Simulator*

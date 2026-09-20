@@ -6,7 +6,8 @@ public class ValidateDrillXRPosition : MonoBehaviour
     {
         if (Calibration.Instance.IsDoneCalibration && 
             NetSpawnedXRData.Local &&
-            XRDrillActivator.Instance && XRDrillActivator.Instance.DrillOrigin) {
+            XRDrillActivator.Instance && XRDrillActivator.Instance.DrillOrigin &&
+            XRDrillActivator.Instance.CurrentDrill) {
 
             var XRdrill = XRDrillActivator.Instance;
             var drill = XRdrill.CurrentDrill;

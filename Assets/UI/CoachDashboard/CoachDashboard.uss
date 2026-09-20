@@ -680,3 +680,78 @@
     color: rgb(100, 116, 139);
     margin-top: 10px;
 }
+
+/* ---- Decision Quality card (shared by coach dashboard and headset HUD) ---- */
+.decision-host {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+}
+
+.decision-card {
+    width: 260px;
+    align-items: center;
+    padding: 18px 16px 14px 16px;
+    background-color: rgba(17, 19, 26, 0.92);
+    border-radius: 24px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.decision-rings {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.decision-ring {
+    width: 104px;
+    height: 104px;
+    margin: 0 6px;
+}
+
+.ring-value {
+    font-size: 30px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    margin: 0;
+    padding: 0;
+}
+
+.ring-caption {
+    font-size: 8px;
+    letter-spacing: 3px;
+    -unity-text-align: middle-center;
+    color: rgb(120, 132, 152);
+    margin-top: -1px;
+}
+
+.decision-toggles {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.decision-pill {
+    margin: 0 4px;
+    padding: 7px 14px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-width: 0;
+    color: rgb(170, 180, 196);
+    transition-property: background-color, color;
+    transition-duration: 0.15s;
+}
+
+.decision-pill:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: rgb(255, 255, 255);
+}
+
+.decision-pill.on {
+    background-color: rgb(0, 212, 255);
+    color: rgb(10, 12, 18);
+}
