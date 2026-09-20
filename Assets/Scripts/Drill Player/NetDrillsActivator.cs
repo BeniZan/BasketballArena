@@ -23,8 +23,9 @@ public class NetDrillsActivator : OdinNetworkBehaviour {
     NetworkVariable<FixedString512Bytes> _syncActiveManeuver 
         = new(new FixedString512Bytes(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    [ShowInInspector]
+    [ShowInInspector, Sirenix.OdinInspector.ReadOnly]
     readonly Notifier<DrillData> _activeManeuver =  new();
+    public NetworkVariable<bool> IsHologram = new NetworkVariable<bool>();
     public ReadOnlyNotifier<DrillData> ActiveManeuver => _activeManeuver;
     public IReadOnlyList<DrillData> AllTeamManeuvers => _allTeamManeuvers;
     public int ActiveManeuverIdx => _activeManeuver.Value ? _allTeamManeuvers.IndexOf(_activeManeuver.Value) : -1;
@@ -53,6 +54,9 @@ public class NetDrillsActivator : OdinNetworkBehaviour {
         var name = cur.ToString();
         _activeManeuver.Value = string.IsNullOrEmpty(name) ? null : GetDrill(name); 
     }
+
+    [Button] 
+    void SetHologram(bool isHologram) => IsHologram.Value = isHologram;
 
     public void Server_SetActiveDrill(int i) => _syncActiveManeuver.Value = _allTeamManeuvers[i].name;
     [Button, ShowIf(nameof(IsServer))]

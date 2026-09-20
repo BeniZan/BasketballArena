@@ -73,15 +73,22 @@ public class DrillPlayer : NetworkBehaviour {
 
     private void Awake() {
         _logger = new CustomLogger(this, Color.magenta);
-        _instance = this;
+        _instance = this; 
     }
 
     public override void OnNetworkSpawn() {
         base.OnNetworkSpawn();
-        if(IsServer)
-            _netDrillActivator.ActiveManeuver.Sub(Server_DrillActivator_OnDrillChange);
+        if (IsServer) {
+            _netDrillActivator.ActiveManeuver.Sub(Server_DrillActivator_OnDrillChange); 
+        }
     }
 
+    public override void OnNetworkPreDespawn() {
+        base.OnNetworkPreDespawn();
+        if (IsServer)
+            _netDrillActivator.ActiveManeuver.Unsub(Server_DrillActivator_OnDrillChange);
+    }
+     
     public bool ReachedMaxAnimationTime() {
         if (!IsSpawned)
             return false;

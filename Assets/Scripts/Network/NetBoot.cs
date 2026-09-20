@@ -112,7 +112,7 @@ public class NetBoot : SingletonMono<NetBoot> {
         } 
 
         if(data.EventType == ConnectionEvent.ClientConnected) { 
-            if(data.ClientId != NetworkManager.ServerClientId) { 
+            if(data.ClientId != NetworkManager.ServerClientId && nm.IsServer) { 
                 _logger.Log("Spawning XR Network object for clientId: " + data.ClientId);
                 nm.SpawnManager.InstantiateAndSpawn(_XRClientPrefab, data.ClientId, true, true);
             }

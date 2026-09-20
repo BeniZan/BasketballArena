@@ -10,7 +10,7 @@ public class ValidateDrillXRPosition : MonoBehaviour
 
             var XRdrill = XRDrillActivator.Instance;
             var drill = XRdrill.CurrentDrill;
-            var startPos = XRdrill.DrillOrigin.TransformPoint(drill.PlayerStartPosition);
+            var startPos = XRdrill.DrillOrigin.TransformPoint(drill.LocalPlayerStartPosition);
             var startPosXZ = startPos.XZ();
             var posXZ = transform.position.XZ();
             var distance = startPosXZ.Distance(posXZ);

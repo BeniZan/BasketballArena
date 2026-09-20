@@ -84,10 +84,12 @@ public class XRDeviceInstance : SingletonBehaviors.SingletonMono<XRDeviceInstanc
         StopAllCoroutines();
         StartCoroutine(StartXRCoroutine());
         _arSession.enabled = true;
-        AwaitPermission();
+        AwaitEnableARRaycastManager();
     }
 
-    async void AwaitPermission() {
+    async void AwaitEnableARRaycastManager() {
+        await Awaitable.NextFrameAsync();
+        await Awaitable.WaitForSecondsAsync(1f);
         var perm = "com.oculus.permission.USE_SCENE";
         while (!Permission.HasUserAuthorizedPermission(perm) || !this || !enabled) {
             _logger.LogWarning("Waiting for " + perm + " permission...");

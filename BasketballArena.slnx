@@ -2,7 +2,6 @@
   <Project Path="Unity.Timeline.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStats.csproj" />
   <Project Path="Unity.RenderPipelines.GPUDriven.Runtime.csproj" />
-  <Project Path="Unity.XR.ARFoundation.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStatsMonitor.Configuration.csproj" />
   <Project Path="Unity.ShaderGraph.Editor.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.csproj" />
@@ -29,6 +28,7 @@
   <Project Path="Unity.Netcode.Runtime.csproj" />
   <Project Path="Unity.VisualStudio.Editor.csproj" />
   <Project Path="Unity.InputSystem.csproj" />
+  <Project Path="Unity.XR.ARFoundation.csproj" />
   <Project Path="Unity.XR.Interaction.Toolkit.Editor.csproj" />
   <Project Path="PPv2URPConverters.csproj" />
   <Project Path="Unity.XR.CoreUtils.csproj" />
@@ -94,6 +94,7 @@
   <Project Path="Unity.Multiplayer.Tools.NetworkProfiler.Runtime.csproj" />
   <Project Path="Unity.InputSystem.ForUI.csproj" />
   <Project Path="Unity.XR.Interaction.Toolkit.CodeSamples.Tests.csproj" />
+  <Project Path="Drills.csproj" />
   <Project Path="Unity.AI.Navigation.csproj" />
   <Project Path="Unity.XR.Interaction.Toolkit.Analytics.Hooks.Editor.csproj" />
   <Project Path="Unity.Collections.CodeGen.csproj" />
@@ -126,7 +127,6 @@
   <Project Path="Unity.XR.Interaction.Toolkit.Samples.WorldSpaceUI.Editor.csproj" />
   <Project Path="Unity.XR.OpenXR.Features.RuntimeDebugger.csproj" />
   <Project Path="UnityEngine.SpatialTracking.csproj" />
-  <Project Path="Drills.csproj" />
   <Project Path="Unity.XR.OpenXR.Features.OculusQuestSupport.Editor.csproj" />
   <Project Path="UnityEngine.XR.LegacyInputHelpers.csproj" />
   <Project Path="Unity.XR.Hands.Samples.Gestures.Editor.csproj" />
@@ -160,7 +160,6 @@
   <Project Path="Unity.Timeline.Player.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStats.Player.csproj" />
   <Project Path="Unity.RenderPipelines.GPUDriven.Runtime.Player.csproj" />
-  <Project Path="Unity.XR.ARFoundation.Player.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStatsMonitor.Configuration.Player.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.Player.csproj" />
   <Project Path="Unity.Mathematics.Player.csproj" />
@@ -176,6 +175,7 @@
   <Project Path="Unity.XR.Interaction.Toolkit.Player.csproj" />
   <Project Path="Unity.Netcode.Runtime.Player.csproj" />
   <Project Path="Unity.InputSystem.Player.csproj" />
+  <Project Path="Unity.XR.ARFoundation.Player.csproj" />
   <Project Path="Unity.XR.CoreUtils.Player.csproj" />
   <Project Path="Unity.Multiplayer.Tools.MetricTypes.Player.csproj" />
   <Project Path="Unity.XR.Hands.Player.csproj" />
@@ -206,6 +206,7 @@
   <Project Path="Unity.InternalAPIEngineBridge.003.Player.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetworkProfiler.Runtime.Player.csproj" />
   <Project Path="Unity.InputSystem.ForUI.Player.csproj" />
+  <Project Path="Drills.Player.csproj" />
   <Project Path="Unity.AI.Navigation.Player.csproj" />
   <Project Path="Unity.XR.Management.Player.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetVis.Configuration.Player.csproj" />
@@ -222,7 +223,6 @@
   <Project Path="Wingman.Player.csproj" />
   <Project Path="Unity.XR.OpenXR.Features.RuntimeDebugger.Player.csproj" />
   <Project Path="UnityEngine.SpatialTracking.Player.csproj" />
-  <Project Path="Drills.Player.csproj" />
   <Project Path="UnityEngine.XR.LegacyInputHelpers.Player.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Shaders.Player.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.Shared.Player.csproj" />

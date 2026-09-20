@@ -12,17 +12,34 @@ using UnityEngine.XR.ARFoundation;
 
 public class XRDrillActivator : SingletonMono<XRDrillActivator> { 
     [SerializeField] CharComponent _templateChar;
+    [SerializeField] NetDrillsActivator _netDrillActivator;
     [SerializeField, ReadOnly] List<CharComponent> _spawnedChars = new List<CharComponent>();
     [ShowInInspector, ReadOnly, HideInEditorMode] DrillData _currentActive;
     [ShowInInspector, HideInEditorMode, ReadOnly] Transform _courtCenter, _drillOrigin;
-
     public Transform DrillOrigin => _drillOrigin;
     public DrillData CurrentDrill => _currentActive;
-
+    bool _isHologram;
     public IReadOnlyList<CharComponent> PlacedChars => _spawnedChars;
     protected override void Awake() {
-        base.Awake(); 
-    } 
+        base.Awake();
+        _netDrillActivator.IsHologram.OnValueChanged += OnIsHologram;
+    }
+
+    protected override void OnDestroy() {
+        base.OnDestroy();
+        _netDrillActivator.IsHologram.OnValueChanged -= OnIsHologram;
+    }
+
+    void OnIsHologram(bool _, bool isHologram) {
+        _isHologram = isHologram;
+        ValidateHoligram();
+    }
+    void ValidateHoligram() {
+        foreach (var character in _spawnedChars) {
+            character.SetHologram(_isHologram);
+        }
+    }
+
     public void Activate(DrillData move) {
         if (_currentActive)
             Deactivate();
@@ -73,6 +90,8 @@ public class XRDrillActivator : SingletonMono<XRDrillActivator> {
                 _spawnedChars[i].gameObject.SafeDestroy();
             _spawnedChars.RemoveAt(i);
         }
+
+        ValidateHoligram();
     }
 
     private void Update() {
